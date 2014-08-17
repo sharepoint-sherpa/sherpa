@@ -1,0 +1,72 @@
+﻿{
+   "Description" : "Sherpa Demo - root site",
+   "Language"    : "1033",
+   "Name"        : "Sherpa Demo",
+   "Quicklaunch" : {
+		"Home": "",
+		"Standarddokumenter": "Standarddokumenter",
+		"Porteføljeoversikt" : "SitePages/PortefoljeOversikt.aspx",
+		"Erfaringslogg": "SitePages/Erfaringslogg.aspx",
+		"Områdeinnhold": ""
+	},
+   "SiteFeatures": [],
+   "Template"    : "",
+   "Url"         : "/",
+   "WebFeatures" : [
+	{
+		"FeatureId"  : "48a243cb-7b16-4b5a-b1b5-07b809b43f47",
+		"FeatureName": "SearchConfigContentType"
+	},	  
+	{
+		"FeatureId"  : "e47705ec-268d-4c41-aa4e-0d8727985ebc",
+		"FeatureName": "SearchConfigListTemplate"
+	},	  
+	{
+		"FeatureId"  : "acb15743-f07b-4c83-8af3-ffcfdf354965",
+		"FeatureName": "SearchConfigList"
+	}
+   ],
+   "Webs"        : [
+		{
+			"Description" : "Sherpa Subsite demo",
+			"Language"    : "1033",
+			"Name"        : "Sherpa Subsite",
+			"Template"    : "STS#0",
+			"Url"         : "subsite1",
+			"Quicklaunch" : {
+				"Home": "",
+				"Testlink": "Testlink",
+				"Google" : "http://google.com"				
+			},
+			"WebFeatures" : [
+				{
+					"FeatureId"  : "ec918931-c874-4033-bd09-4f36b2e31fef",
+					"FeatureName": "WorkflowAppOnlyPolicyManager",
+					"ReactivateAlways": "true"
+				}
+			],
+			"Webs" : [
+				{
+					"Description" : "Sherpa Subsite demo",
+					"Language"    : "1033",
+					"Name"        : "Sherpa Subsite",
+					"Template"    : "STS#0",
+					"Url"         : "subsite1",
+					"Quicklaunch" : {
+					"Home": "",
+					"Testlink": "Testlink",
+					"Google" : "http://google.com"				
+					},
+					"WebFeatures" : [
+						{
+							"FeatureId"  : "ec918931-c874-4033-bd09-4f36b2e31fef",
+							"FeatureName": "WorkflowAppOnlyPolicyManager",
+							"ReactivateAlways": "true"
+						}
+					],
+					"Webs"        : []
+				}
+			]
+		}
+   ]
+}

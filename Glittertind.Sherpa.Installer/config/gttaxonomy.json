@@ -1,0 +1,24 @@
+{
+  "TermSets": [
+    {
+      "Terms": [
+        {
+          "Title": "Term A",
+          "Id": "f75c72ff-05e4-46c1-9fb6-68ea8c8854f8"
+        },
+        {
+          "Title": "Term B",
+          "Id": "7249a133-2d20-45d5-9163-1d488cc739db"
+        },
+        {
+          "Title": "Term C",
+          "Id": "3881f94d-8508-46b4-8acd-9ecc2b52a5b0"
+        }
+      ],
+      "Title": "Sherpa Term Set",
+      "Id": "fa79e775-aa88-4da5-bd57-59a696e7a8f2"
+    }
+  ],
+  "Title": "Sherpa Term Set Group",
+  "Id": "efa51fbf-bb01-4871-acdd-43da13b69aef"
+}
