@@ -4,10 +4,8 @@
    "Name"        : "Sherpa Demo",
    "Quicklaunch" : {
 		"Home": "",
-		"Standarddokumenter": "Standarddokumenter",
-		"Porteføljeoversikt" : "SitePages/PortefoljeOversikt.aspx",
-		"Erfaringslogg": "SitePages/Erfaringslogg.aspx",
-		"Områdeinnhold": ""
+		"A custom link": "http://google.com",
+		"A demo subsite" : "subsite1"
 	},
    "SiteFeatures": [],
    "Template"    : "",

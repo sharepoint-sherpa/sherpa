@@ -7,7 +7,7 @@
       InternalName: "SherpaParentContentType",
       Fields : [],
       RequiredFields : []
-    }
+    },
 	{
 	  Description : "Example Content Type using Sherpa configured site columns",
       DisplayName : "Sherpa Child Content Type",

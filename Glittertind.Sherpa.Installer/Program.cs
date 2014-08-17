@@ -146,14 +146,16 @@ namespace Glittertind.Sherpa.Installer
         [ParserState]
         public IParserState LastParserState { get; set; }
 
-        [Option("url", Required = true, HelpText = "URL til området prosjektportalen skal installeres")]
+        [Option("url", Required = true, HelpText = "Full URL to the target SharePoint site collection")]
         public string UrlToSite { get; set; }
 
-        [Option('u', "userName", HelpText = "Brukernavn til personen som skal installere løsningen ved SPO-installering")]
+        [Option('u', "userName", HelpText = "Username@domain whos credentials will be used during installation (spo only)")]
         public string UserName{ get; set; }
 
-        [Option("spo", HelpText = "Dersom løsningen skal installeres til O365 / SharePoint Online")]
+        [Option("spo", HelpText = "Specify if the solution is targeting SharePoint Online")]
         public bool SharePointOnline { get; set; }
+
+        
 
         [HelpOption]
         public string GetUsage()

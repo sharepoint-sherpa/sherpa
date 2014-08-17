@@ -13,7 +13,7 @@
         Group: "Sherpa Sitecolumns",
         ID: "7cad3eea-e371-45c2-bda8-bcde3e23e405",
         InternalName: "SherpaTaxonomyField",
-        TermSetId: "fa79e775-aa88-4da5-bd57-59a696e7a8f2", //note: this must correspond to a termset. You can configure one using Sherpa.
+        TermSetId: "fa79e775-aa88-4da5-bd57-59a696e7a8f2", 
         Type: "TaxonomyFieldType"
     },
     {
@@ -76,7 +76,7 @@
         Group: "Sherpa Sitecolumns",
         ID: "cb688f18-d682-427e-a602-e12b96a4d63b",
         InternalName: "SherpaNumberField",
-        Type: "Number",
+        Type: "Number"
     },
     {
         Description: "Example sitecolumn of type number with constraints",
