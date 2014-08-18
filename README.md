@@ -20,7 +20,7 @@ The deployment story with especially SharePoint Online leaves a lot to be desire
 # Getting started
 1. Clone the project from github
 2. Add your fields, content types, taxonomy and site hierarchy etc through configuration, look at the sample config for guidance
-3. Build the solution and navigate to the out folder, typically Glittertind.Sherpa.Installer\bin\debug)
+3. Build the solution and navigate to the out folder, typically Sherpa.Installer\bin\debug)
 4. Put any Sandboxed solutions you might have in the folder 'solutions' 
 5. Start Sherpa.exe and pass the parameters 'url' and 'username' to hint where and as whom the application should connect. Add the flag --spo if and only if you are connecting to SharePoint Online. You can type 'Sherpa.exe --help' for help
 6. Sherpa will authenticate the user after you provide the password. After this you can choose which action you want to perform 
