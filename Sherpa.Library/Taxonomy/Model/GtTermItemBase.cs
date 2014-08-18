@@ -6,6 +6,7 @@ namespace Sherpa.Library.Taxonomy.Model
     {
         public string Title { get; set; }
         public Guid Id { get; set; }
+        public string CustomSortOrder { get; set; }
         
         protected GtTermItemBase(Guid id, string title)
         {

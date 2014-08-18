@@ -1,37 +1,36 @@
 ﻿[
-    {
-	  Description : "Example Content Type using Sherpa configured site columns",
-      DisplayName : "Sherpa Parent Content Type",
-      Group       : "Sherpa Content Types",
-      ID          : "0X01000B2865A6E59B4BA9A56F341258240952",
-      InternalName: "SherpaParentContentType",
-      Fields : [],
-      RequiredFields : []
-    },
-	{
-	  Description : "Example Content Type using Sherpa configured site columns",
-      DisplayName : "Sherpa Child Content Type",
-      Group       : "Sherpa Content Types",
-      ID          : "0X01000B2865A6E59B4BA9A56F34125824095201",
-      InternalName: "SherpaChildContentType",
-      Fields : [
-		"SherpaTextField",
-		"SherpaNoteField",
-		"SherpaTaxonomyField",
-		"SherpaUserField",
-		"SherpaDateField",
-		"SherpaChoiceField",
-		"SherpaMultipleChoiceField",
-		"SherpaNumberField",
-		"SherpaNumberFieldConstrained",
-		"SherpaCalculatedField",
-		"SherpaBooleanField"
+   {
+      "Description"    : "Example Content Type using Sherpa configured site columns",
+      "DisplayName"    : "Sherpa Parent Content Type",
+      "Fields"         : [],
+      "Group"          : "Sherpa Content Types",
+      "ID"             : "0X01000B2865A6E59B4BA9A56F341258240952",
+      "InternalName"   : "SherpaParentContentType",
+      "RequiredFields" : []
+   },
+   {
+      "Description"    : "Example Content Type using Sherpa configured site columns",
+      "DisplayName"    : "Sherpa Child Content Type",
+      "Fields"         : [
+         "SherpaTextField",
+         "SherpaNoteField",
+         "SherpaTaxonomyField",
+         "SherpaUserField",
+         "SherpaDateField",
+         "SherpaChoiceField",
+         "SherpaMultipleChoiceField",
+         "SherpaNumberField",
+         "SherpaNumberFieldConstrained",
+         "SherpaCalculatedField",
+         "SherpaBooleanField"
       ],
-      RequiredFields : [
-        "SherpaTextField",
-		"SherpaNoteField",
-		"SherpaTaxonomyField"
+      "Group"          : "Sherpa Content Types",
+      "ID"             : "0X01000B2865A6E59B4BA9A56F34125824095201",
+      "InternalName"   : "SherpaChildContentType",
+      "RequiredFields" : [
+         "SherpaTextField",
+         "SherpaNoteField",
+         "SherpaTaxonomyField"
       ]
    }
- 
 ]

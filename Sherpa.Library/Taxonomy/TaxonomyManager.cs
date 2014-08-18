@@ -45,6 +45,8 @@ namespace Sherpa.Library.Taxonomy
                     if (spTermSet.ServerObjectIsNull.Value)
                     {
                         spTermSet = termGroup.CreateTermSet(termSet.Title, termSet.Id, language);
+                        if (!string.IsNullOrEmpty(termSet.CustomSortOrder)) 
+                            spTermSet.CustomSortOrder = termSet.CustomSortOrder;
                         context.Load(spTermSet,x=>x.Terms);
                         context.ExecuteQuery();
                     }
@@ -57,6 +59,8 @@ namespace Sherpa.Library.Taxonomy
                         if (spTerm.ServerObjectIsNull.Value)
                         {
                             var spterm = spTermSet.CreateTerm(term.Title, language, term.Id);
+                            if (!string.IsNullOrEmpty(term.CustomSortOrder))
+                                spterm.CustomSortOrder = term.CustomSortOrder;
                             context.Load(spterm);
                             context.ExecuteQuery();
                         }
