@@ -9,6 +9,7 @@ namespace Sherpa.Installer
     class Program
     {
         public static ICredentials Credentials { get; set; }
+        public static string RootPath { get; set; }
         public static Uri UrlToSite { get; set; }
         public static bool IsSharePointOnline { get; set; }
         public static InstallationManager InstallationManager { get; set; }
@@ -24,6 +25,7 @@ namespace Sherpa.Installer
             }
             UrlToSite = new Uri(options.UrlToSite);
             IsSharePointOnline = options.SharePointOnline;
+            RootPath = options.RootPath;
             
             PrintLogo();
 
@@ -42,8 +44,25 @@ namespace Sherpa.Installer
                     Console.WriteLine("Authenticated with default credentials");
                 }
             }
-            InstallationManager = new InstallationManager(UrlToSite, Credentials, IsSharePointOnline, options.RootPath);
-            ShowStartScreenAndExecuteCommand();
+            RunApplication();
+        }
+
+        private static void RunApplication()
+        {
+            try
+            {
+                InstallationManager = new InstallationManager(UrlToSite, Credentials, IsSharePointOnline,RootPath);
+                ShowStartScreenAndExecuteCommand();
+            }
+            catch (Exception exception)
+            {
+                var oldColor = Console.ForegroundColor;
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("An exception occured: " + exception.Message);
+                Console.WriteLine(exception.StackTrace);
+                Console.ForegroundColor = oldColor;
+                RunApplication();
+            }
         }
 
         private static void ShowStartScreenAndExecuteCommand()
