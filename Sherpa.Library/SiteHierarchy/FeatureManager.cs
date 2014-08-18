@@ -34,7 +34,7 @@ namespace Sherpa.Library.SiteHierarchy
                 {
                     var featureCollection = web.Features;
                     if (feature.ReactivateAlways) DeActivateFeatureInCollection(clientContext, feature, featureCollection);
-                    ActivateFeatureInCollection(clientContext, feature, featureCollection, FeatureDefinitionScope.None);
+                    ActivateFeatureInCollection(clientContext, feature, featureCollection, FeatureDefinitionScope.Web);
                     break;
                 }
                 case FeatureDefinitionScope.Site:
@@ -42,7 +42,7 @@ namespace Sherpa.Library.SiteHierarchy
                     var siteCollection = clientContext.Site;
                     var featureCollection = siteCollection.Features;
                     if (feature.ReactivateAlways) DeActivateFeatureInCollection(clientContext, feature, featureCollection);
-                    ActivateFeatureInCollection(clientContext, feature, featureCollection, FeatureDefinitionScope.None);
+                    ActivateFeatureInCollection(clientContext, feature, featureCollection, FeatureDefinitionScope.Site);
 
                     break;
                 }
@@ -63,9 +63,19 @@ namespace Sherpa.Library.SiteHierarchy
 
             if (!DoesFeatureExistInCollection(featureCollection, featureInfo.FeatureId))
             {
-                Console.WriteLine("Activating feature " + featureInfo.FeatureName);
-                featureCollection.Add(featureInfo.FeatureId, true, scope);
-                clientContext.ExecuteQuery();
+                try
+                {
+                    Console.WriteLine("Activating feature " + featureInfo.FeatureName);
+                    featureCollection.Add(featureInfo.FeatureId, true, scope);
+                    clientContext.ExecuteQuery();
+                }
+                catch (ServerException)
+                {
+                    // Out of the box features will bomb using other scopes than FeatureDefinitionScope.None
+                    // This is why we first try with the correct scope, then fallback to Scope.None
+                    featureCollection.Add(featureInfo.FeatureId, true, FeatureDefinitionScope.None);
+                    clientContext.ExecuteQuery();
+                }
             }
         }
 
