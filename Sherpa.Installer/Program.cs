@@ -26,7 +26,6 @@ namespace Sherpa.Installer
             IsSharePointOnline = options.SharePointOnline;
             
             PrintLogo();
-            Console.WriteLine("Sherpa Initiated");
 
             if (options.SharePointOnline)
             {
@@ -43,7 +42,7 @@ namespace Sherpa.Installer
                     Console.WriteLine("Authenticated with default credentials");
                 }
             }
-            InstallationManager = new InstallationManager(UrlToSite, Credentials, IsSharePointOnline);
+            InstallationManager = new InstallationManager(UrlToSite, Credentials, IsSharePointOnline, options.RootPath);
             ShowStartScreenAndExecuteCommand();
         }
 
@@ -155,7 +154,8 @@ namespace Sherpa.Installer
         [Option("spo", HelpText = "Specify if the solution is targeting SharePoint Online")]
         public bool SharePointOnline { get; set; }
 
-        
+        [Option("path", HelpText = "Path to directory where the config and solutions folders are present. Not specifying will use application directory")]
+        public string RootPath { get; set; }
 
         [HelpOption]
         public string GetUsage()

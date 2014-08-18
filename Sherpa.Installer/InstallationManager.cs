@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net;
 using Microsoft.SharePoint.Client;
 using Sherpa.Library;
@@ -20,31 +19,46 @@ namespace Sherpa.Installer
         private readonly ICredentials _credentials;
         private readonly Uri _urlToSite;
         private readonly bool _isSharePointOnline;
+        private readonly string _rootPath;
 
-        public InstallationManager(Uri urlToSite, ICredentials credentials, bool isSharePointOnline)
+        private string ConfigurationDirectoryPath
+        {
+            get { return Path.Combine(_rootPath, "config"); }
+        }
+        private string SolutionsDirectoryPath
+        {
+            get { return Path.Combine(_rootPath, "solutions"); }
+        }
+
+        public InstallationManager(Uri urlToSite, ICredentials credentials, bool isSharePointOnline, string rootPath)
         {
             _urlToSite = urlToSite;
             _credentials = credentials;
             _isSharePointOnline = isSharePointOnline;
+            _rootPath = rootPath ?? Environment.CurrentDirectory;
         }
 
         public void SetupTaxonomy()
         {
             Console.WriteLine("Starting installation of term groups, term sets and terms");
-            var path = Path.Combine(Environment.CurrentDirectory, @"config\gttaxonomy.json");
-            var taxPersistanceProvider = new FilePersistanceProvider<GtTermSetGroup>(path);
-            var taxonomyManager = new TaxonomyManager(_urlToSite, _credentials, taxPersistanceProvider.Load());
-            taxonomyManager.WriteTaxonomyToTermStore();
+            using (var context = new ClientContext(_urlToSite))
+            {
+                context.Credentials = _credentials;
+                foreach (var file in Directory.GetFiles(ConfigurationDirectoryPath, "*taxonomy.json", SearchOption.AllDirectories))
+                {
+                    var taxPersistanceProvider = new FilePersistanceProvider<GtTermSetGroup>(file);
+                    var taxonomyManager = new TaxonomyManager(taxPersistanceProvider.Load());
+                    taxonomyManager.WriteTaxonomyToTermStore(context);
+                }
+            }
             Console.WriteLine("Done installation of term groups, term sets and terms");
         }
 
         public void UploadAndActivateSandboxSolution()
         {
             Console.WriteLine("Uploading and activating sandboxed solution(s)");
-            var pathToSandboxedSolution = Path.Combine(Environment.CurrentDirectory, "solutions");
-            var files = Directory.GetFiles(pathToSandboxedSolution);
             var deployManager = new DeployManager(_urlToSite, _credentials, _isSharePointOnline);
-            foreach (var file in files.Where(f => Path.GetExtension(f).ToLower() == ".wsp"))
+            foreach (var file in Directory.GetFiles(SolutionsDirectoryPath, "*.wsp", SearchOption.AllDirectories))
             {
                 deployManager.UploadDesignPackageToSiteAssets(file);
                 deployManager.ActivateDesignPackage(file, "SiteAssets");
@@ -55,29 +69,36 @@ namespace Sherpa.Installer
         public void CreateSiteColumnsAndContentTypes()
         {
             Console.WriteLine("Starting setup of site columns and content types");
-            var pathToSiteColumnJson = Path.Combine(Environment.CurrentDirectory, @"config\gtfields.json");
-            var siteColumnPersister = new FilePersistanceProvider<List<GtField>>(pathToSiteColumnJson);
-
-            var pathToContentTypesJson = Path.Combine(Environment.CurrentDirectory, @"config\gtcontenttypes.json");
-            var contentTypePersister = new FilePersistanceProvider<List<GtContentType>>(pathToContentTypesJson);
-
-            var contentTypeManager = new ContentTypeManager(_urlToSite, _credentials, contentTypePersister.Load(), siteColumnPersister.Load());
-            contentTypeManager.CreateSiteColumns();
-            contentTypeManager.CreateContentTypes();
-            contentTypeManager.DisposeContext();
+            using (var context = new ClientContext(_urlToSite))
+            {
+                context.Credentials = _credentials;
+                foreach (var file in Directory.GetFiles(ConfigurationDirectoryPath, "*fields.json", SearchOption.AllDirectories))
+                {
+                    var siteColumnPersister = new FilePersistanceProvider<List<GtField>>(file);
+                    var siteColumnManager = new FieldManager(context, siteColumnPersister.Load());
+                    siteColumnManager.CreateSiteColumns();
+                }
+                foreach (var file in Directory.GetFiles(ConfigurationDirectoryPath, "*contenttypes.json", SearchOption.AllDirectories))
+                {
+                    var contentTypePersister = new FilePersistanceProvider<List<GtContentType>>(file);
+                    var contentTypeManager = new ContentTypeManager(context, contentTypePersister.Load());
+                    contentTypeManager.CreateContentTypes();
+                }
+            }
             Console.WriteLine("Done setup of site columns and content types");
         }
 
         public void ConfigureSites()
         {
             Console.WriteLine("Starting configuring sites");
-            var pathToSiteSetup = Path.Combine(Environment.CurrentDirectory, @"config\gtsitehierarchy.json");
-            var sitePersister = new FilePersistanceProvider<GtWeb>(pathToSiteSetup);
-            
             using (var clientContext = new ClientContext(_urlToSite) { Credentials = _credentials })
             {
-                var siteManager = new SiteSetupManager(clientContext, sitePersister.Load());
-                siteManager.SetupSites();
+                foreach (var file in Directory.GetFiles(ConfigurationDirectoryPath, "*sitehierarchy.json", SearchOption.AllDirectories))
+                {
+                    var sitePersister = new FilePersistanceProvider<GtWeb>(file);
+                    var siteManager = new SiteSetupManager(clientContext, sitePersister.Load());
+                    siteManager.SetupSites();
+                }
             }
             Console.WriteLine("Done configuring sites");
         }
@@ -85,13 +106,14 @@ namespace Sherpa.Installer
         public void TeardownSites()
         {
             Console.WriteLine("Starting teardown of sites");
-            var pathToSiteSetup = Path.Combine(Environment.CurrentDirectory, @"config\gtsitehierarchy.json");
-            var sitePersister = new FilePersistanceProvider<GtWeb>(pathToSiteSetup);
-
-            using (var clientContext = new ClientContext(_urlToSite) {Credentials = _credentials})
+            using (var clientContext = new ClientContext(_urlToSite) { Credentials = _credentials })
             {
-                var siteManager = new SiteSetupManager(clientContext, sitePersister.Load());
-                siteManager.DeleteSites();
+                foreach (var file in Directory.GetFiles(ConfigurationDirectoryPath, "*sitehierarchy.json", SearchOption.AllDirectories))
+                {
+                    var sitePersister = new FilePersistanceProvider<GtWeb>(file);
+                    var siteManager = new SiteSetupManager(clientContext, sitePersister.Load());
+                    siteManager.DeleteSites();
+                }
             }
             Console.WriteLine("Done teardown of sites");
         }
@@ -99,15 +121,22 @@ namespace Sherpa.Installer
         public void DeleteAllSherpaSiteColumnsAndContentTypes()
         {
             Console.WriteLine("Deleting all Glitterind columns and content types");
-            var pathToSiteColumnJson = Path.Combine(Environment.CurrentDirectory, @"config\gtfields.json");
-            var siteColumnPersister = new FilePersistanceProvider<List<GtField>>(pathToSiteColumnJson);
-
-            var pathToContentTypesJson = Path.Combine(Environment.CurrentDirectory, @"config\gtcontenttypes.json");
-            var contentTypePersister = new FilePersistanceProvider<List<GtContentType>>(pathToContentTypesJson);
-
-            var contentTypeManager = new ContentTypeManager(_urlToSite, _credentials, contentTypePersister.Load(), siteColumnPersister.Load());
-            contentTypeManager.DeleteAllCustomFieldsAndContentTypes();
-            contentTypeManager.DisposeContext();
+            using (var context = new ClientContext(_urlToSite))
+            {
+                context.Credentials = _credentials;
+                foreach (var file in Directory.GetFiles(ConfigurationDirectoryPath, "*contenttypes.json", SearchOption.AllDirectories))
+                {
+                    var contentTypePersister = new FilePersistanceProvider<List<GtContentType>>(file);
+                    var contentTypeManager = new ContentTypeManager(context, contentTypePersister.Load());
+                    contentTypeManager.DeleteAllCustomContentTypes();
+                }
+                foreach (var file in Directory.GetFiles(ConfigurationDirectoryPath, "*fields.json", SearchOption.AllDirectories))
+                {
+                    var siteColumnPersister = new FilePersistanceProvider<List<GtField>>(file);
+                    var siteColumnManager = new FieldManager(context, siteColumnPersister.Load());
+                    siteColumnManager.DeleteAllCustomFields();
+                }
+            }
             Console.WriteLine("Done deleting all Glitterind columns and content types");
         }
 

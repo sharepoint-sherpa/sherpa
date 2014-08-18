@@ -49,7 +49,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ContentTypes\ContentTypeManager.cs" />
-    <Compile Include="ContentTypes\IContentTypeManager.cs" />
+    <Compile Include="ContentTypes\FieldManager.cs" />
     <Compile Include="ContentTypes\Model\GtCalculatedProps.cs" />
     <Compile Include="ContentTypes\Model\GtContentType.cs" />
     <Compile Include="ContentTypes\Model\GtField.cs" />
@@ -69,7 +69,6 @@
     <Compile Include="SiteHierarchy\Model\GtWeb.cs" />
     <Compile Include="SiteHierarchy\SiteSetupManager.cs" />
     <Compile Include="SiteHierarchy\QuicklaunchManager.cs" />
-    <Compile Include="Taxonomy\ITaxonomyManager.cs" />
     <Compile Include="Taxonomy\Model\GtTerm.cs" />
     <Compile Include="Taxonomy\Model\GtTermItemBase.cs" />
     <Compile Include="Taxonomy\Model\GtTermSet.cs" />

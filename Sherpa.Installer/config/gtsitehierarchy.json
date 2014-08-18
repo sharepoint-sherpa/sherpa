@@ -7,7 +7,13 @@
       "A demo subsite" : "subsite1",
       "Home"           : ""
    },
-   "SiteFeatures" : [],
+   "SiteFeatures" : [
+       {
+           "FeatureId" : "57ff23fc-ec05-4dd8-b7ed-d93faa7c795d",
+           "FeatureName": "SiteHelp",
+           "ReactivateAlways": "true"
+       }
+   ],
    "Template"     : "",
    "Url"          : "/",
    "WebFeatures"  : [

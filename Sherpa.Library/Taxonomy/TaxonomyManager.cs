@@ -1,69 +1,60 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using Microsoft.SharePoint.Client;
 using Microsoft.SharePoint.Client.Taxonomy;
 using Sherpa.Library.Taxonomy.Model;
 
 namespace Sherpa.Library.Taxonomy
 {
-    public class TaxonomyManager : ITaxonomyManager
+    public class TaxonomyManager
     {
-        private readonly ICredentials _credentials;
-        private readonly Uri _urlToSite;
         private readonly GtTermSetGroup _termSetGroup;
 
-        public TaxonomyManager(Uri urlToSite, ICredentials credentials, GtTermSetGroup termSetGroup)
+        public TaxonomyManager(GtTermSetGroup termSetGroup)
         {
-            _urlToSite = urlToSite;
-            _credentials = credentials;
             _termSetGroup = termSetGroup;
         }
 
-        public void WriteTaxonomyToTermStore()
+        public void WriteTaxonomyToTermStore(ClientContext context)
         {
             ValidateConfiguration(_termSetGroup);
-            using (var context = new ClientContext(_urlToSite))
-            {
-                // user must be termstore admin
-                context.Credentials = _credentials;
-                var termStore = GetTermStore(context);
+            // user must be termstore admin
+            var termStore = GetTermStore(context);
 
-                var termGroup = termStore.Groups.ToList().FirstOrDefault(g => g.Id == _termSetGroup.Id) ??
-                                termStore.CreateGroup(_termSetGroup.Title, _termSetGroup.Id);
+            var termGroup = termStore.Groups.ToList().FirstOrDefault(g => g.Id == _termSetGroup.Id) ??
+                            termStore.CreateGroup(_termSetGroup.Title, _termSetGroup.Id);
                 
-                context.Load(termGroup, x => x.TermSets);
+            context.Load(termGroup, x => x.TermSets);
+            context.ExecuteQuery();
+
+            var language = termStore.DefaultLanguage;
+            foreach (var termSet in _termSetGroup.TermSets)
+            {
+                var spTermSet = termStore.GetTermSet(termSet.Id);
+                context.Load(spTermSet, x => x.Terms);
                 context.ExecuteQuery();
-
-                var language = termStore.DefaultLanguage;
-                foreach (var termSet in _termSetGroup.TermSets)
+                if (spTermSet.ServerObjectIsNull.Value)
                 {
-                    var spTermSet = termStore.GetTermSet(termSet.Id);
-                    context.Load(spTermSet,x=>x.Terms);
+                    spTermSet = termGroup.CreateTermSet(termSet.Title, termSet.Id, language);
+                    if (!string.IsNullOrEmpty(termSet.CustomSortOrder))
+                        spTermSet.CustomSortOrder = termSet.CustomSortOrder;
+                    context.Load(spTermSet, x => x.Terms);
                     context.ExecuteQuery();
-                    if (spTermSet.ServerObjectIsNull.Value)
-                    {
-                        spTermSet = termGroup.CreateTermSet(termSet.Title, termSet.Id, language);
-                        if (!string.IsNullOrEmpty(termSet.CustomSortOrder)) 
-                            spTermSet.CustomSortOrder = termSet.CustomSortOrder;
-                        context.Load(spTermSet,x=>x.Terms);
-                        context.ExecuteQuery();
-                    }
+                }
 
-                    foreach (var term in termSet.Terms)
+                foreach (var term in termSet.Terms)
+                {
+                    var spTerm = termStore.GetTerm(term.Id);
+                    context.Load(spTerm);
+                    context.ExecuteQuery();
+                    if (spTerm.ServerObjectIsNull.Value)
                     {
-                        var spTerm = termStore.GetTerm(term.Id);
-                        context.Load(spTerm);
+                        var spterm = spTermSet.CreateTerm(term.Title, language, term.Id);
+                        if (!string.IsNullOrEmpty(term.CustomSortOrder))
+                            spterm.CustomSortOrder = term.CustomSortOrder;
+                        context.Load(spterm);
                         context.ExecuteQuery();
-                        if (spTerm.ServerObjectIsNull.Value)
-                        {
-                            var spterm = spTermSet.CreateTerm(term.Title, language, term.Id);
-                            if (!string.IsNullOrEmpty(term.CustomSortOrder))
-                                spterm.CustomSortOrder = term.CustomSortOrder;
-                            context.Load(spterm);
-                            context.ExecuteQuery();
-                        }
                     }
                 }
             }
@@ -79,19 +70,13 @@ namespace Sherpa.Library.Taxonomy
             TermStore termStore = taxonomySession.GetDefaultSiteCollectionTermStore();
             context.Load(termStore, x => x.Groups, x => x.Id, x=> x.DefaultLanguage);
             context.ExecuteQuery();
+
             return termStore;
         }
 
-        public Guid GetTermStoreId()
+        public Guid GetTermStoreId(ClientContext context)
         {
-            using (var context = new ClientContext(_urlToSite))
-            {
-                // user must be termstore admin
-                context.Credentials = _credentials;
-                var termStore = GetTermStore(context);
-
-                return termStore.Id;
-            }
+            return GetTermStore(context).Id;
         }
 
         /// <summary>

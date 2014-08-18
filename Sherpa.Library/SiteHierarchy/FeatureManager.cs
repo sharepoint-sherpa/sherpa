@@ -34,7 +34,7 @@ namespace Sherpa.Library.SiteHierarchy
                 {
                     var featureCollection = web.Features;
                     if (feature.ReactivateAlways) DeActivateFeatureInCollection(clientContext, feature, featureCollection);
-                    ActivateFeatureInCollection(clientContext, feature, featureCollection);
+                    ActivateFeatureInCollection(clientContext, feature, featureCollection, FeatureDefinitionScope.None);
                     break;
                 }
                 case FeatureDefinitionScope.Site:
@@ -42,14 +42,21 @@ namespace Sherpa.Library.SiteHierarchy
                     var siteCollection = clientContext.Site;
                     var featureCollection = siteCollection.Features;
                     if (feature.ReactivateAlways) DeActivateFeatureInCollection(clientContext, feature, featureCollection);
-                    ActivateFeatureInCollection(clientContext, feature, featureCollection);
+                    ActivateFeatureInCollection(clientContext, feature, featureCollection, FeatureDefinitionScope.None);
 
                     break;
                 }
             }
         }
 
-        private static void ActivateFeatureInCollection(ClientContext clientContext, GtFeature featureInfo, FeatureCollection featureCollection)
+        /// <summary>
+        /// FeaturedefinitionScope.None is the way to go for (many) features. http://stackoverflow.com/questions/17803291/failing-to-activate-a-feature-using-com-in-sharepoint-2010
+        /// </summary>
+        /// <param name="clientContext"></param>
+        /// <param name="featureInfo"></param>
+        /// <param name="featureCollection"></param>
+        /// <param name="scope"></param>
+        private static void ActivateFeatureInCollection(ClientContext clientContext, GtFeature featureInfo, FeatureCollection featureCollection, FeatureDefinitionScope scope)
         {
             clientContext.Load(featureCollection);
             clientContext.ExecuteQuery();
@@ -57,8 +64,7 @@ namespace Sherpa.Library.SiteHierarchy
             if (!DoesFeatureExistInCollection(featureCollection, featureInfo.FeatureId))
             {
                 Console.WriteLine("Activating feature " + featureInfo.FeatureName);
-                // FeaturedefinitionScope.None is the way to go for any feature. http://stackoverflow.com/questions/17803291/failing-to-activate-a-feature-using-com-in-sharepoint-2010
-                featureCollection.Add(featureInfo.FeatureId, true, FeatureDefinitionScope.None);
+                featureCollection.Add(featureInfo.FeatureId, true, scope);
                 clientContext.ExecuteQuery();
             }
         }
