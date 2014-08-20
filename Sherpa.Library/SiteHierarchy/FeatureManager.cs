@@ -34,7 +34,7 @@ namespace Sherpa.Library.SiteHierarchy
                 {
                     var featureCollection = web.Features;
                     if (feature.ReactivateAlways) DeActivateFeatureInCollection(clientContext, feature, featureCollection);
-                    ActivateFeatureInCollection(clientContext, feature, featureCollection, FeatureDefinitionScope.Web);
+                    ActivateFeatureInCollection(clientContext, feature, featureCollection, FeatureDefinitionScope.Site);
                     break;
                 }
                 case FeatureDefinitionScope.Site:
@@ -50,7 +50,8 @@ namespace Sherpa.Library.SiteHierarchy
         }
 
         /// <summary>
-        /// FeaturedefinitionScope.None is the way to go for (many) features. http://stackoverflow.com/questions/17803291/failing-to-activate-a-feature-using-com-in-sharepoint-2010
+        /// FeaturedefinitionScope.None is the way to go OOTB features. http://stackoverflow.com/questions/17803291/failing-to-activate-a-feature-using-com-in-sharepoint-2010
+        /// Both Site Collection and Web scoped custom features MUST use Scope.Site.
         /// </summary>
         /// <param name="clientContext"></param>
         /// <param name="featureInfo"></param>

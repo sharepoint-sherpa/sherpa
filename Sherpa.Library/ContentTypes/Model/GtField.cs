@@ -18,6 +18,7 @@ namespace Sherpa.Library.ContentTypes.Model
         public string Default { get; set; }
         public int? Min { get; set; }
         public int? Max { get; set; }
+        public int? NumLines { get; set; }
         
         public bool Required { get; set; }
         public bool Hidden { get; set; }
@@ -65,6 +66,11 @@ namespace Sherpa.Library.ContentTypes.Model
                 case("Number"):
                 {
                     var options = (Min != null ? "Min=\"" + Min +"\"" : "") + (Max != null ? " Max=\"" + Max +"\"" : "");
+                    return GetSelfClosingFieldXml(required, options);
+                }
+                case ("Note"):
+                {
+                    var options = NumLines != null && NumLines != 0 ? "NumLines=\"" + NumLines + "\"" : "";
                     return GetSelfClosingFieldXml(required, options);
                 }
 
