@@ -15,18 +15,25 @@ namespace Sherpa.Installer
                 Console.ResetColor();
                 Console.WriteLine();
 
-                var credentials = new SharePointOnlineCredentials(userName, password);
-                if (AuthenticateUser(credentials, urlToSite))
+                if (password != null && password.Length > 0)
                 {
-                    Console.ForegroundColor = ConsoleColor.Green;
-                    Console.WriteLine("Account successfully authenticated!");
-                    Console.ResetColor();
+                    var credentials = new SharePointOnlineCredentials(userName, password);
+                    if (AuthenticateUser(credentials, urlToSite))
+                    {
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        Console.WriteLine("Account successfully authenticated!");
+                        Console.ResetColor();
 
-                    return credentials;
+                        return credentials;
+                    }
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("Couldn't authenticate user. Try again.");
+                    Console.ResetColor();
                 }
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("Couldn't authenticate user. Try again.");
-                Console.ResetColor();
+                else
+                {
+                    return GetCredentialsForSharePointOnline(userName, urlToSite);
+                }
             }
         }
 
