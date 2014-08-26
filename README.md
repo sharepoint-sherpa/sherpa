@@ -29,7 +29,9 @@ The deployment story with especially SharePoint Online leaves a lot to be desire
 * On-premises: the application must run at one of your servers in your SharePoint farm
 * On-premises: the application runs exclusively in the context of the current user
 
-# Maintainers
+# Relevant resources
+* <a href="http://www.uize.com/examples/json-prettifier.html">JSON Prettifier</a>
 
+# Maintainers
 Tarjei Ormestøyl [<a href="mailto:tarjeieo@puzzlepart.com">tarjeieo@puzzlepart.com</a>]
 Ole Kristian Mørch-Storstein [<a href="mailto:olekms@puzzlepart.com">olekms@puzzlepart.com</a>]
