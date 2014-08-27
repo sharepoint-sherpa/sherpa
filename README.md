@@ -25,6 +25,9 @@ The deployment story with especially SharePoint Online leaves a lot to be desire
 5. Start Sherpa.exe and pass the parameters 'url' and 'username' to hint where and as whom the application should connect. Add the flag --spo if and only if you are connecting to SharePoint Online. You can type 'Sherpa.exe --help' for help
 6. Sherpa will authenticate the user after you provide the password. After this you can choose which action you want to perform 
 
+# What Sherpa won't do
+At the moment Sherpa is connecting to a single site collection, which means that Sherpa will not create new site collections. This also means that a site collection has to be created by an administrator up front. Sherpa also does not do any tenant administration tasks, except for setting up taxonomy.
+
 # Known limitations
 * On-premises: the application must run at one of your servers in your SharePoint farm
 * On-premises: the application runs exclusively in the context of the current user
@@ -33,5 +36,5 @@ The deployment story with especially SharePoint Online leaves a lot to be desire
 * <a href="http://www.uize.com/examples/json-prettifier.html">JSON Prettifier</a>
 
 # Maintainers
-Tarjei Ormestøyl [<a href="mailto:tarjeieo@puzzlepart.com">tarjeieo@puzzlepart.com</a>]
+Tarjei Ormestøyl [<a href="mailto:tarjeieo@puzzlepart.com">tarjeieo@puzzlepart.com</a>], 
 Ole Kristian Mørch-Storstein [<a href="mailto:olekms@puzzlepart.com">olekms@puzzlepart.com</a>]
