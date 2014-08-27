@@ -6,8 +6,7 @@ Sherpa
   * Deploy taxonomy (groups, term sets and terms) with known IDs 
   * Upload, activate and upgrade sandboxed solutions
   * Configure fields and content types on a site collection level
-  * Activate site and web scoped features
-  * Disable and re-activate selected features after a solution upgrade
+  * Configure sites (features, quicklaunch, properties)
 
 # Why use Sherpa
 The deployment story with especially SharePoint Online leaves a lot to be desired. If you're creating anything but apps, the deploy process is manual or requires you to write your own deploy scrips and code from scratch. Sherpa allows you to deploy your artifacts in a repeatable manner from day one, without having to spend time writing code. 
@@ -38,3 +37,6 @@ At the moment Sherpa is connecting to a single site collection, which means that
 # Maintainers
 Tarjei Ormestøyl [<a href="mailto:tarjeieo@puzzlepart.com">tarjeieo@puzzlepart.com</a>], 
 Ole Kristian Mørch-Storstein [<a href="mailto:olekms@puzzlepart.com">olekms@puzzlepart.com</a>]
+
+# Disclaimer
+Use at own risk. The product is not considered finished and the product should not be used in production environments. The maintainers takes no responsibility of errors or bugs in the tool, or for problems caused because of this or because of usage errors.
