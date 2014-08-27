@@ -39,4 +39,4 @@ Tarjei Ormestøyl [<a href="mailto:tarjeieo@puzzlepart.com">tarjeieo@puzzlepart.
 Ole Kristian Mørch-Storstein [<a href="mailto:olekms@puzzlepart.com">olekms@puzzlepart.com</a>]
 
 # Disclaimer
-Use at own risk. The product is not considered finished and the product should not be used in production environments. The maintainers takes no responsibility of errors or bugs in the tool, or for problems caused because of this or because of usage errors.
+The tool is a work in progress, and not considered finished. Use at own risk. We do not recommend usage of the tool in production environments. The maintainers takes no responsibility of errors or bugs in the tool, problems caused by the tool or by usage errors.
