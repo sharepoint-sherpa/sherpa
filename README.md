@@ -38,5 +38,8 @@ At the moment Sherpa is connecting to a single site collection, which means that
 Tarjei Ormestøyl [<a href="mailto:tarjeieo@puzzlepart.com">tarjeieo@puzzlepart.com</a>], 
 Ole Kristian Mørch-Storstein [<a href="mailto:olekms@puzzlepart.com">olekms@puzzlepart.com</a>]
 
+# About
+The sherpa tool is built by <a href="http://www.puzzlepart.com">Puzzlepart AS</a> as part of the <a href="https://github.com/prosjektstotte/sp-prosjektportal">Project portal for SharePoint project</a> for Asker Kommune.
+
 # Disclaimer
 The tool is a work in progress, and not considered finished. Use at own risk. We do not recommend usage of the tool in production environments. The maintainers takes no responsibility of errors or bugs in the tool, problems caused by the tool or by usage errors.
