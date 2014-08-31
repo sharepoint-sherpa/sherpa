@@ -5,7 +5,7 @@ namespace Sherpa.Installer
 {
     public class AuthenticationHandler
     {
-        public SharePointOnlineCredentials GetCredentialsForSharePointOnline(string userName, string urlToSite)
+        public SharePointOnlineCredentials GetCredentialsForSharePointOnline(string userName, Uri urlToSite)
         {
             while (true)
             {
@@ -37,11 +37,11 @@ namespace Sherpa.Installer
             }
         }
 
-        private bool AuthenticateUser(SharePointOnlineCredentials credentials, string urlToSite)
+        private bool AuthenticateUser(SharePointOnlineCredentials credentials, Uri urlToSite)
         {
             try
             {
-                credentials.GetAuthenticationCookie(new Uri(urlToSite));
+                credentials.GetAuthenticationCookie(urlToSite);
                 return true;
             }
             catch (IdcrlException)

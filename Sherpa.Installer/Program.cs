@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Net;
-using CommandLine;
-using CommandLine.Text;
 using Microsoft.SharePoint.Client;
 
 namespace Sherpa.Installer
@@ -9,37 +7,36 @@ namespace Sherpa.Installer
     class Program
     {
         public static ICredentials Credentials { get; set; }
-        public static string RootPath { get; set; }
-        public static Uri UrlToSite { get; set; }
-        public static bool IsSharePointOnline { get; set; }
         public static InstallationManager InstallationManager { get; set; }
+        private static Options ProgramOptions { get; set; }
+        private static Uri UrlToSite { get; set; }
 
         static void Main(string[] args)
         {
-            Console.Clear();
-            var options = new Options();
-            if (!Parser.Default.ParseArguments(args, options))
+            PrintLogo();
+            try
             {
-                options.GetUsage();
+                ProgramOptions = OptionsParser.ParseArguments(args);
+                UrlToSite = new Uri(ProgramOptions.UrlToSite);
+            }
+            catch (Exception)
+            {
+                Console.WriteLine("Invalid parameters, application cannot continue");
                 Environment.Exit(1);
             }
-            UrlToSite = new Uri(options.UrlToSite);
-            IsSharePointOnline = options.SharePointOnline;
-            RootPath = options.RootPath;
-            
             PrintLogo();
 
-            if (options.SharePointOnline)
+            if (ProgramOptions.SharePointOnline)
             {
-                Console.WriteLine("Login to {0}", UrlToSite);
+                Console.WriteLine("Login with your password to {0}", ProgramOptions.UrlToSite);
                 var authenticationHandler = new AuthenticationHandler();
-                Credentials = authenticationHandler.GetCredentialsForSharePointOnline(options.UserName, options.UrlToSite);
+                Credentials = authenticationHandler.GetCredentialsForSharePointOnline(ProgramOptions.UserName, UrlToSite);
             }
             else
             {
                 Credentials = CredentialCache.DefaultCredentials;
 
-                using (new ClientContext(options.UrlToSite) { Credentials = Credentials})
+                using (new ClientContext(ProgramOptions.UrlToSite) { Credentials = Credentials })
                 {
                     Console.WriteLine("Authenticated with default credentials");
                 }
@@ -51,16 +48,15 @@ namespace Sherpa.Installer
         {
             try
             {
-                InstallationManager = new InstallationManager(UrlToSite, Credentials, IsSharePointOnline,RootPath);
+                InstallationManager = new InstallationManager(UrlToSite, Credentials, ProgramOptions.SharePointOnline, ProgramOptions.RootPath);
                 ShowStartScreenAndExecuteCommand();
             }
             catch (Exception exception)
             {
-                var oldColor = Console.ForegroundColor;
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("An exception occured: " + exception.Message);
                 Console.WriteLine(exception.StackTrace);
-                Console.ForegroundColor = oldColor;
+                Console.ForegroundColor = ConsoleColor.White;
                 RunApplication();
             }
         }
@@ -126,7 +122,7 @@ namespace Sherpa.Installer
                 }
                 case 1337:
                 {
-                    Console.WriteLine("(Hidden feature) Forcing recrawl of "+UrlToSite +" and all subsites");
+                    Console.WriteLine("(Hidden feature) Forcing recrawl of rootsite and all subsites");
                     InstallationManager.ForceReCrawl();
                     break;
                 }
@@ -147,6 +143,7 @@ namespace Sherpa.Installer
 
         private static void PrintLogo()
         {
+            Console.Clear();
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine(@"     _______. __    __   _______ .______   .______     ___      ");
             Console.WriteLine(@"    /       ||  |  |  | |   ____||   _  \  |   _  \   /   \     ");
@@ -156,31 +153,6 @@ namespace Sherpa.Installer
             Console.WriteLine(@"|_______/    |__|  |__| |_______|| _| `.__|| _|   /__/     \__\ ");
             Console.WriteLine(@"                                                                ");
             Console.ForegroundColor = ConsoleColor.White;
-        }
-    }
-
-    internal sealed class Options
-    {
-        [ParserState]
-        public IParserState LastParserState { get; set; }
-
-        [Option("url", Required = true, HelpText = "Full URL to the target SharePoint site collection")]
-        public string UrlToSite { get; set; }
-
-        [Option('u', "userName", HelpText = "Username@domain whos credentials will be used during installation (spo only)")]
-        public string UserName{ get; set; }
-
-        [Option("spo", HelpText = "Specify if the solution is targeting SharePoint Online")]
-        public bool SharePointOnline { get; set; }
-
-        [Option("path", HelpText = "Path to directory where the config and solutions folders are present. Not specifying will use application directory")]
-        public string RootPath { get; set; }
-
-        [HelpOption]
-        public string GetUsage()
-        {
-            return HelpText.AutoBuild(this,
-              current => HelpText.DefaultParsingErrorsHandler(this, current));
         }
     }
 }
