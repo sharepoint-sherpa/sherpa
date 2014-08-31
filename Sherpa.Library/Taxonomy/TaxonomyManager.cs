@@ -20,7 +20,15 @@ namespace Sherpa.Library.Taxonomy
         {
             ValidateConfiguration(_termSetGroup);
             // user must be termstore admin
-            var termStore = GetTermStore(context);
+            TermStore termStore = GetTermStore(context);
+
+            if (!IsCurrentUserTermStoreAdministrator(context, termStore))
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("You must be a term store administrator to perform this operation");
+                Console.ResetColor();
+                return;
+            }
 
             var termGroup = termStore.Groups.ToList().FirstOrDefault(g => g.Id == _termSetGroup.Id) ??
                             termStore.CreateGroup(_termSetGroup.Title, _termSetGroup.Id);
@@ -57,6 +65,25 @@ namespace Sherpa.Library.Taxonomy
                         context.ExecuteQuery();
                     }
                 }
+            }
+        }
+
+        private bool IsCurrentUserTermStoreAdministrator(ClientContext context, TermStore termStore)
+        {
+            const string testGroupName = "SherpaTemporaryTestGroup";
+            var testGroupGuid = new Guid("0972a735-b89a-400f-a858-b80e29492b62");
+            try
+            {
+                var termGroup = termStore.CreateGroup(testGroupName, testGroupGuid);
+                context.ExecuteQuery();
+
+                termGroup.DeleteObject();
+                context.ExecuteQuery();
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
             }
         }
 

@@ -56,7 +56,7 @@ namespace Sherpa.Installer
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("An exception occured: " + exception.Message);
                 Console.WriteLine(exception.StackTrace);
-                Console.ForegroundColor = ConsoleColor.White;
+                Console.ResetColor();
                 RunApplication();
             }
         }
@@ -152,7 +152,7 @@ namespace Sherpa.Installer
             Console.WriteLine(@".----)   |   |  |  |  | |  |____ |  |\  \_ |  |    /   ___   \  ");
             Console.WriteLine(@"|_______/    |__|  |__| |_______|| _| `.__|| _|   /__/     \__\ ");
             Console.WriteLine(@"                                                                ");
-            Console.ForegroundColor = ConsoleColor.White;
+            Console.ResetColor();
         }
     }
 }

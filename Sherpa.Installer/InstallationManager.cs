@@ -56,14 +56,37 @@ namespace Sherpa.Installer
 
         public void UploadAndActivateSandboxSolution()
         {
-            Console.WriteLine("Uploading and activating sandboxed solution(s)");
-            var deployManager = new DeployManager(_urlToSite, _credentials, _isSharePointOnline);
-            foreach (var file in Directory.GetFiles(SolutionsDirectoryPath, "*.wsp", SearchOption.AllDirectories))
+            if (!IsCurrentUserSiteCollectionAdmin())
             {
-                deployManager.UploadDesignPackageToSiteAssets(file);
-                deployManager.ActivateDesignPackage(file, "SiteAssets");
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("You need to be site collection administrator to perform this operation.");
+                Console.ResetColor();
             }
-            Console.WriteLine("Done uploading and activating sandboxed solution(s)");
+            else
+            {
+                Console.WriteLine("Uploading and activating sandboxed solution(s)");
+                var deployManager = new DeployManager(_urlToSite, _credentials, _isSharePointOnline);
+                foreach (var file in Directory.GetFiles(SolutionsDirectoryPath, "*.wsp", SearchOption.AllDirectories))
+                {
+                    deployManager.UploadDesignPackageToSiteAssets(file);
+                    deployManager.ActivateDesignPackage(file, "SiteAssets");
+                }
+                Console.WriteLine("Done uploading and activating sandboxed solution(s)");
+            }
+        }
+
+        private bool IsCurrentUserSiteCollectionAdmin()
+        {
+            using (var context = new ClientContext(_urlToSite))
+            {
+                context.Credentials = _credentials;
+
+                var currentUser = context.Web.CurrentUser;
+                context.Load(currentUser, u => u.IsSiteAdmin);
+                context.ExecuteQuery();
+
+                return currentUser.IsSiteAdmin;
+            }
         }
 
         public void CreateSiteColumnsAndContentTypes()
