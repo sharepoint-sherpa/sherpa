@@ -21,7 +21,7 @@ namespace Sherpa.Library.SiteHierarchy
         }
         public void SetupSites()
         {
-                EnsureAndConfigureWebAndActivateFeatures(ClientContext, null, _configurationWeb);
+            EnsureAndConfigureWebAndActivateFeatures(ClientContext, null, _configurationWeb);
         }
 
         /// <summary>
@@ -106,6 +106,13 @@ namespace Sherpa.Library.SiteHierarchy
             var absoluteUrlToCheck = parentWeb.Url.TrimEnd('/') + '/' + webUrl;
             // use a simple linq query to get any sub webs with the URL we want to check
             return (from w in parentWeb.Webs where w.Url == absoluteUrlToCheck select w).SingleOrDefault();
+        }
+        /// <summary>
+        /// Will only activate site collection features or rootweb's web features
+        /// </summary>
+        public void ActivateContentTypeDependencyFeatures()
+        {
+            FeatureManager.ActivateFeatures(ClientContext, _configurationWeb.SiteFeatures, _configurationWeb.WebFeatures, true);
         }
     }
 }

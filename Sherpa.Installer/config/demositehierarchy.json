@@ -9,9 +9,10 @@
    },
    "SiteFeatures" : [
        {
-           "FeatureId" : "57ff23fc-ec05-4dd8-b7ed-d93faa7c795d",
-           "FeatureName": "SiteHelp",
-           "ReactivateAlways": "true"
+            "FeatureId" : "57ff23fc-ec05-4dd8-b7ed-d93faa7c795d",
+            "FeatureName": "SiteHelp",
+            "ReactivateAlways": "true",
+            "ContentTypeDependency": "true"
        }
    ],
    "Template"     : "",
@@ -19,7 +20,8 @@
    "WebFeatures"  : [
       {
          "FeatureId"   : "48a243cb-7b16-4b5a-b1b5-07b809b43f47",
-         "FeatureName" : "SearchConfigContentType"
+         "FeatureName" : "SearchConfigContentType",
+         "ContentTypeDependency": "true"
       },
       {
          "FeatureId"   : "e47705ec-268d-4c41-aa4e-0d8727985ebc",

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.SharePoint.Client;
 using Sherpa.Library.SiteHierarchy.Model;
 
@@ -7,27 +8,31 @@ namespace Sherpa.Library.SiteHierarchy
 {
     public class FeatureManager
     {
-        public void ActivateFeatures(ClientContext clientContext, List<GtFeature> siteFeatures, List<GtFeature> webFeatures)
+        public void ActivateFeatures(ClientContext clientContext, List<GtFeature> siteFeatures, List<GtFeature> webFeatures, bool onlyContentTypeDependencyFeatures)
         {
             if (siteFeatures != null)
             {
-                foreach (var featureActivation in siteFeatures)
+                foreach (var featureActivation in siteFeatures.Where(f => f.ContentTypeDependency == onlyContentTypeDependencyFeatures))
                 {
                     ActivateFeature(clientContext, clientContext.Web, featureActivation, FeatureDefinitionScope.Site);
                 }
             }
             if (webFeatures != null)
             {
-                foreach (var featureActivation in webFeatures)
+                foreach (var featureActivation in webFeatures.Where(f => f.ContentTypeDependency == onlyContentTypeDependencyFeatures))
                 {
                     ActivateFeature(clientContext, clientContext.Web, featureActivation, FeatureDefinitionScope.Web);
                 }
             }
         }
 
+        public void ActivateFeatures(ClientContext clientContext, List<GtFeature> siteFeatures, List<GtFeature> webFeatures)
+        {
+            ActivateFeatures(clientContext, siteFeatures, webFeatures, false);
+        }
+
         private void ActivateFeature(ClientContext clientContext, Web web, GtFeature feature, FeatureDefinitionScope featureScope)
         {
-            
             switch (featureScope)
             {
                 case FeatureDefinitionScope.Web:
@@ -48,6 +53,7 @@ namespace Sherpa.Library.SiteHierarchy
                 }
             }
         }
+
 
         /// <summary>
         /// FeaturedefinitionScope.None is the way to go OOTB features. http://stackoverflow.com/questions/17803291/failing-to-activate-a-feature-using-com-in-sharepoint-2010

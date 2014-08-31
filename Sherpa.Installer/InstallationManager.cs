@@ -75,23 +75,11 @@ namespace Sherpa.Installer
             }
         }
 
-        private bool IsCurrentUserSiteCollectionAdmin()
-        {
-            using (var context = new ClientContext(_urlToSite))
-            {
-                context.Credentials = _credentials;
-
-                var currentUser = context.Web.CurrentUser;
-                context.Load(currentUser, u => u.IsSiteAdmin);
-                context.ExecuteQuery();
-
-                return currentUser.IsSiteAdmin;
-            }
-        }
-
         public void CreateSiteColumnsAndContentTypes()
         {
+            ConfigureSites(true, "activating content type dependeny features");
             Console.WriteLine("Starting setup of site columns and content types");
+
             using (var context = new ClientContext(_urlToSite))
             {
                 context.Credentials = _credentials;
@@ -113,17 +101,29 @@ namespace Sherpa.Installer
 
         public void ConfigureSites()
         {
-            Console.WriteLine("Starting configuring sites");
+            ConfigureSites(false, "configuring sites");
+        }
+
+        public void ConfigureSites(bool onlyContentTypeDependecyFeatures, string operationDescription)
+        {
+            Console.WriteLine("Starting " + operationDescription);
             using (var clientContext = new ClientContext(_urlToSite) { Credentials = _credentials })
             {
                 foreach (var file in Directory.GetFiles(ConfigurationDirectoryPath, "*sitehierarchy.json", SearchOption.AllDirectories))
                 {
                     var sitePersister = new FilePersistanceProvider<GtWeb>(file);
                     var siteManager = new SiteSetupManager(clientContext, sitePersister.Load());
-                    siteManager.SetupSites();
+                    if (onlyContentTypeDependecyFeatures)
+                    {
+                        siteManager.ActivateContentTypeDependencyFeatures();
+                    }
+                    else
+                    {
+                        siteManager.SetupSites();
+                    }
                 }
             }
-            Console.WriteLine("Done configuring sites");
+            Console.WriteLine("Done " + operationDescription);
         }
 
         public void TeardownSites()
@@ -167,6 +167,20 @@ namespace Sherpa.Installer
         {
             var deployManager = new DeployManager(_urlToSite, _credentials, _isSharePointOnline);
             deployManager.ForceRecrawl();
+        }
+
+        private bool IsCurrentUserSiteCollectionAdmin()
+        {
+            using (var context = new ClientContext(_urlToSite))
+            {
+                context.Credentials = _credentials;
+
+                var currentUser = context.Web.CurrentUser;
+                context.Load(currentUser, u => u.IsSiteAdmin);
+                context.ExecuteQuery();
+
+                return currentUser.IsSiteAdmin;
+            }
         }
     }
 }
