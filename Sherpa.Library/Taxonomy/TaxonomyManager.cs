@@ -68,6 +68,12 @@ namespace Sherpa.Library.Taxonomy
             }
         }
 
+        /// <summary>
+        /// Since the administrator members like TermStore.DoesUserHavePermissions aren't available in the client API, this is currently how we check if user has permissions
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="termStore"></param>
+        /// <returns></returns>
         private bool IsCurrentUserTermStoreAdministrator(ClientContext context, TermStore termStore)
         {
             const string testGroupName = "SherpaTemporaryTestGroup";
