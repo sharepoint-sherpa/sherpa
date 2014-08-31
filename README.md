@@ -1,4 +1,4 @@
-Sherpa 
+﻿Sherpa 
 =================
 # What is Sherpa
 * Sherpa is a library and a command-line tool create for easy deployment of customizations and sandboxed solutions On-premises and to SharePoint Online (Office 365)
@@ -31,7 +31,7 @@ At the moment Sherpa is connecting to a single site collection, which means that
 * On-premises: the application must run at one of your servers in your SharePoint farm
 * On-premises: the application runs exclusively in the context of the current user
 
-# Relevant resources
+# Tools and resources
 * <a href="http://www.uize.com/examples/json-prettifier.html">JSON Prettifier</a>
 
 # Maintainers
@@ -39,7 +39,7 @@ Tarjei Ormestøyl [<a href="mailto:tarjeieo@puzzlepart.com">tarjeieo@puzzlepart.
 Ole Kristian Mørch-Storstein [<a href="mailto:olekms@puzzlepart.com">olekms@puzzlepart.com</a>]
 
 # About
-The sherpa tool is built by <a href="http://www.puzzlepart.com">Puzzlepart AS</a> as part of the <a href="https://github.com/prosjektstotte/sp-prosjektportal">Project portal for SharePoint project</a> for Asker Kommune.
+The sherpa tool is built by <a href="http://www.puzzlepart.com">Puzzlepart AS</a> as part of the <a href="https://github.com/prosjektstotte/sp-prosjektportal">Project portal for SharePoint project</a> for Asker Kommune and <a href="http://www.ks.no/kommit">KommIT</a>.
 
 # Disclaimer
 The tool is a work in progress, and not considered finished. Use at own risk. We do not recommend usage of the tool in production environments. The maintainers takes no responsibility of errors or bugs in the tool, problems caused by the tool or by usage errors.
