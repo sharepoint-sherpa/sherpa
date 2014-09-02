@@ -164,8 +164,8 @@ namespace Sherpa.Library.Deploy
             var newVersionPackageInfo = GetPackageInfo(nameOfPackage, majorVersion, minorVersion);
 
             var nameInSolutionGallery = GetFileNameFromPackageInfo(newVersionPackageInfo);
-            var fileInSolutionGallery =
-                context.Web.GetFileByServerRelativeUrl(context.Site.ServerRelativeUrl + "/_catalogs/solutions/" + nameInSolutionGallery);
+            var serverRelativeUri = UriUtilities.CombineServerRelativeUri(context.Site.ServerRelativeUrl, "/_catalogs/solutions/", nameInSolutionGallery);
+            var fileInSolutionGallery = context.Web.GetFileByServerRelativeUrl(serverRelativeUri);
             context.Load(fileInSolutionGallery, f => f.Exists);
             context.ExecuteQuery();
 
