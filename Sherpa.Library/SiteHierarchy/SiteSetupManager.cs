@@ -33,7 +33,7 @@ namespace Sherpa.Library.SiteHierarchy
         {
             var webToConfigure = EnsureWeb(context, parentWeb, configWeb);
 
-            FeatureManager.ActivateFeatures(context, configWeb.SiteFeatures, configWeb.WebFeatures);
+            FeatureManager.ActivateFeatures(context, webToConfigure, configWeb.SiteFeatures, configWeb.WebFeatures);
             QuicklaunchManager.CreateQuicklaunchNodes(context, webToConfigure, configWeb.Quicklaunch);
 
             foreach (GtWeb subWeb in configWeb.Webs)
@@ -112,7 +112,7 @@ namespace Sherpa.Library.SiteHierarchy
         /// </summary>
         public void ActivateContentTypeDependencyFeatures()
         {
-            FeatureManager.ActivateFeatures(ClientContext, _configurationWeb.SiteFeatures, _configurationWeb.WebFeatures, true);
+            FeatureManager.ActivateFeatures(ClientContext, ClientContext.Web, _configurationWeb.SiteFeatures, _configurationWeb.WebFeatures, true);
         }
     }
 }

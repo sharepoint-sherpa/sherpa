@@ -8,50 +8,42 @@ namespace Sherpa.Library.SiteHierarchy
 {
     public class FeatureManager
     {
-        public void ActivateFeatures(ClientContext clientContext, List<GtFeature> siteFeatures, List<GtFeature> webFeatures, bool onlyContentTypeDependencyFeatures)
+        public void ActivateFeatures(ClientContext clientContext, Web webToConfigure, List<GtFeature> siteFeatures, List<GtFeature> webFeatures, bool onlyContentTypeDependencyFeatures)
         {
             if (siteFeatures != null)
             {
                 foreach (var featureActivation in siteFeatures.Where(f => f.ContentTypeDependency == onlyContentTypeDependencyFeatures))
                 {
-                    ActivateFeature(clientContext, clientContext.Web, featureActivation, FeatureDefinitionScope.Site);
+                    ActivateSiteCollectionFeature(clientContext, featureActivation);
                 }
             }
             if (webFeatures != null)
             {
                 foreach (var featureActivation in webFeatures.Where(f => f.ContentTypeDependency == onlyContentTypeDependencyFeatures))
                 {
-                    ActivateFeature(clientContext, clientContext.Web, featureActivation, FeatureDefinitionScope.Web);
+                    ActivateWebFeature(clientContext, featureActivation, webToConfigure);
                 }
             }
         }
 
-        public void ActivateFeatures(ClientContext clientContext, List<GtFeature> siteFeatures, List<GtFeature> webFeatures)
+        public void ActivateFeatures(ClientContext clientContext, Web webToConfigure, List<GtFeature> siteFeatures, List<GtFeature> webFeatures)
         {
-            ActivateFeatures(clientContext, siteFeatures, webFeatures, false);
+            ActivateFeatures(clientContext, webToConfigure, siteFeatures, webFeatures, false);
         }
 
-        private void ActivateFeature(ClientContext clientContext, Web web, GtFeature feature, FeatureDefinitionScope featureScope)
+        private void ActivateWebFeature(ClientContext clientContext, GtFeature feature, Web web)
         {
-            switch (featureScope)
-            {
-                case FeatureDefinitionScope.Web:
-                {
-                    var featureCollection = web.Features;
-                    if (feature.ReactivateAlways) DeActivateFeatureInCollection(clientContext, feature, featureCollection);
-                    ActivateFeatureInCollection(clientContext, feature, featureCollection, FeatureDefinitionScope.Site);
-                    break;
-                }
-                case FeatureDefinitionScope.Site:
-                {
-                    var siteCollection = clientContext.Site;
-                    var featureCollection = siteCollection.Features;
-                    if (feature.ReactivateAlways) DeActivateFeatureInCollection(clientContext, feature, featureCollection);
-                    ActivateFeatureInCollection(clientContext, feature, featureCollection, FeatureDefinitionScope.Site);
+            var featureCollection = web.Features;
+            if (feature.ReactivateAlways) DeActivateFeatureInCollection(clientContext, feature, featureCollection);
+            ActivateFeatureInCollection(clientContext, feature, featureCollection, FeatureDefinitionScope.Site);
+        }
 
-                    break;
-                }
-            }
+        private void ActivateSiteCollectionFeature(ClientContext clientContext, GtFeature feature)
+        {
+            var siteCollection = clientContext.Site;
+            var featureCollection = siteCollection.Features;
+            if (feature.ReactivateAlways) DeActivateFeatureInCollection(clientContext, feature, featureCollection);
+            ActivateFeatureInCollection(clientContext, feature, featureCollection, FeatureDefinitionScope.Site);
         }
 
 
