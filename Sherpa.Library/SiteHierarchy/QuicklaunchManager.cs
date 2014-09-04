@@ -8,7 +8,7 @@ namespace Sherpa.Library.SiteHierarchy
     {
         public void CreateQuicklaunchNodes(ClientContext clientContext, Web web, Dictionary<string, string> quicklaunchNodes)
         {
-            if (quicklaunchNodes == null) return;
+            if (quicklaunchNodes == null || quicklaunchNodes.Count < 1) return;
 
             var quickLaunch = web.Navigation.QuickLaunch;
             clientContext.Load(quickLaunch);

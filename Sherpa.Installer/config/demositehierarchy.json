@@ -1,7 +1,12 @@
 ﻿{
-   "Description"  : "Sherpa Demo - root site",
-   "Language"     : "1033",
-   "Name"         : "Sherpa Demo",
+    "Description": "Sherpa Demo - root site",
+    "Language": "1033",
+    "Name": "Sherpa Demo",
+    "Properties": {
+        "sherpaversion": "1.0.0.0",
+        "SRCH_ENH_FTR_URL_SITE": "/searchsite",
+        "SRCH_ENH_FTR_URL": "/searchsite"
+    },
    "Quicklaunch"  : {
       "A custom link"  : "http://google.com",
       "A demo subsite" : "subsite1",
@@ -11,8 +16,7 @@
        {
             "FeatureId" : "57ff23fc-ec05-4dd8-b7ed-d93faa7c795d",
             "FeatureName": "SiteHelp",
-            "ReactivateAlways": "true",
-            "ContentTypeDependency": "true"
+            "ReactivateAlways": "true"
        }
    ],
    "Template"     : "",
@@ -33,46 +37,43 @@
       }
    ],
    "Webs"         : [
-      {
-         "Description" : "Sherpa Subsite demo",
-         "Language"    : "1033",
-         "Name"        : "Sherpa Subsite",
-         "Quicklaunch" : {
-            "Google"   : "http://google.com",
-            "Home"     : "",
-            "Testlink" : "Testlink"
-         },
-         "Template"    : "STS#0",
-         "Url"         : "subsite1",
-         "WebFeatures" : [
+    {
+        "Description": "Sherpa Subsite demo",
+        "Language": "1033",
+        "Name": "Sherpa Subsite",
+        "Quicklaunch": {
+            "Google": "http://google.com",
+            "Home": "",
+            "Testlink": "Testlink"
+        },
+        "Template": "STS#0",
+        "Url": "subsite1",
+        "WebFeatures": [
             {
-               "FeatureId"        : "ec918931-c874-4033-bd09-4f36b2e31fef",
-               "FeatureName"      : "WorkflowAppOnlyPolicyManager",
-               "ReactivateAlways" : "true"
+                "FeatureId": "ec918931-c874-4033-bd09-4f36b2e31fef",
+                "FeatureName": "WorkflowAppOnlyPolicyManager"
             }
-         ],
-         "Webs"        : [
+        ],
+        "Webs": [
             {
-               "Description" : "Sherpa Subsite demo",
-               "Language"    : "1033",
-               "Name"        : "Sherpa Subsite",
-               "Quicklaunch" : {
-                  "Google"   : "http://google.com",
-                  "Home"     : "",
-                  "Testlink" : "Testlink"
-               },
-               "Template"    : "STS#0",
-               "Url"         : "subsite1",
-               "WebFeatures" : [
-                  {
-                     "FeatureId"        : "ec918931-c874-4033-bd09-4f36b2e31fef",
-                     "FeatureName"      : "WorkflowAppOnlyPolicyManager",
-                     "ReactivateAlways" : "true"
-                  }
-               ],
-               "Webs"        : []
+                "Description": "Sherpa Subsite demo",
+                "Language": "1033",
+                "Name": "Sherpa Subsubsite",
+                "Quicklaunch": {
+                    "Google": "http://google.com",
+                    "Home": "",
+                    "Testlink": "Testlink"
+                },
+                "Template": "STS#0",
+                "Url": "subsubsite1",
+                "WebFeatures": [
+                    {
+                        "FeatureId": "ec918931-c874-4033-bd09-4f36b2e31fef",
+                        "FeatureName": "WorkflowAppOnlyPolicyManager"
+                    }
+                ]
             }
-         ]
-      }
+        ]
+    }
    ]
 }

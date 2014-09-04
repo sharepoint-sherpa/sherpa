@@ -75,6 +75,7 @@
     <Compile Include="IPersistanceProvider.cs" />
     <Compile Include="SiteHierarchy\ISiteSetupManager.cs" />
     <Compile Include="SiteHierarchy\Model\GtWeb.cs" />
+    <Compile Include="SiteHierarchy\PropertyManager.cs" />
     <Compile Include="SiteHierarchy\SiteSetupManager.cs" />
     <Compile Include="SiteHierarchy\QuicklaunchManager.cs" />
     <Compile Include="Taxonomy\Model\GtTerm.cs" />

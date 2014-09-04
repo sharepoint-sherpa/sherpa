@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Microsoft.SharePoint.Client;
 using Sherpa.Library.SiteHierarchy.Model;
 
@@ -10,6 +11,7 @@ namespace Sherpa.Library.SiteHierarchy
         private ClientContext ClientContext { get; set; }
         private FeatureManager FeatureManager { get; set; }
         private QuicklaunchManager QuicklaunchManager { get; set; }
+        private PropertyManager PropertyManager { get; set; }
 
         public SiteSetupManager(ClientContext clientContext, GtWeb configurationWeb)
         {
@@ -18,6 +20,7 @@ namespace Sherpa.Library.SiteHierarchy
 
             FeatureManager = new FeatureManager();
             QuicklaunchManager = new QuicklaunchManager();
+            PropertyManager = new PropertyManager();
         }
         public void SetupSites()
         {
@@ -35,6 +38,7 @@ namespace Sherpa.Library.SiteHierarchy
 
             FeatureManager.ActivateFeatures(context, webToConfigure, configWeb.SiteFeatures, configWeb.WebFeatures);
             QuicklaunchManager.CreateQuicklaunchNodes(context, webToConfigure, configWeb.Quicklaunch);
+            PropertyManager.SetProperties(context, webToConfigure, configWeb.Properties);
 
             foreach (GtWeb subWeb in configWeb.Webs)
             {
@@ -52,13 +56,36 @@ namespace Sherpa.Library.SiteHierarchy
             }
             else
             {
-                webToConfigure = GetSubWeb(context, parentWeb, configWeb.Url) ??
-                                 parentWeb.Webs.Add(GetWebCreationInformationFromConfig(configWeb));
+                webToConfigure = GetSubWeb(context, parentWeb, configWeb.Url);
+
+                if (webToConfigure == null)
+                {
+                    Console.WriteLine("Creating web " + configWeb.Url);
+                    parentWeb.Webs.Add(GetWebCreationInformationFromConfig(configWeb));
+                }
             }
             context.Load(webToConfigure, w => w.Url);
             context.ExecuteQuery();
 
             return webToConfigure;
+        }
+
+        private Web GetSubWeb(ClientContext context, Web parentWeb, string webUrl)
+        {
+            context.Load(parentWeb, w => w.Url, w => w.Webs);
+            context.ExecuteQuery();
+
+            var absoluteUrlToCheck = parentWeb.Url.TrimEnd('/') + '/' + webUrl;
+            // use a simple linq query to get any sub webs with the URL we want to check
+            return (from w in parentWeb.Webs where w.Url == absoluteUrlToCheck select w).SingleOrDefault();
+        }
+
+        /// <summary>
+        /// Will only activate site collection features or rootweb's web features
+        /// </summary>
+        public void ActivateContentTypeDependencyFeatures()
+        {
+            FeatureManager.ActivateFeatures(ClientContext, ClientContext.Web, _configurationWeb.SiteFeatures, _configurationWeb.WebFeatures, true);
         }
 
         private WebCreationInformation GetWebCreationInformationFromConfig(GtWeb configWeb)
@@ -96,23 +123,6 @@ namespace Sherpa.Library.SiteHierarchy
             }
             web.DeleteObject();
             ClientContext.ExecuteQuery();
-        }
-
-        private Web GetSubWeb(ClientContext context, Web parentWeb, string webUrl)
-        {
-            context.Load(parentWeb, w => w.Url, w => w.Webs);
-            context.ExecuteQuery();
-
-            var absoluteUrlToCheck = parentWeb.Url.TrimEnd('/') + '/' + webUrl;
-            // use a simple linq query to get any sub webs with the URL we want to check
-            return (from w in parentWeb.Webs where w.Url == absoluteUrlToCheck select w).SingleOrDefault();
-        }
-        /// <summary>
-        /// Will only activate site collection features or rootweb's web features
-        /// </summary>
-        public void ActivateContentTypeDependencyFeatures()
-        {
-            FeatureManager.ActivateFeatures(ClientContext, ClientContext.Web, _configurationWeb.SiteFeatures, _configurationWeb.WebFeatures, true);
         }
     }
 }
