@@ -39,7 +39,7 @@
          "Some other choice",
          "Third choice"
       ],
-      "Default"      : "Medium",
+      "Default"      : "Choice 1",
       "Description"  : "Example sitecolumn of type Choice",
       "DisplayName"  : "Sherpa Choice Field",
       "Format"       : "RadioButtons",
@@ -68,7 +68,7 @@
       "Group"        : "Sherpa Sitecolumns",
       "ID"           : "8c30d6a9-e2d8-4583-9b96-1a5af42f4773",
       "InternalName" : "SherpaNoteField",
-      "NumLines"     : 6,
+      "NumLines"     : "6",
       "Type"         : "Note"
    },
    {
@@ -85,8 +85,8 @@
       "Group"        : "Sherpa Sitecolumns",
       "ID"           : "0434121f-996b-4fcd-80af-48f976fe06f5",
       "InternalName" : "SherpaNumberFieldConstrained",
-      "Max"          : 5,
-      "Min"          : 0,
+      "Max"          : "5",
+      "Min"          : "0",
       "Type"         : "Number"
    },
    {
