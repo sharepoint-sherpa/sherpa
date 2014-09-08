@@ -69,12 +69,15 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="SiteHierarchy\FeatureManager.cs" />
+    <Compile Include="SiteHierarchy\ListManager.cs" />
     <Compile Include="SiteHierarchy\Model\GtFeature.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="FilePersistanceProvider.cs" />
     <Compile Include="IPersistanceProvider.cs" />
     <Compile Include="SiteHierarchy\ISiteSetupManager.cs" />
+    <Compile Include="SiteHierarchy\Model\ShList.cs" />
     <Compile Include="SiteHierarchy\Model\GtWeb.cs" />
+    <Compile Include="SiteHierarchy\Model\ShView.cs" />
     <Compile Include="SiteHierarchy\PropertyManager.cs" />
     <Compile Include="SiteHierarchy\SiteSetupManager.cs" />
     <Compile Include="SiteHierarchy\QuicklaunchManager.cs" />

@@ -2,16 +2,22 @@
     "Description": "Sherpa Demo - root site",
     "Language": "1033",
     "Name": "Sherpa Demo",
+    "Lists": [
+        {
+            "Title": "Log Lady",
+            "Description": "For logging things",
+            "Url": "Lists/Log",
+            "TemplateType": "100",
+            "VersioningEnabled": "true",
+            "OnQuickLaunch": "true"
+        }
+    ],
     "Properties": {
         "sherpaversion": "1.0.0.0",
         "SRCH_ENH_FTR_URL_SITE": "/searchsite",
         "SRCH_ENH_FTR_URL": "/searchsite"
     },
-   "Quicklaunch"  : {
-      "A custom link"  : "http://google.com",
-      "A demo subsite" : "subsite1",
-      "Home"           : ""
-   },
+   "Quicklaunch"  : {},
    "SiteFeatures" : [
        {
             "FeatureId" : "57ff23fc-ec05-4dd8-b7ed-d93faa7c795d",

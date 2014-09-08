@@ -12,6 +12,7 @@ namespace Sherpa.Library.SiteHierarchy
         private FeatureManager FeatureManager { get; set; }
         private QuicklaunchManager QuicklaunchManager { get; set; }
         private PropertyManager PropertyManager { get; set; }
+        private ListManager ListManager { get; set; }
 
         public SiteSetupManager(ClientContext clientContext, GtWeb configurationWeb)
         {
@@ -21,6 +22,7 @@ namespace Sherpa.Library.SiteHierarchy
             FeatureManager = new FeatureManager();
             QuicklaunchManager = new QuicklaunchManager();
             PropertyManager = new PropertyManager();
+            ListManager = new ListManager();
         }
         public void SetupSites()
         {
@@ -37,6 +39,7 @@ namespace Sherpa.Library.SiteHierarchy
             var webToConfigure = EnsureWeb(context, parentWeb, configWeb);
 
             FeatureManager.ActivateFeatures(context, webToConfigure, configWeb.SiteFeatures, configWeb.WebFeatures);
+            ListManager.CreateLists(context, webToConfigure, configWeb.Lists);
             QuicklaunchManager.CreateQuicklaunchNodes(context, webToConfigure, configWeb.Quicklaunch);
             PropertyManager.SetProperties(context, webToConfigure, configWeb.Properties);
 

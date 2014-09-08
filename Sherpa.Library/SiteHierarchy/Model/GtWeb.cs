@@ -12,6 +12,7 @@ namespace Sherpa.Library.SiteHierarchy.Model
         public List<GtWeb> Webs { get; set; }
         public List<GtFeature> SiteFeatures { get; set; }
         public List<GtFeature> WebFeatures { get; set; }
+        public List<ShList> Lists { get; set; }
         public Dictionary<string, string> Quicklaunch { get; set; }
         public Dictionary<string, string> Properties { get; set; }
 
@@ -20,6 +21,7 @@ namespace Sherpa.Library.SiteHierarchy.Model
             Webs = new List<GtWeb>();
             SiteFeatures = new List<GtFeature>();
             WebFeatures = new List<GtFeature>();
+            Lists = new List<ShList>();
             Quicklaunch = new Dictionary<string, string>();
             Properties = new Dictionary<string, string>();
         }
