@@ -9,7 +9,23 @@
             "Url": "Lists/Log",
             "TemplateType": "100",
             "VersioningEnabled": "true",
-            "OnQuickLaunch": "true"
+            "OnQuickLaunch": "true",
+            "Views": [
+                {
+                    "Title": "The all-seeing view",
+                    "Query": "<OrderBy><FieldRef Name='LinkTitle' Ascending='TRUE' /></OrderBy>",
+                    "ViewFields": [ "LinkTitle", "ID", "Author", "Editor", "_UIVersionString" ],
+                    "RowLimit": "30",
+                    "DefaultView": "true"
+                },
+                {
+                    "Title": "My view",
+                    "Query": "<Where><Eq><FieldRef Name='Author' /><Value Type='Integer'><UserID Type='Integer'/></Value></Eq></Where>",
+                    "ViewFields": [ "LinkTitle", "Author", "Editor", "_UIVersionString" ],
+                    "RowLimit": "30",
+                    "DefaultView": "false"
+                }
+            ]
         }
     ],
     "Properties": {

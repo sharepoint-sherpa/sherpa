@@ -12,12 +12,13 @@ namespace Sherpa.Library.SiteHierarchy.Model
         public bool OnQuickLaunch { get; set; }
         public string Description { get; set; }
         public List<ShView> Views { get; set; }
-        public List<string> ContentTypes { get; set; }
+        //TODO: Add support for setting content types
+        //public List<string> ContentTypes { get; set; }
 
         public ShList()
         {
             Views = new List<ShView>();
-            ContentTypes = new List<string>();
+            //ContentTypes = new List<string>();
         }
     }
 }

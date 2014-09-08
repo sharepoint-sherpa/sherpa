@@ -20,18 +20,61 @@ namespace Sherpa.Library.SiteHierarchy
             context.Load(listCollection);
             context.ExecuteQuery();
 
-            var existingList = listCollection.FirstOrDefault(l => l.Title == listConfig.Title);
-            if (existingList == null)
+            var setupList = listCollection.FirstOrDefault(l => l.Title == listConfig.Title);
+            if (setupList == null)
             {
                 var listCreationInfo = GetListCreationInfoFromConfig(listConfig);
-                existingList = listCollection.Add(listCreationInfo);
+                setupList = listCollection.Add(listCreationInfo);
                 context.ExecuteQuery();
             }
-            existingList.OnQuickLaunch = listConfig.OnQuickLaunch;
-            existingList.EnableVersioning = listConfig.VersioningEnabled;
-            //TODO: Setup views
-            existingList.Update();
+            setupList.OnQuickLaunch = listConfig.OnQuickLaunch;
+            setupList.EnableVersioning = listConfig.VersioningEnabled;
+            setupList.Update();
+
+            context.Load(setupList.Views);
             context.ExecuteQuery();
+
+            foreach (ShView view in listConfig.Views)
+            {
+                SetupView(context, setupList, view);
+            }
+        }
+
+        private void SetupView(ClientContext context, List list, ShView view)
+        {
+            var viewCollection = list.Views;
+            View setupView = null;
+            if (!string.IsNullOrEmpty(view.Title))
+            {
+                setupView = viewCollection.FirstOrDefault(v => v.Title == view.Title);
+                if (setupView == null)
+                {
+                    setupView = viewCollection.Add(GetViewCreationInfoFromConfig(view));
+                    context.ExecuteQuery();
+                }
+            }
+            else if (!string.IsNullOrEmpty(view.Url))
+            {
+                var serverRelativeUrl = UriUtilities.CombineServerRelativeUri(list.ParentWebUrl, view.Url);
+                setupView = viewCollection.FirstOrDefault(v => v.ServerRelativeUrl == serverRelativeUrl);
+            }
+            if (setupView != null)
+            {
+                setupView.JSLink = view.JSLink;
+                setupView.Update();
+            }
+        }
+
+        private ViewCreationInformation GetViewCreationInfoFromConfig(ShView view)
+        {
+            return new ViewCreationInformation
+            {
+                Title = view.Title,
+                Query = view.Query,
+                ViewFields = view.ViewFields,
+                RowLimit = view.RowLimit,
+                SetAsDefaultView = view.DefaultView
+            };
         }
 
         private ListCreationInformation GetListCreationInfoFromConfig(ShList listConfig)
