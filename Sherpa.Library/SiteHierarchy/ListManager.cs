@@ -60,7 +60,19 @@ namespace Sherpa.Library.SiteHierarchy
             }
             if (setupView != null)
             {
+                if (view.ViewFields.Length > 0)
+                {
+                    setupView.ViewFields.RemoveAll();
+                    foreach (var field in view.ViewFields)
+                    {
+                        setupView.ViewFields.Add(field);
+                    }
+                }
+                setupView.Title = view.Title;
                 setupView.JSLink = view.JSLink;
+                setupView.ViewQuery = view.Query;
+                setupView.RowLimit = view.RowLimit;
+                
                 setupView.Update();
             }
         }
