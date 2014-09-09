@@ -68,7 +68,6 @@ namespace Sherpa.Library.SiteHierarchy
                         setupView.ViewFields.Add(field);
                     }
                 }
-                setupView.Title = view.Title;
                 setupView.JSLink = view.JSLink;
                 setupView.ViewQuery = view.Query;
                 setupView.RowLimit = view.RowLimit;
