@@ -32,7 +32,9 @@ At the moment Sherpa is connecting to a single site collection, which means that
 * On-premises: the application runs exclusively in the context of the current user
 
 # Tools and resources
-* <a href="http://www.uize.com/examples/json-prettifier.html">JSON Prettifier</a>
+* <a href="http://www.uize.com/examples/json-prettifier.html">JSON Prettifier - Format JSON nicely</a>
+* <a href="http://shancarter.github.io/mr-data-converter/">Mr. Data Converter - Convert Excel to JSON</a>
+* <a href="http://jsonlint.com/">JSONLint - JSON validator</a>
 
 # Maintainers
 Tarjei Ormestøyl [<a href="mailto:tarjeieo@puzzlepart.com">tarjeieo@puzzlepart.com</a>], 
