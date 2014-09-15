@@ -61,8 +61,8 @@ namespace Sherpa.Library.Taxonomy
             if (spTerm.ServerObjectIsNull != null && spTerm.ServerObjectIsNull.Value)
             {
                 spTerm = parentTerm.CreateTerm(shTerm.Title, termStore.DefaultLanguage, shTerm.Id);
-                if (!string.IsNullOrEmpty(shTerm.CustomSortOrder))
-                    spTerm.CustomSortOrder = shTerm.CustomSortOrder;
+                if (!string.IsNullOrEmpty(shTerm.CustomSortOrder)) spTerm.CustomSortOrder = shTerm.CustomSortOrder;
+                spTerm.IsAvailableForTagging = shTerm.IsAvailableForTagging;
                 context.Load(spTerm);
                 context.ExecuteQuery();
             }

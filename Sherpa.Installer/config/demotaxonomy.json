@@ -5,6 +5,7 @@
         {
           "Title": "Sherpa Term A",
           "Id": "f75c72ff-05e4-46c1-9fb6-68ea8c8854f8",
+          "IsAvailableForTagging": "false",
           "Terms": [
                 {
                     "Title": "Subterm 1",
