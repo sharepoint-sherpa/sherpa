@@ -46,7 +46,7 @@ namespace Sherpa.Installer
                 context.Credentials = _credentials;
                 foreach (var file in Directory.GetFiles(ConfigurationDirectoryPath, "*taxonomy.json", SearchOption.AllDirectories))
                 {
-                    var taxPersistanceProvider = new FilePersistanceProvider<GtTermSetGroup>(file);
+                    var taxPersistanceProvider = new FilePersistanceProvider<ShTermSetGroup>(file);
                     var taxonomyManager = new TaxonomyManager(taxPersistanceProvider.Load());
                     taxonomyManager.WriteTaxonomyToTermStore(context);
                 }

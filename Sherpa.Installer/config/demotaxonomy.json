@@ -4,7 +4,31 @@
       "Terms": [
         {
           "Title": "Sherpa Term A",
-          "Id": "f75c72ff-05e4-46c1-9fb6-68ea8c8854f8"
+          "Id": "f75c72ff-05e4-46c1-9fb6-68ea8c8854f8",
+          "Terms": [
+                {
+                    "Title": "Subterm 1",
+                    "Id": "8818a10d-802c-4c2f-8245-66ffe291845e",
+                    "Terms": [
+                        {
+                            "Title": "Babyterm X",
+                            "Id": "08b53d8f-79e7-430f-8799-019bccb85b60"
+                        },
+                        {
+                            "Title": "Babyterm Y",
+                            "Id": "439d9386-9d9b-4f05-b4a3-f2fea4791523"
+                        }
+                    ]
+                },
+                {
+                    "Title": "Subterm 2",
+                    "Id": "ad29a9d6-708d-4d47-aa03-73eedd76686f"
+                },
+                {
+                    "Title": "Subterm 3",
+                    "Id": "c8005b3d-599b-484a-9660-acf51521217c"
+                }
+            ]
         },
         {
           "Title": "Sherpa Term B",
@@ -17,7 +41,7 @@
       ],
       "Title": "Sherpa Termset",
       "Id": "fa79e775-aa88-4da5-bd57-59a696e7a8f2",
-      "CustomSortOrder": "3881f94d-8508-46b4-8acd-9ecc2b52a5b0:7249a133-2d20-45d5-9163-1d488cc739db:f75c72ff-05e4-46c1-9fb6-68ea8c8854f8"
+      "CustomSortOrder": ""
     }
   ],
   "Title": "Sherpa Termgroup",

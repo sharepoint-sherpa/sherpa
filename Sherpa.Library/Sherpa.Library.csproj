@@ -81,10 +81,10 @@
     <Compile Include="SiteHierarchy\PropertyManager.cs" />
     <Compile Include="SiteHierarchy\SiteSetupManager.cs" />
     <Compile Include="SiteHierarchy\QuicklaunchManager.cs" />
-    <Compile Include="Taxonomy\Model\GtTerm.cs" />
-    <Compile Include="Taxonomy\Model\GtTermItemBase.cs" />
-    <Compile Include="Taxonomy\Model\GtTermSet.cs" />
-    <Compile Include="Taxonomy\Model\GtTermSetGroup.cs" />
+    <Compile Include="Taxonomy\Model\ShTerm.cs" />
+    <Compile Include="Taxonomy\Model\ShTermItemBase.cs" />
+    <Compile Include="Taxonomy\Model\ShTermSet.cs" />
+    <Compile Include="Taxonomy\Model\ShTermSetGroup.cs" />
     <Compile Include="Taxonomy\TaxonomyManager.cs" />
     <Compile Include="UriUtilities.cs" />
   </ItemGroup>

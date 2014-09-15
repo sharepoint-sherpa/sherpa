@@ -9,9 +9,9 @@ namespace Sherpa.Library.Taxonomy
 {
     public class TaxonomyManager
     {
-        private readonly GtTermSetGroup _termSetGroup;
+        private readonly ShTermSetGroup _termSetGroup;
 
-        public TaxonomyManager(GtTermSetGroup termSetGroup)
+        public TaxonomyManager(ShTermSetGroup termSetGroup)
         {
             _termSetGroup = termSetGroup;
         }
@@ -19,15 +19,11 @@ namespace Sherpa.Library.Taxonomy
         public void WriteTaxonomyToTermStore(ClientContext context)
         {
             ValidateConfiguration(_termSetGroup);
-            // user must be termstore admin
             TermStore termStore = GetTermStore(context);
 
             if (!IsCurrentUserTermStoreAdministrator(context, termStore))
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("You must be a term store administrator to perform this operation");
-                Console.ResetColor();
-                return;
+                throw new Exception("Couldn't verify admin access. You must be a term store administrator to perform this operation");
             }
 
             var termGroup = termStore.Groups.ToList().FirstOrDefault(g => g.Id == _termSetGroup.Id) ??
@@ -36,15 +32,14 @@ namespace Sherpa.Library.Taxonomy
             context.Load(termGroup, x => x.TermSets);
             context.ExecuteQuery();
 
-            var language = termStore.DefaultLanguage;
             foreach (var termSet in _termSetGroup.TermSets)
             {
                 var spTermSet = termStore.GetTermSet(termSet.Id);
                 context.Load(spTermSet, x => x.Terms);
                 context.ExecuteQuery();
-                if (spTermSet.ServerObjectIsNull.Value)
+                if (spTermSet.ServerObjectIsNull != null && spTermSet.ServerObjectIsNull.Value)
                 {
-                    spTermSet = termGroup.CreateTermSet(termSet.Title, termSet.Id, language);
+                    spTermSet = termGroup.CreateTermSet(termSet.Title, termSet.Id, termStore.DefaultLanguage);
                     if (!string.IsNullOrEmpty(termSet.CustomSortOrder))
                         spTermSet.CustomSortOrder = termSet.CustomSortOrder;
                     context.Load(spTermSet, x => x.Terms);
@@ -53,21 +48,29 @@ namespace Sherpa.Library.Taxonomy
 
                 foreach (var term in termSet.Terms)
                 {
-                    var spTerm = termStore.GetTerm(term.Id);
-                    context.Load(spTerm);
-                    context.ExecuteQuery();
-                    if (spTerm.ServerObjectIsNull.Value)
-                    {
-                        var spterm = spTermSet.CreateTerm(term.Title, language, term.Id);
-                        if (!string.IsNullOrEmpty(term.CustomSortOrder))
-                            spterm.CustomSortOrder = term.CustomSortOrder;
-                        context.Load(spterm);
-                        context.ExecuteQuery();
-                    }
+                    CreateTerm(context, termStore, term, spTermSet);
                 }
             }
         }
 
+        private void CreateTerm(ClientContext context, TermStore termStore, ShTerm shTerm, TermSetItem parentTerm)
+        {
+            var spTerm = termStore.GetTerm(shTerm.Id);
+            context.Load(spTerm, t => t.Terms);
+            context.ExecuteQuery();
+            if (spTerm.ServerObjectIsNull != null && spTerm.ServerObjectIsNull.Value)
+            {
+                spTerm = parentTerm.CreateTerm(shTerm.Title, termStore.DefaultLanguage, shTerm.Id);
+                if (!string.IsNullOrEmpty(shTerm.CustomSortOrder))
+                    spTerm.CustomSortOrder = shTerm.CustomSortOrder;
+                context.Load(spTerm);
+                context.ExecuteQuery();
+            }
+            foreach (ShTerm childTerm in shTerm.Terms)
+            {
+                CreateTerm(context, termStore, childTerm, spTerm);
+            }
+        }
         /// <summary>
         /// Since the administrator members like TermStore.DoesUserHavePermissions aren't available in the client API, this is currently how we check if user has permissions
         /// </summary>
@@ -117,13 +120,13 @@ namespace Sherpa.Library.Taxonomy
         /// Also checks that no terms at the same level have duplicate names.
         /// Both scenarios will lead to problems with 'rogue' terms and term sets
         /// </summary>
-        /// <param name="gtTermGroup"></param>
+        /// <param name="shTermGroup"></param>
         /// <returns></returns>
-        public void ValidateConfiguration(GtTermSetGroup gtTermGroup)
+        public void ValidateConfiguration(ShTermSetGroup shTermGroup)
         {
-            var termIdsForEnsuringUniqueness = new List<Guid> {gtTermGroup.Id};
+            var termIdsForEnsuringUniqueness = new List<Guid> {shTermGroup.Id};
 
-            foreach (var termSet in gtTermGroup.TermSets)
+            foreach (var termSet in shTermGroup.TermSets)
             {
                 if (termIdsForEnsuringUniqueness.Contains(termSet.Id)) 
                     throw new NotSupportedException("One or more term items has the same Id which is not supported. Termset Id " + termSet.Id);
