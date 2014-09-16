@@ -100,7 +100,7 @@ namespace Sherpa.Library.Taxonomy
             {
                 spTerm = parentTerm.CreateTerm(shTerm.Title, termStore.DefaultLanguage, shTerm.Id);
                 if (!string.IsNullOrEmpty(shTerm.CustomSortOrder)) spTerm.CustomSortOrder = shTerm.CustomSortOrder;
-                spTerm.IsAvailableForTagging = shTerm.NotAvailableForTagging;
+                spTerm.IsAvailableForTagging = !shTerm.NotAvailableForTagging;
                 context.Load(spTerm);
                 context.ExecuteQuery();
             }
