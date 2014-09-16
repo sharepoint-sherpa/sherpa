@@ -9,16 +9,54 @@ namespace Sherpa.Library.Taxonomy
 {
     public class TaxonomyManager
     {
-        private readonly ShTermSetGroup _termSetGroup;
+        private readonly ShTermGroup _termGroup;
 
-        public TaxonomyManager(ShTermSetGroup termSetGroup)
+        public TaxonomyManager(){}
+        public TaxonomyManager(ShTermGroup termGroup)
         {
-            _termSetGroup = termSetGroup;
+            _termGroup = termGroup;
+        }
+
+        public ShTermGroup ExportTaxonomyGroupToConfig(ClientContext context, string groupName)
+        {
+            TermStore termStore = GetTermStore(context);
+
+            var spTermGroup = termStore.Groups.ToList().FirstOrDefault(g => g.Name == groupName);
+            context.Load(spTermGroup, x => x.TermSets);
+            context.ExecuteQuery();
+
+            if (spTermGroup == null)
+            {
+                Console.WriteLine("Couldn't find a taxonomy group with the name " + groupName);
+                return null;
+            }
+            var shTermGroup = new ShTermGroup(spTermGroup.Id, spTermGroup.Name);
+
+            foreach (var spTermSet in spTermGroup.TermSets)
+            {
+                var shTermSet = new ShTermSet(spTermSet.Id, spTermSet.Name);
+                AddTermsToConfig(context, spTermSet, shTermSet);
+                shTermGroup.TermSets.Add(shTermSet);
+            }
+            return shTermGroup;
+        }
+
+        private void AddTermsToConfig(ClientContext context, TermSetItem spTerm, ShTermItemBase termItem)
+        {
+            context.Load(spTerm, t => t.Terms);
+            context.ExecuteQuery();
+
+            foreach (var spChildTerm in spTerm.Terms)
+            {
+                var shTerm = new ShTerm(spChildTerm.Id, spChildTerm.Name);
+                AddTermsToConfig(context, spChildTerm, shTerm);
+                termItem.Terms.Add(shTerm);
+            }
         }
 
         public void WriteTaxonomyToTermStore(ClientContext context)
         {
-            ValidateConfiguration(_termSetGroup);
+            ValidateConfiguration(_termGroup);
             TermStore termStore = GetTermStore(context);
 
             if (!IsCurrentUserTermStoreAdministrator(context, termStore))
@@ -26,13 +64,13 @@ namespace Sherpa.Library.Taxonomy
                 throw new Exception("Couldn't verify admin access. You must be a term store administrator to perform this operation");
             }
 
-            var termGroup = termStore.Groups.ToList().FirstOrDefault(g => g.Id == _termSetGroup.Id) ??
-                            termStore.CreateGroup(_termSetGroup.Title, _termSetGroup.Id);
+            var termGroup = termStore.Groups.ToList().FirstOrDefault(g => g.Id == _termGroup.Id) ??
+                            termStore.CreateGroup(_termGroup.Title, _termGroup.Id);
                 
             context.Load(termGroup, x => x.TermSets);
             context.ExecuteQuery();
 
-            foreach (var termSet in _termSetGroup.TermSets)
+            foreach (var termSet in _termGroup.TermSets)
             {
                 var spTermSet = termStore.GetTermSet(termSet.Id);
                 context.Load(spTermSet, x => x.Terms);
@@ -62,7 +100,7 @@ namespace Sherpa.Library.Taxonomy
             {
                 spTerm = parentTerm.CreateTerm(shTerm.Title, termStore.DefaultLanguage, shTerm.Id);
                 if (!string.IsNullOrEmpty(shTerm.CustomSortOrder)) spTerm.CustomSortOrder = shTerm.CustomSortOrder;
-                spTerm.IsAvailableForTagging = shTerm.IsAvailableForTagging;
+                spTerm.IsAvailableForTagging = shTerm.NotAvailableForTagging;
                 context.Load(spTerm);
                 context.ExecuteQuery();
             }
@@ -122,10 +160,11 @@ namespace Sherpa.Library.Taxonomy
         /// </summary>
         /// <param name="shTermGroup"></param>
         /// <returns></returns>
-        public void ValidateConfiguration(ShTermSetGroup shTermGroup)
+        public void ValidateConfiguration(ShTermGroup shTermGroup)
         {
-            var termIdsForEnsuringUniqueness = new List<Guid> {shTermGroup.Id};
+            if (shTermGroup == null) throw new ArgumentNullException("shTermGroup");
 
+            var termIdsForEnsuringUniqueness = new List<Guid> {shTermGroup.Id};
             foreach (var termSet in shTermGroup.TermSets)
             {
                 if (termIdsForEnsuringUniqueness.Contains(termSet.Id)) 

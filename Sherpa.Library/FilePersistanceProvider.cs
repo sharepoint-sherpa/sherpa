@@ -1,5 +1,5 @@
 ﻿using System.IO;
-using System.Web.Script.Serialization;
+using Newtonsoft.Json;
 
 namespace Sherpa.Library
 {
@@ -14,19 +14,21 @@ namespace Sherpa.Library
 
         public void Save(T poco)
         {
-            var jsonSerializer = new JavaScriptSerializer();
-            var result = jsonSerializer.Serialize(poco);
+            var result = JsonConvert.SerializeObject(poco, Formatting.Indented,
+                new JsonSerializerSettings
+                {
+                    NullValueHandling = NullValueHandling.Ignore,
+                    DefaultValueHandling = DefaultValueHandling.Ignore
+                });
             File.WriteAllText(Path, result);
         }
 
         public T Load()
         {
-            var jsonSerializer = new JavaScriptSerializer();
             using (var reader = new StreamReader(Path))
             {
                 var json = reader.ReadToEnd();
-                var result = jsonSerializer.Deserialize<T>(json);
-                return result;
+                return JsonConvert.DeserializeObject<T>(json);
             }
         }
     }

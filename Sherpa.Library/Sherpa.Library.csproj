@@ -45,6 +45,9 @@
     <Reference Include="Microsoft.SharePoint.Client.Taxonomy, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
       <Private>True</Private>
     </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\packages\Newtonsoft.Json.6.0.5\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Web.Extensions" />
@@ -84,7 +87,7 @@
     <Compile Include="Taxonomy\Model\ShTerm.cs" />
     <Compile Include="Taxonomy\Model\ShTermItemBase.cs" />
     <Compile Include="Taxonomy\Model\ShTermSet.cs" />
-    <Compile Include="Taxonomy\Model\ShTermSetGroup.cs" />
+    <Compile Include="Taxonomy\Model\ShTermGroup.cs" />
     <Compile Include="Taxonomy\TaxonomyManager.cs" />
     <Compile Include="UriUtilities.cs" />
   </ItemGroup>

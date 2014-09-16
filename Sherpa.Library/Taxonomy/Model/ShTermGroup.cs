@@ -3,15 +3,19 @@ using System.Collections.Generic;
 
 namespace Sherpa.Library.Taxonomy.Model
 {
-    public class ShTermSetGroup : ShTermItemBase
+    public class ShTermGroup
     {
+        public string Title { get; set; }
+        public Guid Id { get; set; }
         public List<ShTermSet> TermSets { get; set; }
-        public ShTermSetGroup()
+        public ShTermGroup()
         {
             TermSets = new List<ShTermSet>();
         }
-        public ShTermSetGroup(Guid id, string title) : base(id, title)
+        public ShTermGroup(Guid id, string title)
         {
+            Title = title;
+            Id = id;
             TermSets = new List<ShTermSet>();
         }
     }

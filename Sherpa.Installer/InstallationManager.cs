@@ -46,7 +46,7 @@ namespace Sherpa.Installer
                 context.Credentials = _credentials;
                 foreach (var file in Directory.GetFiles(ConfigurationDirectoryPath, "*taxonomy.json", SearchOption.AllDirectories))
                 {
-                    var taxPersistanceProvider = new FilePersistanceProvider<ShTermSetGroup>(file);
+                    var taxPersistanceProvider = new FilePersistanceProvider<ShTermGroup>(file);
                     var taxonomyManager = new TaxonomyManager(taxPersistanceProvider.Load());
                     taxonomyManager.WriteTaxonomyToTermStore(context);
                 }
@@ -54,6 +54,33 @@ namespace Sherpa.Installer
             Console.WriteLine("Done installation of term groups, term sets and terms");
         }
 
+        public void ExportTaxonomyGroup()
+        {
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.Write("Please provide name of the taxonomy term group to export: ");
+            Console.ResetColor();
+            var input = Console.ReadLine();
+            ExportTaxonomyGroup(input);
+        }
+
+        public void ExportTaxonomyGroup(string groupName)
+        {
+            Console.WriteLine("Starting export of taxonomy group " + groupName);
+            using (var context = new ClientContext(_urlToSite))
+            {
+                context.Credentials = _credentials;
+                var outputDirectoryPath = Path.Combine(_rootPath, "export");
+                Directory.CreateDirectory(outputDirectoryPath);
+                var taxPersistanceProvider = new FilePersistanceProvider<ShTermGroup>(Path.Combine(outputDirectoryPath, groupName.ToLower().Replace(" ", "") + "taxonomy.json"));
+                var taxonomyManager = new TaxonomyManager();
+                var groupConfig = taxonomyManager.ExportTaxonomyGroupToConfig(context, groupName);
+                if (groupConfig != null)
+                {
+                    taxPersistanceProvider.Save(groupConfig);
+                    Console.WriteLine("Completed exported of taxonomy group " + groupName);
+                }
+            }
+        }
         public void UploadAndActivateSandboxSolution()
         {
             if (!IsCurrentUserSiteCollectionAdmin())
