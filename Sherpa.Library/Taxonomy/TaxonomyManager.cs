@@ -17,43 +17,6 @@ namespace Sherpa.Library.Taxonomy
             _termGroup = termGroup;
         }
 
-        public ShTermGroup ExportTaxonomyGroupToConfig(ClientContext context, string groupName)
-        {
-            TermStore termStore = GetTermStore(context);
-
-            var spTermGroup = termStore.Groups.ToList().FirstOrDefault(g => g.Name == groupName);
-            context.Load(spTermGroup, x => x.TermSets);
-            context.ExecuteQuery();
-
-            if (spTermGroup == null)
-            {
-                Console.WriteLine("Couldn't find a taxonomy group with the name " + groupName);
-                return null;
-            }
-            var shTermGroup = new ShTermGroup(spTermGroup.Id, spTermGroup.Name);
-
-            foreach (var spTermSet in spTermGroup.TermSets)
-            {
-                var shTermSet = new ShTermSet(spTermSet.Id, spTermSet.Name);
-                AddTermsToConfig(context, spTermSet, shTermSet);
-                shTermGroup.TermSets.Add(shTermSet);
-            }
-            return shTermGroup;
-        }
-
-        private void AddTermsToConfig(ClientContext context, TermSetItem spTerm, ShTermItemBase termItem)
-        {
-            context.Load(spTerm, t => t.Terms);
-            context.ExecuteQuery();
-
-            foreach (var spChildTerm in spTerm.Terms)
-            {
-                var shTerm = new ShTerm(spChildTerm.Id, spChildTerm.Name);
-                AddTermsToConfig(context, spChildTerm, shTerm);
-                termItem.Terms.Add(shTerm);
-            }
-        }
-
         public void WriteTaxonomyToTermStore(ClientContext context)
         {
             ValidateConfiguration(_termGroup);
@@ -109,6 +72,44 @@ namespace Sherpa.Library.Taxonomy
                 CreateTerm(context, termStore, childTerm, spTerm);
             }
         }
+
+        public ShTermGroup ExportTaxonomyGroupToConfig(ClientContext context, string groupName)
+        {
+            TermStore termStore = GetTermStore(context);
+
+            var spTermGroup = termStore.Groups.ToList().FirstOrDefault(g => g.Name == groupName);
+            context.Load(spTermGroup, x => x.TermSets);
+            context.ExecuteQuery();
+
+            if (spTermGroup == null)
+            {
+                Console.WriteLine("Couldn't find a taxonomy group with the name " + groupName);
+                return null;
+            }
+            var shTermGroup = new ShTermGroup(spTermGroup.Id, spTermGroup.Name);
+
+            foreach (var spTermSet in spTermGroup.TermSets)
+            {
+                var shTermSet = new ShTermSet(spTermSet.Id, spTermSet.Name);
+                AddTermsToConfig(context, spTermSet, shTermSet);
+                shTermGroup.TermSets.Add(shTermSet);
+            }
+            return shTermGroup;
+        }
+
+        private void AddTermsToConfig(ClientContext context, TermSetItem spTerm, ShTermItemBase termItem)
+        {
+            context.Load(spTerm, t => t.Terms);
+            context.ExecuteQuery();
+
+            foreach (var spChildTerm in spTerm.Terms)
+            {
+                var shTerm = new ShTerm(spChildTerm.Id, spChildTerm.Name);
+                AddTermsToConfig(context, spChildTerm, shTerm);
+                termItem.Terms.Add(shTerm);
+            }
+        }
+
         /// <summary>
         /// Since the administrator members like TermStore.DoesUserHavePermissions aren't available in the client API, this is currently how we check if user has permissions
         /// </summary>
