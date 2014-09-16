@@ -78,14 +78,16 @@ namespace Sherpa.Library.Taxonomy
             TermStore termStore = GetTermStore(context);
 
             var spTermGroup = termStore.Groups.ToList().FirstOrDefault(g => g.Name == groupName);
+            if (spTermGroup == null)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("Couldn't find a taxonomy group with the name " + groupName);
+                Console.ResetColor();
+                return null;
+            }
             context.Load(spTermGroup, x => x.TermSets);
             context.ExecuteQuery();
 
-            if (spTermGroup == null)
-            {
-                Console.WriteLine("Couldn't find a taxonomy group with the name " + groupName);
-                return null;
-            }
             var shTermGroup = new ShTermGroup(spTermGroup.Id, spTermGroup.Name);
 
             foreach (var spTermSet in spTermGroup.TermSets)
