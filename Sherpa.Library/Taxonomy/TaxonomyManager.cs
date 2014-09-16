@@ -97,7 +97,7 @@ namespace Sherpa.Library.Taxonomy
             return shTermGroup;
         }
 
-        private void AddTermsToConfig(ClientContext context, TermSetItem spTerm, ShTermItemBase termItem)
+        private void AddTermsToConfig(ClientContext context, TermSetItem spTerm, ShTermSetItem termItem)
         {
             context.Load(spTerm, t => t.Terms);
             context.ExecuteQuery();

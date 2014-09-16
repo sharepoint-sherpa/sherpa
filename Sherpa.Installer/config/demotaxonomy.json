@@ -9,15 +9,12 @@
           "Terms": [
                 {
                     "Title": "Subterm 1",
-                    "Id": "8818a10d-802c-4c2f-8245-66ffe291845e",
                     "Terms": [
                         {
-                            "Title": "Babyterm X",
-                            "Id": "08b53d8f-79e7-430f-8799-019bccb85b60"
+                            "Title": "Babyterm X"
                         },
                         {
-                            "Title": "Babyterm Y",
-                            "Id": "439d9386-9d9b-4f05-b4a3-f2fea4791523"
+                            "Title": "Babyterm Y"
                         }
                     ]
                 },
@@ -43,6 +40,9 @@
       "Title": "Sherpa Termset",
       "Id": "fa79e775-aa88-4da5-bd57-59a696e7a8f2",
       "CustomSortOrder": ""
+    },
+    {
+      "Title":"Sherpa another termset"
     }
   ],
   "Title": "Sherpa Termgroup",

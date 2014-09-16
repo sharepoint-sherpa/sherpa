@@ -84,8 +84,9 @@
     <Compile Include="SiteHierarchy\PropertyManager.cs" />
     <Compile Include="SiteHierarchy\SiteSetupManager.cs" />
     <Compile Include="SiteHierarchy\QuicklaunchManager.cs" />
+    <Compile Include="Taxonomy\Model\ShTaxonomyItem.cs" />
     <Compile Include="Taxonomy\Model\ShTerm.cs" />
-    <Compile Include="Taxonomy\Model\ShTermItemBase.cs" />
+    <Compile Include="Taxonomy\Model\ShTermSetItem.cs" />
     <Compile Include="Taxonomy\Model\ShTermSet.cs" />
     <Compile Include="Taxonomy\Model\ShTermGroup.cs" />
     <Compile Include="Taxonomy\TaxonomyManager.cs" />
