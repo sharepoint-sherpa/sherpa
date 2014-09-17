@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Linq;
 using System.Net;
+using System.Reflection;
 using Microsoft.SharePoint.Client;
 
 namespace Sherpa.Installer
@@ -14,8 +16,14 @@ namespace Sherpa.Installer
         static void Main(string[] args)
         {
             PrintLogo();
+
             try
             {
+                if (!IsCorrectSharePointAssemblyVersionLoaded())
+                {
+                    Console.WriteLine("Old version of SharePoint assemblies loaded. Application cannot be run on a machine with SharePoint 2010 or older installed. ");
+                    Environment.Exit(1);
+                }
                 ProgramOptions = OptionsParser.ParseArguments(args);
                 UrlToSite = new Uri(ProgramOptions.UrlToSite);
             }
@@ -146,6 +154,12 @@ namespace Sherpa.Installer
             ShowStartScreenAndExecuteCommand();
         }
 
+        private static bool IsCorrectSharePointAssemblyVersionLoaded()
+        {
+            var sharePointAssembly = Assembly.GetExecutingAssembly().GetReferencedAssemblies().Single(a => a.Name.Equals("Microsoft.SharePoint.Client"));
+
+            return sharePointAssembly.Version.Major >= 15;
+        }
 
         private static void PrintLogo()
         {
