@@ -12,16 +12,30 @@ namespace Sherpa.Library.SiteHierarchy
         {
             if (siteFeatures != null)
             {
-                foreach (var featureActivation in siteFeatures.Where(f => f.ContentTypeDependency == onlyContentTypeDependencyFeatures))
+                foreach (var featureActivation in siteFeatures)
                 {
-                    ActivateSiteCollectionFeature(clientContext, featureActivation);
+                    if (onlyContentTypeDependencyFeatures && featureActivation.ContentTypeDependency)
+                    {
+                        ActivateSiteCollectionFeature(clientContext, featureActivation);
+                    }
+                    else if (!onlyContentTypeDependencyFeatures)
+                    {
+                        ActivateSiteCollectionFeature(clientContext, featureActivation);
+                    }
                 }
             }
             if (webFeatures != null)
             {
-                foreach (var featureActivation in webFeatures.Where(f => f.ContentTypeDependency == onlyContentTypeDependencyFeatures))
+                foreach (var featureActivation in webFeatures)
                 {
-                    ActivateWebFeature(clientContext, featureActivation, webToConfigure);
+                    if (onlyContentTypeDependencyFeatures && featureActivation.ContentTypeDependency)
+                    {
+                        ActivateWebFeature(clientContext, featureActivation, webToConfigure);
+                    }
+                    else if (!onlyContentTypeDependencyFeatures)
+                    {
+                        ActivateWebFeature(clientContext, featureActivation, webToConfigure);
+                    }
                 }
             }
         }
