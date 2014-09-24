@@ -137,6 +137,25 @@ namespace Sherpa.Library.Taxonomy
             }
         }
 
+        public Guid GetTermSetId(ClientContext context, string termSetName)
+        {
+            var termStore = GetTermStore(context);
+            var termSetsByName = termStore.GetTermSetsByName(termSetName, termStore.DefaultLanguage);
+            context.Load(termSetsByName);
+            context.ExecuteQuery();
+
+            if (termSetsByName.Count > 1)
+            {
+                throw new Exception("There are more than one term set with the name " + termSetName);
+            }
+            if (termSetsByName.Count == 0)
+            {
+                throw new Exception("Could not find any term sets with then name " + termSetName);
+            }
+
+            return termSetsByName.Single().Id;
+        }
+
         public TermStore GetTermStore(ClientContext context)
         {
             TaxonomySession taxonomySession = TaxonomySession.GetTaxonomySession(context);

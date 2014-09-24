@@ -32,7 +32,7 @@ namespace Sherpa.Library.ContentTypes
             {
                 if (field.Type.StartsWith("TaxonomyFieldType"))
                 {
-                    field.InitializeTaxonomyProperties(termStoreId);
+                    field.SspId = termStoreId;
                     DeleteHiddenFieldForTaxonomyField(webFieldCollection, field.ID);
                     CreateTaxonomyField(field, webFieldCollection);
                 }
@@ -58,13 +58,26 @@ namespace Sherpa.Library.ContentTypes
             ClientContext.Load(newField);
             ClientContext.ExecuteQuery();
 
+            var termSetId = GetTermSetId(field);
             var newTaxonomyField = ClientContext.CastTo<TaxonomyField>(newField);
             newTaxonomyField.SspId = field.SspId;
-            newTaxonomyField.TermSetId = field.TermSetId;
+            newTaxonomyField.TermSetId = termSetId;
             newTaxonomyField.TargetTemplate = String.Empty;
             newTaxonomyField.AnchorId = Guid.Empty;
             newTaxonomyField.Update();
             ClientContext.ExecuteQuery();
+        }
+
+        private Guid GetTermSetId(GtField field)
+        {
+            if (field.TermSetId != Guid.Empty) return field.TermSetId;
+
+            if (string.IsNullOrEmpty(field.TermSetName))
+            {
+                throw new Exception("Invalid taxonomy configuration settings for field " + field.DisplayName);
+            }
+            var manager = new TaxonomyManager();
+            return manager.GetTermSetId(ClientContext, field.TermSetName);
         }
 
         /// <summary>

@@ -22,18 +22,20 @@ namespace Sherpa.Library.ContentTypes.Model
         
         public bool Required { get; set; }
         public bool Hidden { get; set; }
+        public bool ShowInNewForm { get; set; }
+        public bool ShowInEditForm { get; set; }
+        public bool ShowInDisplayForm { get; set; }
 
         public Guid SspId { get; set; }
         public Guid TermSetId { get; set; }
+        public string TermSetName { get; set; }
 
-        public void InitializeTaxonomyProperties(Guid termStoreId)
+        public GtField()
         {
-            if (Type.StartsWith("TaxonomyFieldType"))
-            {
-                SspId = termStoreId;
-            }
+            ShowInDisplayForm = true;
+            ShowInEditForm = true;
+            ShowInNewForm = true;
         }
-
         public string GetFieldAsXml()
         {
             return GetFieldAsXml(false);
@@ -123,8 +125,14 @@ namespace Sherpa.Library.ContentTypes.Model
         {
             var format = !string.IsNullOrEmpty(Format) ? "Format=\"" + Format + "\"" : string.Empty;
             return String.Format(
-                "<Field ID=\"{0}\" Name=\"{1}\" DisplayName=\"{2}\" Type=\"{3}\" Hidden=\"{4}\" Group=\"{5}\" Description=\"{6}\" Required=\"{7}\" {8} {9} />",
-                ID.ToString("B"), InternalName, DisplayName, Type, Hidden, Group, Description, required.ToString().ToUpper(), format, additionalProperties);
+                "<Field ID=\"{0}\" Name=\"{1}\" DisplayName=\"{2}\" Type=\"{3}\" Hidden=\"{4}\" " +
+                "Group=\"{5}\" Description=\"{6}\" Required=\"{7}\" "+
+                "ShowInNewForm=\"{8}\" ShowInEditForm=\"{9}\" ShowInDisplayForm=\"{10}\" " + 
+                "{11} {12} />",
+                ID.ToString("B"), InternalName, DisplayName, Type, Hidden, 
+                Group, Description, required.ToString().ToUpper(), 
+                ShowInNewForm, ShowInEditForm, ShowInDisplayForm,
+                format, additionalProperties);
         }
         private string GetFieldWithContentXml(bool required, string additionalProperties, string fieldContent)
         {
