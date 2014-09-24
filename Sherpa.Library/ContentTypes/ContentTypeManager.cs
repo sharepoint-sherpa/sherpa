@@ -81,6 +81,7 @@ namespace Sherpa.Library.ContentTypes
                 var link = new FieldLinkCreationInformation { Field = webField };
                 var fieldLink = contentType.FieldLinks.Add(link);
                 fieldLink.Required = configContentType.RequiredFields.Contains(fieldName);
+                fieldLink.Hidden = configContentType.HiddenFields.Contains(fieldName);
                 contentType.Update(true);
                 ClientContext.ExecuteQuery();
             }

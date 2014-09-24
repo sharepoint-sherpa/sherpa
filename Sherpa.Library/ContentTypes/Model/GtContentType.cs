@@ -20,11 +20,13 @@ namespace Sherpa.Library.ContentTypes.Model
 
         public List<string> Fields { get; set; }
         public List<string> RequiredFields { get; set; }
+        public List<string> HiddenFields { get; set; }
 
         public GtContentType()
         {
             Fields = new List<string>();
             RequiredFields = new List<string>();
+            HiddenFields = new List<string>();
         }
 
         public ContentTypeCreationInformation GetContentTypeCreationInformation()
