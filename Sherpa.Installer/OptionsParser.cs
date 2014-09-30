@@ -12,7 +12,7 @@ namespace Sherpa.Installer
             if (args.Length == 0)
             {
                 Console.WriteLine(
-                    "You can start the app from the command line to specify multiple argumens.");
+                    "You can start Sherpa from the command line to specify multiple arguments.");
 
                 Uri uriInput = null;
                 while (uriInput == null)
