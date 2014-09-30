@@ -64,7 +64,7 @@ namespace Sherpa.Library.SiteHierarchy
                 if (webToConfigure == null)
                 {
                     Console.WriteLine("Creating web " + configWeb.Url);
-                    parentWeb.Webs.Add(GetWebCreationInformationFromConfig(configWeb));
+                    webToConfigure = parentWeb.Webs.Add(GetWebCreationInformationFromConfig(configWeb));
                 }
             }
             context.Load(webToConfigure, w => w.Url);
