@@ -111,7 +111,7 @@ namespace Sherpa.Library.ContentTypes
                 }
                 catch
                 {
-                    Console.WriteLine("Could not delete content type '" + contentTypes[i].DisplayFormTemplateName + "' (internal name: " + contentTypes[i].Name + " , Id: " + contentTypes[i].Id + "). This is most probably due to it being in use");
+                    Console.WriteLine("Could not delete content type '" + contentTypes[i].Name + "'");
                 }
             }
         }

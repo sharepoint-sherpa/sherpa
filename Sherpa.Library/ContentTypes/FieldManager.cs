@@ -128,16 +128,17 @@ namespace Sherpa.Library.ContentTypes
             }
             for (int i = webFieldCollection.Count - 1; i >= 0; i--)
             {
-                if (fieldGroups.Contains(webFieldCollection[i].Group))
+                var currentField = webFieldCollection[i];
+                if (fieldGroups.Contains(currentField.Group))
                 {
-                    webFieldCollection[i].DeleteObject();
+                    currentField.DeleteObject();
                     try
                     {
                         ClientContext.ExecuteQuery();
                     }
                     catch
                     {
-                        Console.WriteLine("Could not delete site column '" + webFieldCollection[i].Title + "' (" + webFieldCollection[i].InternalName + "). This is most probably due to it being in use");
+                        Console.WriteLine("Could not delete site column '" + currentField.InternalName + "'");
                     }
                 }
             }
