@@ -19,6 +19,7 @@ namespace Sherpa.Library.ContentTypes.Model
         public int? Min { get; set; }
         public int? Max { get; set; }
         public int? NumLines { get; set; }
+        public string ShowField { get; set; }
         
         public bool Required { get; set; }
         public bool Hidden { get; set; }
@@ -124,15 +125,16 @@ namespace Sherpa.Library.ContentTypes.Model
         private string GetSelfClosingFieldXml(bool required, string additionalProperties)
         {
             var format = !string.IsNullOrEmpty(Format) ? "Format=\"" + Format + "\"" : string.Empty;
+            var showField = !string.IsNullOrEmpty(ShowField) ? "ShowField=\"" + ShowField + "\"" : string.Empty;
             return String.Format(
                 "<Field ID=\"{0}\" Name=\"{1}\" DisplayName=\"{2}\" Type=\"{3}\" Hidden=\"{4}\" " +
                 "Group=\"{5}\" Description=\"{6}\" Required=\"{7}\" "+
                 "ShowInNewForm=\"{8}\" ShowInEditForm=\"{9}\" ShowInDisplayForm=\"{10}\" " + 
-                "{11} {12} />",
+                "{11} {12} {13}/>",
                 ID.ToString("B"), InternalName, DisplayName, Type, Hidden, 
                 Group, Description, required.ToString().ToUpper(), 
                 ShowInNewForm, ShowInEditForm, ShowInDisplayForm,
-                format, additionalProperties);
+                format, showField, additionalProperties);
         }
         private string GetFieldWithContentXml(bool required, string additionalProperties, string fieldContent)
         {
