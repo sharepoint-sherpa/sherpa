@@ -104,28 +104,28 @@ namespace Sherpa.Library.SiteHierarchy
                 };
         }
 
-        public void DeleteSites()
+        public static void DeleteSites(ClientContext clientContext)
         {
-            ClientContext.Load(ClientContext.Site.RootWeb.Webs);
-            ClientContext.ExecuteQuery();
+            clientContext.Load(clientContext.Site.RootWeb.Webs);
+            clientContext.ExecuteQuery();
 
-            foreach (var web in ClientContext.Site.RootWeb.Webs)
+            foreach (var web in clientContext.Site.RootWeb.Webs)
             {
-                DeleteWeb(web);
+                DeleteWeb(clientContext, web);
             }
         }
 
-        private void DeleteWeb(Web web)
+        private static void DeleteWeb(ClientContext clientContext, Web web)
         {
-            ClientContext.Load(web.Webs);
-            ClientContext.ExecuteQuery();
+            clientContext.Load(web.Webs);
+            clientContext.ExecuteQuery();
 
             foreach (Web subWeb in web.Webs)
             {
-                DeleteWeb(subWeb);
+                DeleteWeb(clientContext, subWeb);
             }
             web.DeleteObject();
-            ClientContext.ExecuteQuery();
+            clientContext.ExecuteQuery();
         }
     }
 }

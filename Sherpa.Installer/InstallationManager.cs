@@ -36,6 +36,8 @@ namespace Sherpa.Installer
             _credentials = credentials;
             _isSharePointOnline = isSharePointOnline;
             _rootPath = rootPath ?? Environment.CurrentDirectory;
+
+            Console.WriteLine("Site Url: \t{0}\r\nConfigpath: \t{1}\r\nSPO: \t\t{2}", _urlToSite.AbsoluteUri, _rootPath, _isSharePointOnline);
         }
 
         public void SetupTaxonomy()
@@ -104,7 +106,7 @@ namespace Sherpa.Installer
 
         public void CreateSiteColumnsAndContentTypes()
         {
-            ConfigureSites(true, "activating content type dependeny features");
+            ConfigureSites(true, "activating content type dependency features");
             Console.WriteLine("Starting setup of site columns and content types");
 
             using (var context = new ClientContext(_urlToSite))
@@ -158,12 +160,7 @@ namespace Sherpa.Installer
             Console.WriteLine("Starting teardown of sites");
             using (var clientContext = new ClientContext(_urlToSite) { Credentials = _credentials })
             {
-                foreach (var file in Directory.GetFiles(ConfigurationDirectoryPath, "*sitehierarchy.json", SearchOption.AllDirectories))
-                {
-                    var sitePersister = new FilePersistanceProvider<GtWeb>(file);
-                    var siteManager = new SiteSetupManager(clientContext, sitePersister.Load());
-                    siteManager.DeleteSites();
-                }
+                SiteSetupManager.DeleteSites(clientContext);
             }
             Console.WriteLine("Done teardown of sites");
         }

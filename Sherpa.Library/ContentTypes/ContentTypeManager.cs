@@ -73,13 +73,13 @@ namespace Sherpa.Library.ContentTypes
                 ClientContext.Load(webField);
                 ClientContext.ExecuteQuery();
 
-                if (Enumerable.Any(contentTypeFields, existingFieldName => existingFieldName.Name == fieldName))
+                var fieldLink = contentTypeFields.FirstOrDefault(existingFieldName => existingFieldName.Name == fieldName);
+                if (fieldLink == null)
                 {
-                    continue;
+                    var link = new FieldLinkCreationInformation { Field = webField };
+                    fieldLink = contentType.FieldLinks.Add(link);
                 }
 
-                var link = new FieldLinkCreationInformation { Field = webField };
-                var fieldLink = contentType.FieldLinks.Add(link);
                 fieldLink.Required = configContentType.RequiredFields.Contains(fieldName);
                 fieldLink.Hidden = configContentType.HiddenFields.Contains(fieldName);
                 contentType.Update(true);
