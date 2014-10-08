@@ -131,9 +131,9 @@ namespace Sherpa.Library.ContentTypes.Model
                 "Group=\"{5}\" Description=\"{6}\" Required=\"{7}\" "+
                 "ShowInNewForm=\"{8}\" ShowInEditForm=\"{9}\" ShowInDisplayForm=\"{10}\" " + 
                 "{11} {12} {13}/>",
-                ID.ToString("B"), InternalName, DisplayName, Type, Hidden, 
-                Group, Description, required.ToString().ToUpper(), 
-                ShowInNewForm, ShowInEditForm, ShowInDisplayForm,
+                ID.ToString("B"), InternalName, DisplayName, Type, Hidden.ToString().ToUpper(), 
+                Group, Description, required.ToString().ToUpper(),
+                ShowInNewForm.ToString().ToUpper(), ShowInEditForm.ToString().ToUpper(), ShowInDisplayForm.ToString().ToUpper(),
                 format, showField, additionalProperties);
         }
         private string GetFieldWithContentXml(bool required, string additionalProperties, string fieldContent)
