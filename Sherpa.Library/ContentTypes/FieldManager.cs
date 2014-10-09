@@ -64,6 +64,8 @@ namespace Sherpa.Library.ContentTypes
             newTaxonomyField.TermSetId = termSetId;
             newTaxonomyField.TargetTemplate = String.Empty;
             newTaxonomyField.AnchorId = Guid.Empty;
+            newTaxonomyField.CreateValuesInEditForm = field.OpenTermSet;
+            newTaxonomyField.Open = field.OpenTermSet;
             newTaxonomyField.Update();
             ClientContext.ExecuteQuery();
         }
