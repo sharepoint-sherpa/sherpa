@@ -30,6 +30,7 @@ namespace Sherpa.Library.ContentTypes.Model
         public Guid SspId { get; set; }
         public Guid TermSetId { get; set; }
         public string TermSetName { get; set; }
+        public bool OpenTermSet { get; set; }
 
         public GtField()
         {
@@ -124,17 +125,18 @@ namespace Sherpa.Library.ContentTypes.Model
         /// <returns></returns>
         private string GetSelfClosingFieldXml(bool required, string additionalProperties)
         {
-            var format = !string.IsNullOrEmpty(Format) ? "Format=\"" + Format + "\"" : string.Empty;
-            var showField = !string.IsNullOrEmpty(ShowField) ? "ShowField=\"" + ShowField + "\"" : string.Empty;
+            var format = !string.IsNullOrEmpty(Format) ? " Format=\"" + Format + "\"" : string.Empty;
+            var showField = !string.IsNullOrEmpty(ShowField) ? " ShowField=\"" + ShowField + "\"" : string.Empty;
+            var openTermSet = OpenTermSet ? " CreateValuesInEditForm=\"TRUE\" Open=\"TRUE\"" : string.Empty;
             return String.Format(
                 "<Field ID=\"{0}\" Name=\"{1}\" DisplayName=\"{2}\" Type=\"{3}\" Hidden=\"{4}\" " +
                 "Group=\"{5}\" Description=\"{6}\" Required=\"{7}\" "+
-                "ShowInNewForm=\"{8}\" ShowInEditForm=\"{9}\" ShowInDisplayForm=\"{10}\" " + 
-                "{11} {12} {13}/>",
-                ID.ToString("B"), InternalName, DisplayName, Type, Hidden.ToString().ToUpper(), 
-                Group, Description, required.ToString().ToUpper(),
-                ShowInNewForm.ToString().ToUpper(), ShowInEditForm.ToString().ToUpper(), ShowInDisplayForm.ToString().ToUpper(),
-                format, showField, additionalProperties);
+                "ShowInNewForm=\"{8}\" ShowInEditForm=\"{9}\" ShowInDisplayForm=\"{10}\"" + 
+                "{11}{12}{13} {14}/>",
+                ID.ToString("B"), InternalName, DisplayName, Type, Hidden, 
+                Group, Description, required.ToString().ToUpper(), 
+                ShowInNewForm, ShowInEditForm, ShowInDisplayForm,
+                format, showField, openTermSet, additionalProperties);
         }
         private string GetFieldWithContentXml(bool required, string additionalProperties, string fieldContent)
         {
