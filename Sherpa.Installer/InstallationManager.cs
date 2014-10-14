@@ -29,6 +29,10 @@ namespace Sherpa.Installer
         {
             get { return Path.Combine(_rootPath, "solutions"); }
         }
+        private string SearchDirectoryPath
+        {
+            get { return Path.Combine(_rootPath, "search"); }
+        }
 
         public InstallationManager(Uri urlToSite, ICredentials credentials, bool isSharePointOnline, string rootPath)
         {
@@ -153,6 +157,20 @@ namespace Sherpa.Installer
                 }
             }
             Console.WriteLine("Done " + operationDescription);
+        }
+
+        public void ImportSearchSettings()
+        {
+            Console.WriteLine("Starting import of search settings");
+            using (var clientContext = new ClientContext(_urlToSite) { Credentials = _credentials })
+            {
+                var searchMan = new SearchImportManager();
+                foreach (var pathToSearchXml in Directory.GetFiles(SearchDirectoryPath))
+                {
+                    searchMan.ImportSearchConfiguration(clientContext, pathToSearchXml);
+                }
+            }
+            Console.WriteLine("Done import of search settings");
         }
 
         public void TeardownSites()

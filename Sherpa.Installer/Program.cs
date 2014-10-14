@@ -76,7 +76,8 @@ namespace Sherpa.Installer
             Console.WriteLine("Press 2 to upload and activate sandboxed solution.");
             Console.WriteLine("Press 3 to setup site columns and content types.");
             Console.WriteLine("Press 4 to setup sites and features.");
-            Console.WriteLine("Press 5 to export taxonomy group.");
+            Console.WriteLine("Press 5 to import search configurations.");
+            Console.WriteLine("Press 6 to export taxonomy group.");
             Console.WriteLine("Press 8 to DELETE all sites (except root site).");
             Console.WriteLine("Press 9 to DELETE all custom site columns and content types.");
             Console.WriteLine("Press 0 to exit application.");
@@ -120,6 +121,11 @@ namespace Sherpa.Installer
                     break;
                 }
                 case 5:
+                {
+                    InstallationManager.ImportSearchSettings();
+                    break;
+                }
+                case 6:
                 {
                     InstallationManager.ExportTaxonomyGroup();
                     break;

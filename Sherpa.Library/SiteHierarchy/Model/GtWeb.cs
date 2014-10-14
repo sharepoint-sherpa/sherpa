@@ -8,6 +8,7 @@ namespace Sherpa.Library.SiteHierarchy.Model
         public string Url { get; set; }
         public string Template { get; set; }
         public string Description { get; set; }
+        public string WelcomePageUrl { get; set; }
         public int Language { get; set; }
         public List<GtWeb> Webs { get; set; }
         public List<GtFeature> SiteFeatures { get; set; }

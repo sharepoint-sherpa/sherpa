@@ -38,6 +38,7 @@ namespace Sherpa.Library.SiteHierarchy
         {
             var webToConfigure = EnsureWeb(context, parentWeb, configWeb);
 
+            SetWelcomePageUrlIfConfigured(context, webToConfigure, configWeb);
             FeatureManager.ActivateFeatures(context, webToConfigure, configWeb.SiteFeatures, configWeb.WebFeatures);
             ListManager.CreateLists(context, webToConfigure, configWeb.Lists);
             QuicklaunchManager.CreateQuicklaunchNodes(context, webToConfigure, configWeb.Quicklaunch);
@@ -46,6 +47,16 @@ namespace Sherpa.Library.SiteHierarchy
             foreach (GtWeb subWeb in configWeb.Webs)
             {
                 EnsureAndConfigureWebAndActivateFeatures(context, webToConfigure, subWeb);
+            }
+        }
+
+        private void SetWelcomePageUrlIfConfigured(ClientContext context, Web webToConfigure, GtWeb configWeb)
+        {
+            if (!string.IsNullOrEmpty(configWeb.WelcomePageUrl))
+            {
+                webToConfigure.RootFolder.WelcomePage = configWeb.WelcomePageUrl;
+                context.Load(webToConfigure.RootFolder);
+                context.ExecuteQuery();
             }
         }
 
