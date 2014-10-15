@@ -18,8 +18,11 @@ namespace Sherpa.Library.ContentTypes.Model
         public string Default { get; set; }
         public int? Min { get; set; }
         public int? Max { get; set; }
-        public int? NumLines { get; set; }
         public string ShowField { get; set; }
+
+        public int? NumLines { get; set; }
+        public bool RichText { get; set; }
+        public string RichTextMode { get; set; }
         
         public bool Required { get; set; }
         public bool Hidden { get; set; }
@@ -69,12 +72,20 @@ namespace Sherpa.Library.ContentTypes.Model
                 }
                 case("Number"):
                 {
-                    var options = (Min != null ? "Min=\"" + Min +"\"" : "") + (Max != null ? " Max=\"" + Max +"\"" : "");
+                    var options = (Min != null ? "Min=\"" + Min +"\"" : "") + (Max != null ? " Max=\"" + Max +"\"" : string.Empty);
                     return GetSelfClosingFieldXml(required, options);
+                }
+                case("HTML"):
+                {
+                    const string additionalProps = "RichText=\"TRUE\" RichTextMode=\"FullHtml\" UnlimitedLengthInDocumentLibrary=\"TRUE\"";
+                    return GetSelfClosingFieldXml(false, additionalProps);
                 }
                 case ("Note"):
                 {
-                    var options = NumLines != null && NumLines != 0 ? "NumLines=\"" + NumLines + "\"" : "";
+                    var options = NumLines != null && NumLines != 0 ? "NumLines=\"" + NumLines + "\"" : string.Empty;
+                    options += RichText ? " RichText=\"TRUE\"" : string.Empty;
+                    options += !string.IsNullOrEmpty(RichTextMode) ? String.Format(" RichTextMode=\"{0}\"", RichTextMode) : string.Empty;
+
                     return GetSelfClosingFieldXml(required, options);
                 }
 
