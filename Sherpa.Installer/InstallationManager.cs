@@ -89,17 +89,24 @@ namespace Sherpa.Installer
         }
         public void UploadAndActivateSandboxSolution()
         {
+            var solutionPackages = Directory.GetFiles(SolutionsDirectoryPath, "*.wsp", SearchOption.AllDirectories);
             if (!IsCurrentUserSiteCollectionAdmin())
             {
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("You need to be site collection administrator to perform this operation.");
                 Console.ResetColor();
             }
+            else if (solutionPackages.Length == 0)
+            {
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine("No solution packages found in directory.");
+                Console.ResetColor();
+            }
             else
             {
                 Console.WriteLine("Uploading and activating sandboxed solution(s)");
                 var deployManager = new DeployManager(_urlToSite, _credentials, _isSharePointOnline);
-                foreach (var file in Directory.GetFiles(SolutionsDirectoryPath, "*.wsp", SearchOption.AllDirectories))
+                foreach (var file in solutionPackages)
                 {
                     deployManager.UploadDesignPackageToSiteAssets(file);
                     deployManager.ActivateDesignPackage(file, "SiteAssets");
@@ -165,12 +172,20 @@ namespace Sherpa.Installer
             using (var clientContext = new ClientContext(_urlToSite) { Credentials = _credentials })
             {
                 var searchMan = new SearchImportManager();
-                foreach (var pathToSearchXml in Directory.GetFiles(SearchDirectoryPath))
+                var pathToSearchXmls = Directory.GetFiles(SearchDirectoryPath);
+                if (pathToSearchXmls.Length > 0)
                 {
-                    searchMan.ImportSearchConfiguration(clientContext, pathToSearchXml);
+                    foreach (var pathToSearchXml in pathToSearchXmls)
+                    {
+                        searchMan.ImportSearchConfiguration(clientContext, pathToSearchXml);
+                    }
+                    Console.WriteLine("Done import of search settings");
+                }
+                else
+                {
+                    Console.WriteLine("Could not find any search settings to import");
                 }
             }
-            Console.WriteLine("Done import of search settings");
         }
 
         public void TeardownSites()
