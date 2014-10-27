@@ -7,14 +7,14 @@ namespace Sherpa.Library.SiteHierarchy
 {
     public class SiteSetupManager : ISiteSetupManager
     {
-        private readonly GtWeb _configurationWeb;
+        private readonly ShWeb _configurationWeb;
         private ClientContext ClientContext { get; set; }
         private FeatureManager FeatureManager { get; set; }
         private QuicklaunchManager QuicklaunchManager { get; set; }
         private PropertyManager PropertyManager { get; set; }
         private ListManager ListManager { get; set; }
 
-        public SiteSetupManager(ClientContext clientContext, GtWeb configurationWeb)
+        public SiteSetupManager(ClientContext clientContext, ShWeb configurationWeb)
         {
             _configurationWeb = configurationWeb;
             ClientContext = clientContext;
@@ -34,7 +34,7 @@ namespace Sherpa.Library.SiteHierarchy
         /// 1. The order of webs and subwebs in the config file follows the structure of SharePoint sites
         /// 2. No config element is present without their parent web already being defined in the config file, except the root web
         /// </summary>
-        private void EnsureAndConfigureWebAndActivateFeatures(ClientContext context, Web parentWeb, GtWeb configWeb)
+        private void EnsureAndConfigureWebAndActivateFeatures(ClientContext context, Web parentWeb, ShWeb configWeb)
         {
             var webToConfigure = EnsureWeb(context, parentWeb, configWeb);
 
@@ -44,13 +44,13 @@ namespace Sherpa.Library.SiteHierarchy
             QuicklaunchManager.CreateQuicklaunchNodes(context, webToConfigure, configWeb.Quicklaunch);
             PropertyManager.SetProperties(context, webToConfigure, configWeb.Properties);
 
-            foreach (GtWeb subWeb in configWeb.Webs)
+            foreach (ShWeb subWeb in configWeb.Webs)
             {
                 EnsureAndConfigureWebAndActivateFeatures(context, webToConfigure, subWeb);
             }
         }
 
-        private void SetWelcomePageUrlIfConfigured(ClientContext context, Web webToConfigure, GtWeb configWeb)
+        private void SetWelcomePageUrlIfConfigured(ClientContext context, Web webToConfigure, ShWeb configWeb)
         {
             if (!string.IsNullOrEmpty(configWeb.WelcomePageUrl))
             {
@@ -60,7 +60,7 @@ namespace Sherpa.Library.SiteHierarchy
             }
         }
 
-        private Web EnsureWeb(ClientContext context, Web parentWeb, GtWeb configWeb)
+        private Web EnsureWeb(ClientContext context, Web parentWeb, ShWeb configWeb)
         {
             Web webToConfigure;
             if (parentWeb == null)
@@ -102,7 +102,7 @@ namespace Sherpa.Library.SiteHierarchy
             FeatureManager.ActivateFeatures(ClientContext, ClientContext.Web, _configurationWeb.SiteFeatures, _configurationWeb.WebFeatures, true);
         }
 
-        private WebCreationInformation GetWebCreationInformationFromConfig(GtWeb configWeb)
+        private WebCreationInformation GetWebCreationInformationFromConfig(ShWeb configWeb)
         {
             return new WebCreationInformation
                 {

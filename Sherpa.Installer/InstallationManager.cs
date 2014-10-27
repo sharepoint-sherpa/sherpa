@@ -125,13 +125,13 @@ namespace Sherpa.Installer
                 context.Credentials = _credentials;
                 foreach (var file in Directory.GetFiles(ConfigurationDirectoryPath, "*fields.json", SearchOption.AllDirectories))
                 {
-                    var siteColumnPersister = new FilePersistanceProvider<List<GtField>>(file);
+                    var siteColumnPersister = new FilePersistanceProvider<List<ShField>>(file);
                     var siteColumnManager = new FieldManager(context, siteColumnPersister.Load());
                     siteColumnManager.CreateSiteColumns();
                 }
                 foreach (var file in Directory.GetFiles(ConfigurationDirectoryPath, "*contenttypes.json", SearchOption.AllDirectories))
                 {
-                    var contentTypePersister = new FilePersistanceProvider<List<GtContentType>>(file);
+                    var contentTypePersister = new FilePersistanceProvider<List<ShContentType>>(file);
                     var contentTypeManager = new ContentTypeManager(context, contentTypePersister.Load());
                     contentTypeManager.CreateContentTypes();
                 }
@@ -151,7 +151,7 @@ namespace Sherpa.Installer
             {
                 foreach (var file in Directory.GetFiles(ConfigurationDirectoryPath, "*sitehierarchy.json", SearchOption.AllDirectories))
                 {
-                    var sitePersister = new FilePersistanceProvider<GtWeb>(file);
+                    var sitePersister = new FilePersistanceProvider<ShWeb>(file);
                     var siteManager = new SiteSetupManager(clientContext, sitePersister.Load());
                     if (onlyContentTypeDependecyFeatures)
                     {
@@ -206,13 +206,13 @@ namespace Sherpa.Installer
                 context.Credentials = _credentials;
                 foreach (var file in Directory.GetFiles(ConfigurationDirectoryPath, "*contenttypes.json", SearchOption.AllDirectories))
                 {
-                    var contentTypePersister = new FilePersistanceProvider<List<GtContentType>>(file);
+                    var contentTypePersister = new FilePersistanceProvider<List<ShContentType>>(file);
                     var contentTypeManager = new ContentTypeManager(context, contentTypePersister.Load());
                     contentTypeManager.DeleteAllCustomContentTypes();
                 }
                 foreach (var file in Directory.GetFiles(ConfigurationDirectoryPath, "*fields.json", SearchOption.AllDirectories))
                 {
-                    var siteColumnPersister = new FilePersistanceProvider<List<GtField>>(file);
+                    var siteColumnPersister = new FilePersistanceProvider<List<ShField>>(file);
                     var siteColumnManager = new FieldManager(context, siteColumnPersister.Load());
                     siteColumnManager.DeleteAllCustomFields();
                 }

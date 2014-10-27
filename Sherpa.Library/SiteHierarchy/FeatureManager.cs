@@ -8,7 +8,7 @@ namespace Sherpa.Library.SiteHierarchy
 {
     public class FeatureManager
     {
-        public void ActivateFeatures(ClientContext clientContext, Web webToConfigure, List<GtFeature> siteFeatures, List<GtFeature> webFeatures, bool onlyContentTypeDependencyFeatures)
+        public void ActivateFeatures(ClientContext clientContext, Web webToConfigure, List<ShFeature> siteFeatures, List<ShFeature> webFeatures, bool onlyContentTypeDependencyFeatures)
         {
             if (siteFeatures != null)
             {
@@ -40,19 +40,19 @@ namespace Sherpa.Library.SiteHierarchy
             }
         }
 
-        public void ActivateFeatures(ClientContext clientContext, Web webToConfigure, List<GtFeature> siteFeatures, List<GtFeature> webFeatures)
+        public void ActivateFeatures(ClientContext clientContext, Web webToConfigure, List<ShFeature> siteFeatures, List<ShFeature> webFeatures)
         {
             ActivateFeatures(clientContext, webToConfigure, siteFeatures, webFeatures, false);
         }
 
-        private void ActivateWebFeature(ClientContext clientContext, GtFeature feature, Web web)
+        private void ActivateWebFeature(ClientContext clientContext, ShFeature feature, Web web)
         {
             var featureCollection = web.Features;
             if (feature.ReactivateAlways) DeActivateFeatureInCollection(clientContext, feature, featureCollection);
             ActivateFeatureInCollection(clientContext, feature, featureCollection, FeatureDefinitionScope.Site);
         }
 
-        private void ActivateSiteCollectionFeature(ClientContext clientContext, GtFeature feature)
+        private void ActivateSiteCollectionFeature(ClientContext clientContext, ShFeature feature)
         {
             var siteCollection = clientContext.Site;
             var featureCollection = siteCollection.Features;
@@ -69,7 +69,7 @@ namespace Sherpa.Library.SiteHierarchy
         /// <param name="featureInfo"></param>
         /// <param name="featureCollection"></param>
         /// <param name="scope"></param>
-        private static void ActivateFeatureInCollection(ClientContext clientContext, GtFeature featureInfo, FeatureCollection featureCollection, FeatureDefinitionScope scope)
+        private static void ActivateFeatureInCollection(ClientContext clientContext, ShFeature featureInfo, FeatureCollection featureCollection, FeatureDefinitionScope scope)
         {
             clientContext.Load(featureCollection);
             clientContext.ExecuteQuery();
@@ -92,7 +92,7 @@ namespace Sherpa.Library.SiteHierarchy
             }
         }
 
-        private static void DeActivateFeatureInCollection(ClientContext clientContext, GtFeature featureInfo, FeatureCollection featureCollection)
+        private static void DeActivateFeatureInCollection(ClientContext clientContext, ShFeature featureInfo, FeatureCollection featureCollection)
         {
             clientContext.Load(featureCollection);
             clientContext.ExecuteQuery();

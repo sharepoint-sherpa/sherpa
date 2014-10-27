@@ -44,7 +44,7 @@
     </Reference>
     <Reference Include="Microsoft.SharePoint.Client.Search, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\Program Files\Common Files\microsoft shared\Web Server Extensions\15\ISAPI\Microsoft.SharePoint.Client.Search.dll</HintPath>
+      <HintPath>C:\Program Files\Common Files\Microsoft Shared\Web Server Extensions\15\ISAPI\Microsoft.SharePoint.Client.Search.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.SharePoint.Client.Taxonomy, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
       <Private>True</Private>
@@ -65,11 +65,11 @@
   <ItemGroup>
     <Compile Include="ContentTypes\ContentTypeManager.cs" />
     <Compile Include="ContentTypes\FieldManager.cs" />
-    <Compile Include="ContentTypes\Model\GtCalculatedProps.cs" />
-    <Compile Include="ContentTypes\Model\GtContentType.cs" />
-    <Compile Include="ContentTypes\Model\GtField.cs" />
-    <Compile Include="ContentTypes\Model\GtFieldRefs.cs" />
-    <Compile Include="ContentTypes\Model\GtResultType.cs" />
+    <Compile Include="ContentTypes\Model\ShCalculatedProps.cs" />
+    <Compile Include="ContentTypes\Model\ShContentType.cs" />
+    <Compile Include="ContentTypes\Model\ShField.cs" />
+    <Compile Include="ContentTypes\Model\ShFieldRefs.cs" />
+    <Compile Include="ContentTypes\Model\ShResultType.cs" />
     <Compile Include="Deploy\DeployManager.cs" />
     <Compile Include="Deploy\IDeployManager.cs" />
     <Compile Include="Deploy\SPWebClient.cs">
@@ -77,13 +77,13 @@
     </Compile>
     <Compile Include="SiteHierarchy\FeatureManager.cs" />
     <Compile Include="SiteHierarchy\ListManager.cs" />
-    <Compile Include="SiteHierarchy\Model\GtFeature.cs" />
+    <Compile Include="SiteHierarchy\Model\ShFeature.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="FilePersistanceProvider.cs" />
     <Compile Include="IPersistanceProvider.cs" />
     <Compile Include="SiteHierarchy\ISiteSetupManager.cs" />
     <Compile Include="SiteHierarchy\Model\ShList.cs" />
-    <Compile Include="SiteHierarchy\Model\GtWeb.cs" />
+    <Compile Include="SiteHierarchy\Model\ShWeb.cs" />
     <Compile Include="SiteHierarchy\Model\ShView.cs" />
     <Compile Include="SiteHierarchy\PropertyManager.cs" />
     <Compile Include="Deploy\SearchImportManager.cs" />

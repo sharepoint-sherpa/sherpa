@@ -10,12 +10,12 @@ namespace Sherpa.Library.ContentTypes
     public class ContentTypeManager
     {
         private ClientContext ClientContext { get; set; }
-        private List<GtContentType> ContentTypes { get; set; }
+        private List<ShContentType> ContentTypes { get; set; }
 
         /// <summary>
         /// For creating fields and content types
         /// </summary>
-        public ContentTypeManager(ClientContext clientContext, List<GtContentType> contentTypes)
+        public ContentTypeManager(ClientContext clientContext, List<ShContentType> contentTypes)
         {
             ContentTypes = contentTypes;
             ValidateConfiguration(ContentTypes);
@@ -29,7 +29,7 @@ namespace Sherpa.Library.ContentTypes
             ClientContext.Load(existingContentTypes);
             ClientContext.ExecuteQuery();
 
-            foreach (GtContentType contentType in ContentTypes)
+            foreach (ShContentType contentType in ContentTypes)
             {
                 if ( existingContentTypes.Any( item => item.Id.ToString().Equals(contentType.ID.ToString(CultureInfo.InvariantCulture)) ) )
                 {
@@ -52,7 +52,7 @@ namespace Sherpa.Library.ContentTypes
             }
         }
 
-        private void AddSiteColumnsToContentType(GtContentType configContentType)
+        private void AddSiteColumnsToContentType(ShContentType configContentType)
         {
             Web web = ClientContext.Web;
             ContentTypeCollection contentTypes = web.ContentTypes;
@@ -96,7 +96,7 @@ namespace Sherpa.Library.ContentTypes
             ClientContext.ExecuteQuery();
 
             var contentTypeGroups = new List<string>();
-            foreach (GtContentType contentType in ContentTypes.Where(contentType => !contentTypeGroups.Contains(contentType.Group)))
+            foreach (ShContentType contentType in ContentTypes.Where(contentType => !contentTypeGroups.Contains(contentType.Group)))
             {
                 contentTypeGroups.Add(contentType.Group);
             }
@@ -116,7 +116,7 @@ namespace Sherpa.Library.ContentTypes
             }
         }
 
-        public void ValidateConfiguration(List<GtContentType> contentTypes)
+        public void ValidateConfiguration(List<ShContentType> contentTypes)
         {
             var contentTypeIdsForEnsuringUniqueness = new List<string>();
             var contentTypeInternalNamesForEnsuringUniqueness = new List<string>();

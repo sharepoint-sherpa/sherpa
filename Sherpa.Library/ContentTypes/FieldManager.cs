@@ -11,9 +11,9 @@ namespace Sherpa.Library.ContentTypes
     public class FieldManager
     {
         private ClientContext ClientContext { get; set; }
-        private List<GtField> Fields { get; set; }
+        private List<ShField> Fields { get; set; }
 
-        public FieldManager(ClientContext clientContext, List<GtField> fields)
+        public FieldManager(ClientContext clientContext, List<ShField> fields)
         {
             Fields = fields;
             ValidateConfiguration(fields);
@@ -28,7 +28,7 @@ namespace Sherpa.Library.ContentTypes
             ClientContext.ExecuteQuery();
 
             var termStoreId = new TaxonomyManager(null).GetTermStoreId(ClientContext);
-            foreach (GtField field in Fields.Where(field => !webFieldCollection.Any(item => item.InternalName == field.InternalName)))
+            foreach (ShField field in Fields.Where(field => !webFieldCollection.Any(item => item.InternalName == field.InternalName)))
             {
                 if (field.Type.StartsWith("TaxonomyFieldType"))
                 {
@@ -43,7 +43,7 @@ namespace Sherpa.Library.ContentTypes
             }
         }
 
-        private void CreateField(GtField field, FieldCollection fields)
+        private void CreateField(ShField field, FieldCollection fields)
         {
             var fieldXml = field.GetFieldAsXml();
             Field newField = fields.AddFieldAsXml(fieldXml, true, AddFieldOptions.AddFieldInternalNameHint);
@@ -51,7 +51,7 @@ namespace Sherpa.Library.ContentTypes
             ClientContext.ExecuteQuery();
         }
 
-        private void CreateTaxonomyField(GtField field, FieldCollection fields)
+        private void CreateTaxonomyField(ShField field, FieldCollection fields)
         {
             var fieldSchema = field.GetFieldAsXml();
             var newField = fields.AddFieldAsXml(fieldSchema, false, AddFieldOptions.AddFieldInternalNameHint);
@@ -70,7 +70,7 @@ namespace Sherpa.Library.ContentTypes
             ClientContext.ExecuteQuery();
         }
 
-        private Guid GetTermSetId(GtField field)
+        private Guid GetTermSetId(ShField field)
         {
             if (field.TermSetId != Guid.Empty) return field.TermSetId;
 
@@ -100,7 +100,7 @@ namespace Sherpa.Library.ContentTypes
             }
         }
 
-        public void ValidateConfiguration(List<GtField> fields)
+        public void ValidateConfiguration(List<ShField> fields)
         {
             var fieldIdsForEnsuringUniqueness = new List<Guid>();
             var fieldNamesForEnsuringUniqueness = new List<string>();
@@ -124,7 +124,7 @@ namespace Sherpa.Library.ContentTypes
             ClientContext.ExecuteQuery();
 
             var fieldGroups = new List<string>();
-            foreach (GtField field in Fields.Where(f => !fieldGroups.Contains(f.Group)))
+            foreach (ShField field in Fields.Where(f => !fieldGroups.Contains(f.Group)))
             {
                 fieldGroups.Add(field.Group);
             }
