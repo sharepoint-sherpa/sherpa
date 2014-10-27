@@ -44,6 +44,11 @@ namespace Sherpa.Installer
             Console.WriteLine("Site Url: \t{0}\r\nConfigpath: \t{1}\r\nSPO: \t\t{2}", _urlToSite.AbsoluteUri, _rootPath, _isSharePointOnline);
         }
 
+        public void InstallUnmanaged(string siteHierarchyFileName)
+        {
+            
+        }
+
         public void SetupTaxonomy()
         {
             Console.WriteLine("Starting installation of term groups, term sets and terms");
@@ -83,7 +88,7 @@ namespace Sherpa.Installer
                 if (groupConfig != null)
                 {
                     taxPersistanceProvider.Save(groupConfig);
-                    Console.WriteLine("Completed exported of taxonomy group " + groupName);
+                    Console.WriteLine("Completed export of taxonomy group " + groupName);
                 }
             }
         }

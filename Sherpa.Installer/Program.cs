@@ -57,7 +57,12 @@ namespace Sherpa.Installer
             try
             {
                 InstallationManager = new InstallationManager(UrlToSite, Credentials, ProgramOptions.SharePointOnline, ProgramOptions.RootPath);
-                ShowStartScreenAndExecuteCommand();
+
+                if (string.IsNullOrEmpty(ProgramOptions.Operations)) ShowStartScreenAndExecuteCommand();
+                else
+                {
+                    InstallationManager.InstallUnmanaged();
+                }
             }
             catch (Exception exception)
             {

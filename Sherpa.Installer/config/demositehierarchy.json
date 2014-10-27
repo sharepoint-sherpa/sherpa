@@ -11,6 +11,9 @@
     "TaxonomyConfigurations": [
         "demotaxonomy.json"
     ],
+    "SandboxedSolutions": [ 
+        "demo.wsp"
+    ],
     "Lists": [
         {
             "Title": "Log Lady",
