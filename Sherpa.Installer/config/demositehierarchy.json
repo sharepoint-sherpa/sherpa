@@ -2,6 +2,15 @@
     "Description": "Sherpa Demo - root site",
     "Language": "1033",
     "Name": "Sherpa Demo",
+    "FieldConfigurations": [
+        "demofields.json"
+    ],
+    "ContentTypeConfigurations": [
+        "democontenttypes.json"
+    ],
+    "TaxonomyConfigurations": [
+        "demotaxonomy.json"
+    ],
     "Lists": [
         {
             "Title": "Log Lady",

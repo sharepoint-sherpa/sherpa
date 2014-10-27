@@ -17,6 +17,11 @@ namespace Sherpa.Library.SiteHierarchy.Model
         public Dictionary<string, string> Quicklaunch { get; set; }
         public Dictionary<string, string> Properties { get; set; }
 
+        /* The references to the configuration files within the config folder */
+        public string[] FieldConfigurations { get; set; }
+        public string[] ContentTypeConfigurations { get; set; }
+        public string[] TaxonomyConfigurations { get; set; }
+
         public ShWeb()
         {
             Webs = new List<ShWeb>();
