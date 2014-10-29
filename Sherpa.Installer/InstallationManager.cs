@@ -66,7 +66,7 @@ namespace Sherpa.Installer
                 if (!File.Exists(configurationFile))
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("Couldn't find the configuration file");
+                    Console.WriteLine("Couldn't find the configuration file " + configurationFile);
                     Console.ResetColor();
                     return;
                 }
@@ -364,45 +364,49 @@ namespace Sherpa.Installer
             switch (inputNum)
             {
                 case 1:
-                    {
-                        return InstallationOperation.InstallTaxonomy;
-                    }
+                {
+                    return InstallationOperation.InstallTaxonomy;
+                }
                 case 2:
-                    {
-                        return InstallationOperation.UploadAndActivateSolution;
-                    }
+                {
+                    return InstallationOperation.UploadAndActivateSolution;
+                }
                 case 3:
-                    {
-                        return InstallationOperation.InstallFieldsAndContentTypes;
-                    }
+                {
+                    return InstallationOperation.InstallFieldsAndContentTypes;
+                }
                 case 4:
-                    {
-                        return InstallationOperation.ConfigureSites;
-                    }
+                {
+                    return InstallationOperation.ConfigureSites;
+                }
                 case 5:
-                    {
-                        return InstallationOperation.ImportSearch;
-                    }
+                {
+                    return InstallationOperation.ImportSearch;
+                }
                 case 6:
-                    {
-                        return InstallationOperation.ExportTaxonomy;
-                    }
+                {
+                    return InstallationOperation.ExportTaxonomy;
+                }
                 case 8:
-                    {
-                        return InstallationOperation.DeleteSites;
-                    }
+                {
+                    return InstallationOperation.DeleteSites;
+                }
                 case 9:
-                    {
-                        return InstallationOperation.DeleteFieldsAndContentTypes;
-                    }
+                {
+                    return InstallationOperation.DeleteFieldsAndContentTypes;
+                }
                 case 1337:
-                    {
-                        return InstallationOperation.ForceRecrawl;
-                    }
+                {
+                    return InstallationOperation.ForceRecrawl;
+                }
+                case 0:
+                {
+                    return InstallationOperation.ExitApplication;
+                }
                 default:
-                    {
-                        return InstallationOperation.Invalid;
-                    }
+                {
+                    return InstallationOperation.Invalid;
+                }
             }
         }
     }

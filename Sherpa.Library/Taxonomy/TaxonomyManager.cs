@@ -27,6 +27,7 @@ namespace Sherpa.Library.Taxonomy
                 throw new Exception("Couldn't verify admin access. You must be a term store administrator to perform this operation");
             }
 
+            Console.WriteLine("Taxonomy import started");
             var termGroup = termStore.Groups.ToList().FirstOrDefault(g => g.Id == _termGroup.Id) ??
                             termStore.CreateGroup(_termGroup.Title, _termGroup.Id);
                 
