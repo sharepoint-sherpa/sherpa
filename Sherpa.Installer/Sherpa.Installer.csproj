@@ -84,6 +84,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AuthenticationHandler.cs" />
+    <Compile Include="CredentialManager.cs" />
     <Compile Include="InstallationOperation.cs" />
     <Compile Include="OptionsParser.cs" />
     <Compile Include="InstallationManager.cs" />
