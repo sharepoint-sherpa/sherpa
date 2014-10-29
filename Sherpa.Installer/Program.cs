@@ -1,14 +1,16 @@
 ﻿using System;
-using System.Dynamic;
 using System.Linq;
 using System.Net;
 using System.Reflection;
+using log4net;
+using log4net.Config;
 using Microsoft.SharePoint.Client;
 
 namespace Sherpa.Installer
 {
     class Program
     {
+        private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         public static ICredentials Credentials { get; set; }
         public static InstallationManager InstallationManager { get; set; }
         private static Options ProgramOptions { get; set; }
@@ -17,6 +19,8 @@ namespace Sherpa.Installer
 
         static void Main(string[] args)
         {
+            XmlConfigurator.Configure();
+            Log.Debug("Sherpa application started");
             PrintLogo();
 
             try
