@@ -7,16 +7,16 @@ namespace Sherpa.Library.SiteHierarchy
 {
     public class SiteSetupManager : ISiteSetupManager
     {
-        private readonly ShWeb _configurationWeb;
+        private readonly ShSiteCollection _configurationSiteCollection;
         private ClientContext ClientContext { get; set; }
         private FeatureManager FeatureManager { get; set; }
         private QuicklaunchManager QuicklaunchManager { get; set; }
         private PropertyManager PropertyManager { get; set; }
         private ListManager ListManager { get; set; }
 
-        public SiteSetupManager(ClientContext clientContext, ShWeb configurationWeb)
+        public SiteSetupManager(ClientContext clientContext, ShSiteCollection configurationSiteCollection)
         {
-            _configurationWeb = configurationWeb;
+            _configurationSiteCollection = configurationSiteCollection;
             ClientContext = clientContext;
 
             FeatureManager = new FeatureManager();
@@ -26,7 +26,8 @@ namespace Sherpa.Library.SiteHierarchy
         }
         public void SetupSites()
         {
-            EnsureAndConfigureWebAndActivateFeatures(ClientContext, null, _configurationWeb);
+            FeatureManager.ActivateSiteCollectionFeatures(ClientContext, _configurationSiteCollection.SiteFeatures);
+            EnsureAndConfigureWebAndActivateFeatures(ClientContext, null, _configurationSiteCollection.RootWeb);
         }
 
         /// <summary>
@@ -39,7 +40,7 @@ namespace Sherpa.Library.SiteHierarchy
             var webToConfigure = EnsureWeb(context, parentWeb, configWeb);
 
             SetWelcomePageUrlIfConfigured(context, webToConfigure, configWeb);
-            FeatureManager.ActivateFeatures(context, webToConfigure, configWeb.SiteFeatures, configWeb.WebFeatures);
+            FeatureManager.ActivateWebFeatures(context, webToConfigure, configWeb.WebFeatures);
             ListManager.CreateLists(context, webToConfigure, configWeb.Lists);
             QuicklaunchManager.CreateQuicklaunchNodes(context, webToConfigure, configWeb.Quicklaunch);
             PropertyManager.SetProperties(context, webToConfigure, configWeb.Properties);
@@ -99,7 +100,8 @@ namespace Sherpa.Library.SiteHierarchy
         /// </summary>
         public void ActivateContentTypeDependencyFeatures()
         {
-            FeatureManager.ActivateFeatures(ClientContext, ClientContext.Web, _configurationWeb.SiteFeatures, _configurationWeb.WebFeatures, true);
+            FeatureManager.ActivateSiteCollectionFeatures(ClientContext, _configurationSiteCollection.SiteFeatures, true);
+            FeatureManager.ActivateWebFeatures(ClientContext, ClientContext.Web, _configurationSiteCollection.RootWeb.WebFeatures, true);
         }
 
         private WebCreationInformation GetWebCreationInformationFromConfig(ShWeb configWeb)

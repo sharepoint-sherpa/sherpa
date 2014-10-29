@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using Microsoft.SharePoint.Client;
 using Sherpa.Library.SiteHierarchy.Model;
 
@@ -8,41 +7,44 @@ namespace Sherpa.Library.SiteHierarchy
 {
     public class FeatureManager
     {
-        public void ActivateFeatures(ClientContext clientContext, Web webToConfigure, List<ShFeature> siteFeatures, List<ShFeature> webFeatures, bool onlyContentTypeDependencyFeatures)
+        public void ActivateSiteCollectionFeatures(ClientContext clientContext, List<ShFeature> siteFeatures, bool onlyContentTypeDependencyFeatures)
         {
-            if (siteFeatures != null)
+            foreach (var featureActivation in siteFeatures)
             {
-                foreach (var featureActivation in siteFeatures)
+                if (onlyContentTypeDependencyFeatures && featureActivation.ContentTypeDependency)
                 {
-                    if (onlyContentTypeDependencyFeatures && featureActivation.ContentTypeDependency)
-                    {
-                        ActivateSiteCollectionFeature(clientContext, featureActivation);
-                    }
-                    else if (!onlyContentTypeDependencyFeatures)
-                    {
-                        ActivateSiteCollectionFeature(clientContext, featureActivation);
-                    }
+                    ActivateSiteCollectionFeature(clientContext, featureActivation);
                 }
-            }
-            if (webFeatures != null)
-            {
-                foreach (var featureActivation in webFeatures)
+                else if (!onlyContentTypeDependencyFeatures)
                 {
-                    if (onlyContentTypeDependencyFeatures && featureActivation.ContentTypeDependency)
-                    {
-                        ActivateWebFeature(clientContext, featureActivation, webToConfigure);
-                    }
-                    else if (!onlyContentTypeDependencyFeatures)
-                    {
-                        ActivateWebFeature(clientContext, featureActivation, webToConfigure);
-                    }
+                    ActivateSiteCollectionFeature(clientContext, featureActivation);
                 }
             }
         }
 
-        public void ActivateFeatures(ClientContext clientContext, Web webToConfigure, List<ShFeature> siteFeatures, List<ShFeature> webFeatures)
+        public void ActivateSiteCollectionFeatures(ClientContext clientContext, List<ShFeature> siteFeatures)
         {
-            ActivateFeatures(clientContext, webToConfigure, siteFeatures, webFeatures, false);
+            ActivateSiteCollectionFeatures(clientContext, siteFeatures, false);
+        }
+
+        public void ActivateWebFeatures(ClientContext clientContext, Web webToConfigure, List<ShFeature> webFeatures, bool onlyContentTypeDependencyFeatures)
+        {
+            foreach (var featureActivation in webFeatures)
+            {
+                if (onlyContentTypeDependencyFeatures && featureActivation.ContentTypeDependency)
+                {
+                    ActivateWebFeature(clientContext, featureActivation, webToConfigure);
+                }
+                else if (!onlyContentTypeDependencyFeatures)
+                {
+                    ActivateWebFeature(clientContext, featureActivation, webToConfigure);
+                }
+            }
+        }
+
+        public void ActivateWebFeatures(ClientContext clientContext, Web webToConfigure, List<ShFeature> webFeatures)
+        {
+            ActivateWebFeatures(clientContext, webToConfigure, webFeatures, false);
         }
 
         private void ActivateWebFeature(ClientContext clientContext, ShFeature feature, Web web)

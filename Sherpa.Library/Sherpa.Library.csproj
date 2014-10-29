@@ -84,6 +84,7 @@
     <Compile Include="IPersistanceProvider.cs" />
     <Compile Include="SiteHierarchy\ISiteSetupManager.cs" />
     <Compile Include="SiteHierarchy\Model\ShList.cs" />
+    <Compile Include="SiteHierarchy\Model\ShSiteCollection.cs" />
     <Compile Include="SiteHierarchy\Model\ShWeb.cs" />
     <Compile Include="SiteHierarchy\Model\ShView.cs" />
     <Compile Include="SiteHierarchy\PropertyManager.cs" />

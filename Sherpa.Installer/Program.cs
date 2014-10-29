@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Dynamic;
 using System.Linq;
 using System.Net;
 using System.Reflection;
@@ -12,6 +13,7 @@ namespace Sherpa.Installer
         public static InstallationManager InstallationManager { get; set; }
         private static Options ProgramOptions { get; set; }
         private static Uri UrlToSite { get; set; }
+        private static bool Unmanaged { get; set; }
 
         static void Main(string[] args)
         {
@@ -61,7 +63,8 @@ namespace Sherpa.Installer
                 if (string.IsNullOrEmpty(ProgramOptions.Operations)) ShowStartScreenAndExecuteCommand();
                 else
                 {
-                    InstallationManager.InstallUnmanaged();
+                    Unmanaged = true;
+                    InstallationManager.InstallUnmanaged(ProgramOptions.SiteHierarchy, ProgramOptions.Operations);
                 }
             }
             catch (Exception exception)
@@ -70,7 +73,7 @@ namespace Sherpa.Installer
                 Console.WriteLine("An exception occured: " + exception.Message);
                 Console.WriteLine(exception.StackTrace);
                 Console.ResetColor();
-                RunApplication();
+                if (!Unmanaged) RunApplication();
             }
         }
 

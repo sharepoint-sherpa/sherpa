@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using Microsoft.SharePoint.Client;
 using Sherpa.Library;
@@ -44,9 +45,34 @@ namespace Sherpa.Installer
             Console.WriteLine("Site Url: \t{0}\r\nConfigpath: \t{1}\r\nSPO: \t\t{2}", _urlToSite.AbsoluteUri, _rootPath, _isSharePointOnline);
         }
 
-        public void InstallUnmanaged(string siteHierarchyFileName)
+        public void InstallUnmanaged(string siteHierarchyFileName, string operation)
         {
-            
+            if (string.IsNullOrEmpty(siteHierarchyFileName))
+            {
+                Console.WriteLine("Configuration filepath is empty - cannot continue");
+                return;
+            }
+            if (string.IsNullOrEmpty(operation))
+            {
+                Console.WriteLine("Operations is empty - cannot continue");
+                return;
+            }
+            Console.WriteLine("Starting unmanaged installation");
+            using (var clientContext = new ClientContext(_urlToSite) {Credentials = _credentials})
+            {
+                var configurationFile = Directory.GetFiles(ConfigurationDirectoryPath, siteHierarchyFileName, SearchOption.TopDirectoryOnly).SingleOrDefault();
+                if (configurationFile == null)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("Couldn't find the configuration file");
+                    Console.ResetColor();
+                    return;
+                }
+                var sitePersister = new FilePersistanceProvider<ShSiteCollection>(configurationFile);
+                var siteManager = new SiteSetupManager(clientContext, sitePersister.Load());
+                siteManager.SetupSites();
+            }
+            Console.WriteLine("Completed unmanaged installation");
         }
 
         public void SetupTaxonomy()
@@ -156,7 +182,7 @@ namespace Sherpa.Installer
             {
                 foreach (var file in Directory.GetFiles(ConfigurationDirectoryPath, "*sitehierarchy.json", SearchOption.AllDirectories))
                 {
-                    var sitePersister = new FilePersistanceProvider<ShWeb>(file);
+                    var sitePersister = new FilePersistanceProvider<ShSiteCollection>(file);
                     var siteManager = new SiteSetupManager(clientContext, sitePersister.Load());
                     if (onlyContentTypeDependecyFeatures)
                     {

@@ -11,21 +11,14 @@ namespace Sherpa.Library.SiteHierarchy.Model
         public string WelcomePageUrl { get; set; }
         public int Language { get; set; }
         public List<ShWeb> Webs { get; set; }
-        public List<ShFeature> SiteFeatures { get; set; }
         public List<ShFeature> WebFeatures { get; set; }
         public List<ShList> Lists { get; set; }
         public Dictionary<string, string> Quicklaunch { get; set; }
         public Dictionary<string, string> Properties { get; set; }
 
-        /* The references to the configuration files within the config folder */
-        public string[] FieldConfigurations { get; set; }
-        public string[] ContentTypeConfigurations { get; set; }
-        public string[] TaxonomyConfigurations { get; set; }
-
         public ShWeb()
         {
             Webs = new List<ShWeb>();
-            SiteFeatures = new List<ShFeature>();
             WebFeatures = new List<ShFeature>();
             Lists = new List<ShList>();
             Quicklaunch = new Dictionary<string, string>();
