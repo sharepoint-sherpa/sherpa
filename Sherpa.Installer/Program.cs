@@ -100,61 +100,55 @@ namespace Sherpa.Installer
 
         private static void HandleCommandKeyPress(string input)
         {
-            int inputNum;
-            if (!int.TryParse(input, out inputNum))
+            var operation = InstallationManager.GetInstallationOperationFromInput(input);
+            switch (operation)
             {
-                Console.WriteLine("Invalid input");
-                ShowStartScreenAndExecuteCommand();
-            }
-            switch (inputNum)
-            {
-                case 1:
+                case InstallationOperation.InstallTaxonomy:
                 {
                     InstallationManager.SetupTaxonomy();
                     break;
                 }
-                case 2:
+                case InstallationOperation.UploadAndActivateSolution:
                 {
-                    InstallationManager.UploadAndActivateSandboxSolution();
+                    InstallationManager.UploadAndActivateSandboxSolutions();
                     break;
                 }
-                case 3:
+                case InstallationOperation.InstallFieldsAndContentTypes:
                 {
                     InstallationManager.CreateSiteColumnsAndContentTypes();
                     break;
                 }
-                case 4:
+                case InstallationOperation.ConfigureSites:
                 {
                     InstallationManager.ConfigureSites();
                     break;
                 }
-                case 5:
+                case InstallationOperation.ImportSearch:
                 {
                     InstallationManager.ImportSearchSettings();
                     break;
                 }
-                case 6:
+                case InstallationOperation.ExportTaxonomy:
                 {
                     InstallationManager.ExportTaxonomyGroup();
                     break;
                 }
-                case 8:
+                case InstallationOperation.DeleteSites:
                 {
                     InstallationManager.TeardownSites();
                     break;
                 }
-                case 9:
+                case InstallationOperation.DeleteFieldsAndContentTypes:
                 {
                     InstallationManager.DeleteAllSherpaSiteColumnsAndContentTypes();
                     break;
                 }
-                case 1337:
+                case InstallationOperation.ForceRecrawl:
                 {
-                    Console.WriteLine("(Hidden feature) Forcing recrawl of rootsite and all subsites");
                     InstallationManager.ForceReCrawl();
                     break;
                 }
-                case 0:
+                case InstallationOperation.ExitApplication:
                 {
                     Environment.Exit(0);
                     break;

@@ -23,13 +23,10 @@ namespace Sherpa.Library.Deploy
         /// <summary>
         /// Uploads a design package to a library. Can be used for uploading sandboxed solutions to solution gallery.
         /// </summary>
+        /// <param name="context"></param>
         /// <param name="localFilePath">Path to package (wsp)</param>
-        public void UploadDesignPackageToSiteAssets(string localFilePath)
+        public void UploadDesignPackageToSiteAssets(ClientContext context, string localFilePath)
         {
-            using (var context = new ClientContext(_urlToWeb))
-            {
-                context.Credentials = _credentials;
-
                 var fileName = Path.GetFileName(localFilePath);
                 var extension = Path.GetExtension(fileName);
                 if (extension != null && extension.ToLower() != ".wsp")
@@ -55,7 +52,6 @@ namespace Sherpa.Library.Deploy
                 {
                     UploadFileToSharePointOnPrem(context, localFilePath, fileName);
                 }
-            }
         }
 
         private void UploadFileToSharePointOnPrem(ClientContext context, string localFilePath, string fileName)
@@ -122,28 +118,26 @@ namespace Sherpa.Library.Deploy
         /// Activates a design package based on package name
         /// Starting point: http://sharepoint.stackexchange.com/questions/90809/is-it-possible-to-activate-a-solution-using-client-code-in-sharepoint-online-201
         /// </summary>
+        /// <param name="context"></param>
         /// <param name="filePathOrName">The filename of the package</param>
         /// <param name="siteRelativeUrlToLibrary">Site relative URL to the library of the package</param>
-        public void ActivateDesignPackage(string filePathOrName, string siteRelativeUrlToLibrary)
+        public void ActivateDesignPackage(ClientContext context, string filePathOrName, string siteRelativeUrlToLibrary)
         {
             // if we pass in a full path, correct this
             var nameOfPackage = Path.GetFileNameWithoutExtension(filePathOrName);
-            using (var context = new ClientContext(_urlToWeb))
-            {
-                context.Credentials = _credentials;
-                context.Load(context.Site);
-                context.Load(context.Web);
-                context.ExecuteQuery();
 
-                var stagedFileUrl = UriUtilities.CombineServerRelativeUri(context.Site.ServerRelativeUrl, siteRelativeUrlToLibrary, nameOfPackage + ".wsp");
-                var packageInfo = GetPackageInfoWithLatestVersion(context, nameOfPackage, stagedFileUrl);
+            context.Load(context.Site);
+            context.Load(context.Web);
+            context.ExecuteQuery();
 
-                Console.WriteLine("Installing solution package " + GetFileNameFromPackageInfo(packageInfo));
-                DesignPackage.Install(context, context.Site, packageInfo, stagedFileUrl);
-                context.ExecuteQuery();
+            var stagedFileUrl = UriUtilities.CombineServerRelativeUri(context.Site.ServerRelativeUrl, siteRelativeUrlToLibrary, nameOfPackage + ".wsp");
+            var packageInfo = GetPackageInfoWithLatestVersion(context, nameOfPackage, stagedFileUrl);
 
-                DeleteFile(context, stagedFileUrl);
-            }
+            Console.WriteLine("Installing solution package " + GetFileNameFromPackageInfo(packageInfo));
+            DesignPackage.Install(context, context.Site, packageInfo, stagedFileUrl);
+            context.ExecuteQuery();
+
+            DeleteFile(context, stagedFileUrl);
         }
 
         private DesignPackageInfo GetPackageInfoWithLatestVersion(ClientContext context, string nameOfPackage, string fileUrl)
@@ -180,6 +174,15 @@ namespace Sherpa.Library.Deploy
                 MajorVersion = majorVersion,
                 MinorVersion = minorVersion
             };
+        }
+
+        public bool IsCurrentUserSiteCollectionAdmin(ClientContext context)
+        {
+            var currentUser = context.Web.CurrentUser;
+            context.Load(currentUser, u => u.IsSiteAdmin);
+            context.ExecuteQuery();
+
+            return currentUser.IsSiteAdmin;
         }
 
         /// <summary>

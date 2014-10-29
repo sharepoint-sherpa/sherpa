@@ -1,8 +1,10 @@
-﻿namespace Sherpa.Library.Deploy
+﻿using Microsoft.SharePoint.Client;
+
+namespace Sherpa.Library.Deploy
 {
     interface IDeployManager
     {
-        void UploadDesignPackageToSiteAssets(string localFilePath);
-        void ActivateDesignPackage(string nameOfPackage, string siteRelativeUrlToLibrary);
+        void UploadDesignPackageToSiteAssets(ClientContext context, string localFilePath);
+        void ActivateDesignPackage(ClientContext context, string nameOfPackage, string siteRelativeUrlToLibrary);
     }
 }

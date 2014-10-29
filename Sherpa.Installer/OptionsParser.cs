@@ -73,7 +73,7 @@ namespace Sherpa.Installer
         [Option("path", HelpText = "Path to directory where the config and solutions folders are present. Not specifying will use application directory")]
         public string RootPath { get; set; }
 
-        [Option("op", HelpText = "For unmanaged execution, specify the operation you want to execute by referencing the operation ID's. 1 is taxonomy, 2 is sandbox solution upload and so forth.")]
+        [Option("op", HelpText = "For unmanaged execution, specify the operation you want to execute by referencing the operation's ID. 1 is taxonomy, 2 is sandbox solution upload and so forth.")]
         public string Operations { get; set; }
 
         [Option("conf", HelpText = "For unmanaged execution, specify the file name of the main site hierarchy configuration file. The file must reside in the config folder.")]

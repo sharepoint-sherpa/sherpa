@@ -7,7 +7,7 @@ namespace Sherpa.Library.SiteHierarchy
 {
     public class SiteSetupManager : ISiteSetupManager
     {
-        private readonly ShSiteCollection _configurationSiteCollection;
+        public readonly ShSiteCollection ConfigurationSiteCollection;
         private ClientContext ClientContext { get; set; }
         private FeatureManager FeatureManager { get; set; }
         private QuicklaunchManager QuicklaunchManager { get; set; }
@@ -16,7 +16,7 @@ namespace Sherpa.Library.SiteHierarchy
 
         public SiteSetupManager(ClientContext clientContext, ShSiteCollection configurationSiteCollection)
         {
-            _configurationSiteCollection = configurationSiteCollection;
+            ConfigurationSiteCollection = configurationSiteCollection;
             ClientContext = clientContext;
 
             FeatureManager = new FeatureManager();
@@ -26,8 +26,8 @@ namespace Sherpa.Library.SiteHierarchy
         }
         public void SetupSites()
         {
-            FeatureManager.ActivateSiteCollectionFeatures(ClientContext, _configurationSiteCollection.SiteFeatures);
-            EnsureAndConfigureWebAndActivateFeatures(ClientContext, null, _configurationSiteCollection.RootWeb);
+            FeatureManager.ActivateSiteCollectionFeatures(ClientContext, ConfigurationSiteCollection.SiteFeatures);
+            EnsureAndConfigureWebAndActivateFeatures(ClientContext, null, ConfigurationSiteCollection.RootWeb);
         }
 
         /// <summary>
@@ -100,8 +100,8 @@ namespace Sherpa.Library.SiteHierarchy
         /// </summary>
         public void ActivateContentTypeDependencyFeatures()
         {
-            FeatureManager.ActivateSiteCollectionFeatures(ClientContext, _configurationSiteCollection.SiteFeatures, true);
-            FeatureManager.ActivateWebFeatures(ClientContext, ClientContext.Web, _configurationSiteCollection.RootWeb.WebFeatures, true);
+            FeatureManager.ActivateSiteCollectionFeatures(ClientContext, ConfigurationSiteCollection.SiteFeatures, true);
+            FeatureManager.ActivateWebFeatures(ClientContext, ClientContext.Web, ConfigurationSiteCollection.RootWeb.WebFeatures, true);
         }
 
         private WebCreationInformation GetWebCreationInformationFromConfig(ShWeb configWeb)

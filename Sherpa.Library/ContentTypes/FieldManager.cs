@@ -20,7 +20,7 @@ namespace Sherpa.Library.ContentTypes
             ClientContext = clientContext;
         }
 
-        public void CreateSiteColumns()
+        public void CreateFields()
         {
             Web web = ClientContext.Web;
             FieldCollection webFieldCollection = web.Fields;
