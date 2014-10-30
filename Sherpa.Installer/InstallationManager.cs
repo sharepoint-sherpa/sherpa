@@ -19,7 +19,7 @@ namespace Sherpa.Installer
 {
     public class InstallationManager
     {
-        private static readonly ILog _log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private readonly ICredentials _credentials;
         private readonly Uri _urlToSite;
         private readonly bool _isSharePointOnline;
@@ -45,33 +45,35 @@ namespace Sherpa.Installer
             _isSharePointOnline = isSharePointOnline;
             _rootPath = rootPath ?? Environment.CurrentDirectory;
 
-            _log.DebugFormat("Site Url: \t{0}\r\nConfigpath: \t{1}\r\nSPO: \t\t{2}", _urlToSite.AbsoluteUri, _rootPath, _isSharePointOnline);
+            Log.DebugFormat("Site Url: {0}, Configpath: {1}, SPO: {2}", _urlToSite.AbsoluteUri, _rootPath, _isSharePointOnline);
         }
 
 
         public void InstallUnmanaged(string siteHierarchyFileName, string operationInput)
         {
-            _log.Debug("Starting unmanaged installation");
+            Log.Debug("Starting InstallUnmanaged");
+            Log.Debug("Site configuration: " + siteHierarchyFileName);
+            Log.Debug("Operation input: " + operationInput);
+
             if (string.IsNullOrEmpty(siteHierarchyFileName))
             {
-                _log.Fatal("Configuration filepath is empty - cannot continue");
+                Log.Fatal("Configuration filepath is empty - cannot continue");
                 return;
             }
             if (string.IsNullOrEmpty(operationInput))
             {
-                _log.Fatal("Operations is empty - cannot continue");
+                Log.Fatal("Operations is empty - cannot continue");
                 return;
             }
-            Console.WriteLine("Starting unmanaged installation");
+            var installationOperation = GetInstallationOperationFromInput(operationInput);
+            var configurationFile = Path.Combine(ConfigurationDirectoryPath, siteHierarchyFileName);
+            if (!File.Exists(configurationFile))
+            {
+                Log.Fatal("Couldn't find the configuration file " + configurationFile);
+                return;
+            }
             using (var context = new ClientContext(_urlToSite) {Credentials = _credentials})
             {
-                var installationOperation = GetInstallationOperationFromInput(operationInput);
-                var configurationFile = Path.Combine(ConfigurationDirectoryPath, siteHierarchyFileName);
-                if (!File.Exists(configurationFile))
-                {
-                    _log.Fatal("Couldn't find the configuration file " + configurationFile);
-                    return;
-                }
                 var sitePersister = new FilePersistanceProvider<ShSiteCollection>(configurationFile);
                 var siteManager = new SiteSetupManager(context, sitePersister.Load());
 
@@ -120,6 +122,7 @@ namespace Sherpa.Installer
                         foreach (var fileName in siteManager.ConfigurationSiteCollection.SearchConfigurations)
                         {
                             var pathToSearchSettingsFile = Path.Combine(SearchDirectoryPath, fileName);
+                            Log.Info("Importing search configuration in " + fileName);
                             searchMan.ImportSearchConfiguration(context, pathToSearchSettingsFile);
                         }
                         break;
@@ -145,12 +148,12 @@ namespace Sherpa.Installer
                     }
                     default:
                     {
-                        _log.Warn("Operation not supported in unmanaged mode");
+                        Log.Warn("Operation not supported in unmanaged mode");
                         break;
                     }
                 }
             }
-            _log.Debug("Completed unmanaged installation");
+            Log.Debug("Completed unmanaged installation");
         }
 
         public void SetupTaxonomy()
@@ -167,7 +170,7 @@ namespace Sherpa.Installer
 
         private void InstallTaxonomyFromSingleFile(ClientContext context, string pathToFile)
         {
-            _log.Info("Starting installation of taxonomy based on " + pathToFile);
+            Log.Info("Starting installation of taxonomy based on " + pathToFile);
             var taxPersistanceProvider = new FilePersistanceProvider<ShTermGroup>(pathToFile);
             var taxonomyManager = new TaxonomyManager(taxPersistanceProvider.Load());
             taxonomyManager.WriteTaxonomyToTermStore(context);
@@ -184,7 +187,7 @@ namespace Sherpa.Installer
 
         public void ExportTaxonomyGroup(string groupName)
         {
-            _log.Info("Starting export of taxonomy group " + groupName);
+            Log.Info("Starting export of taxonomy group " + groupName);
             using (var context = new ClientContext(_urlToSite))
             {
                 context.Credentials = _credentials;
@@ -196,13 +199,13 @@ namespace Sherpa.Installer
                 if (groupConfig != null)
                 {
                     taxPersistanceProvider.Save(groupConfig);
-                    _log.Info("Completed export of taxonomy group " + groupName);
+                    Log.Info("Completed export of taxonomy group " + groupName);
                 }
             }
         }
         public void UploadAndActivateSandboxSolutions()
         {
-            Console.WriteLine("Uploading and activating sandboxed solution(s)");
+            Log.Info("Uploading and activating sandboxed solution(s)");
             var deployManager = new DeployManager(_urlToSite, _credentials, _isSharePointOnline);
             var solutionPackages = Directory.GetFiles(SolutionsDirectoryPath, "*.wsp", SearchOption.AllDirectories);
 
@@ -212,21 +215,20 @@ namespace Sherpa.Installer
 
                 if (!deployManager.IsCurrentUserSiteCollectionAdmin(context))
                 {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("You need to be site collection administrator to perform this operation.");
-                    Console.ResetColor();
+                    Log.Fatal("You need to be site collection administrator to perform this operation.");
+                    return;
                 }
                 foreach (var file in solutionPackages)
                 {
                     UploadAndActivatePackage(context, deployManager, file);
                 }
             }
-            Console.WriteLine("Done uploading and activating sandboxed solution(s)");
+            Log.Info("Done uploading and activating sandboxed solution(s)");
         }
 
         private static void UploadAndActivatePackage(ClientContext context, DeployManager deployManager, string file)
         {
-            _log.Debug("Processing solution package " + file);
+            Log.Info("Processing solution package " + file);
             deployManager.UploadDesignPackageToSiteAssets(context, file);
             deployManager.ActivateDesignPackage(context, file, "SiteAssets");
         }
@@ -234,7 +236,7 @@ namespace Sherpa.Installer
         public void CreateSiteColumnsAndContentTypes()
         {
             ConfigureSites(true);
-            Console.WriteLine("Starting setup of site columns and content types");
+            Log.Info("Starting setup of site columns and content types");
 
             using (var context = new ClientContext(_urlToSite))
             {
@@ -248,7 +250,7 @@ namespace Sherpa.Installer
                     CreateContentTypesFromFile(context, filePath);
                 }
             }
-            Console.WriteLine("Done setup of site columns and content types");
+            Log.Info("Done setup of site columns and content types");
         }
 
         private static void CreateContentTypesFromFile(ClientContext context, string filePath)
@@ -272,7 +274,7 @@ namespace Sherpa.Installer
 
         public void ConfigureSites(bool onlyContentTypeDependecyFeatures)
         {
-            _log.Debug("Starting ConfigureSites, only content type dependencies: " + onlyContentTypeDependecyFeatures);
+            Log.Debug("Starting ConfigureSites, only content type dependencies: " + onlyContentTypeDependecyFeatures);
             using (var context = new ClientContext(_urlToSite) { Credentials = _credentials })
             {
                 foreach (var file in Directory.GetFiles(ConfigurationDirectoryPath, "*sitehierarchy.json", SearchOption.AllDirectories))
@@ -281,12 +283,12 @@ namespace Sherpa.Installer
                     var siteManager = new SiteSetupManager(context, sitePersister.Load());
                     if (onlyContentTypeDependecyFeatures)
                     {
-                        _log.Debug("ConfigureSites: Activating only content type dependecy features");
+                        Log.Debug("ConfigureSites: Activating only content type dependecy features");
                         siteManager.ActivateContentTypeDependencyFeatures();
                     }
                     else
                     {
-                        _log.Debug("ConfigureSites: Setting up sites in normal mode");
+                        Log.Debug("ConfigureSites: Setting up sites in normal mode");
                         siteManager.SetupSites();
                     }
                 }
@@ -301,7 +303,7 @@ namespace Sherpa.Installer
                 var pathToSearchXmls = Directory.GetFiles(SearchDirectoryPath);
                 foreach (var pathToSearchXml in pathToSearchXmls)
                 {
-                    _log.Info("Importing search setting " + pathToSearchXml);
+                    Log.Info("Importing search setting " + pathToSearchXml);
                     searchMan.ImportSearchConfiguration(context, pathToSearchXml);
                 }
             }
@@ -311,17 +313,16 @@ namespace Sherpa.Installer
         {
             using (var context = new ClientContext(_urlToSite) { Credentials = _credentials })
             {
-                _log.Info("Deleting sites");
+                Log.Info("Deleting sites");
                 SiteSetupManager.DeleteSites(context);
             }
         }
 
         public void DeleteAllSherpaSiteColumnsAndContentTypes()
         {
-            Console.WriteLine("Deleting all custom site columns and content types");
-            using (var context = new ClientContext(_urlToSite))
+            Log.Info("Deleting all custom site columns and content types");
+            using (var context = new ClientContext(_urlToSite) { Credentials = _credentials })
             {
-                context.Credentials = _credentials;
                 foreach (var file in Directory.GetFiles(ConfigurationDirectoryPath, "*contenttypes.json", SearchOption.AllDirectories))
                 {
                     DeleteContentTypesSpecifiedInFile(context, file);
@@ -331,11 +332,12 @@ namespace Sherpa.Installer
                     DeleteFieldsSpecifiedInFile(context, file);
                 }
             }
-            Console.WriteLine("Done deleting all custom site columns and content types");
+            Log.Info("Done deleting all custom site columns and content types");
         }
 
         private static void DeleteFieldsSpecifiedInFile(ClientContext context, string file)
         {
+            Log.Info("Deleting all fields with the same group as the ones in the file " + file);
             var siteColumnPersister = new FilePersistanceProvider<List<ShField>>(file);
             var siteColumnManager = new FieldManager(context, siteColumnPersister.Load());
             siteColumnManager.DeleteAllCustomFields();
@@ -343,6 +345,7 @@ namespace Sherpa.Installer
 
         private static void DeleteContentTypesSpecifiedInFile(ClientContext context, string file)
         {
+            Log.Info("Deleting all content types with the same group as the ones in the file " + file);
             var contentTypePersister = new FilePersistanceProvider<List<ShContentType>>(file);
             var contentTypeManager = new ContentTypeManager(context, contentTypePersister.Load());
             contentTypeManager.DeleteAllCustomContentTypes();
@@ -350,7 +353,7 @@ namespace Sherpa.Installer
 
         public void ForceReCrawl()
         {
-            Console.WriteLine("(Hidden feature) Forcing recrawl of rootsite and all subsites");
+            Log.Info("(Hidden feature) Forcing recrawl of rootsite and all subsites");
             var deployManager = new DeployManager(_urlToSite, _credentials, _isSharePointOnline);
             deployManager.ForceRecrawl();
         }
