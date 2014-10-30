@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using log4net;
 using Microsoft.SharePoint.Client;
 using Microsoft.SharePoint.Client.Taxonomy;
 using Sherpa.Library.ContentTypes.Model;
@@ -10,6 +12,7 @@ namespace Sherpa.Library.ContentTypes
 {
     public class FieldManager
     {
+        private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private ClientContext ClientContext { get; set; }
         private List<ShField> Fields { get; set; }
 
@@ -30,6 +33,7 @@ namespace Sherpa.Library.ContentTypes
             var termStoreId = new TaxonomyManager(null).GetTermStoreId(ClientContext);
             foreach (ShField field in Fields.Where(field => !webFieldCollection.Any(item => item.InternalName == field.InternalName)))
             {
+                Log.Debug("Attempting to create field " + field.DisplayName);
                 if (field.Type.StartsWith("TaxonomyFieldType"))
                 {
                     field.SspId = termStoreId;
@@ -53,6 +57,7 @@ namespace Sherpa.Library.ContentTypes
 
         private void CreateTaxonomyField(ShField field, FieldCollection fields)
         {
+            Log.Debug("Attempting to create taxonomy field " + field.DisplayName);
             var fieldSchema = field.GetFieldAsXml();
             var newField = fields.AddFieldAsXml(fieldSchema, false, AddFieldOptions.AddFieldInternalNameHint);
             ClientContext.Load(newField);
@@ -102,6 +107,7 @@ namespace Sherpa.Library.ContentTypes
 
         public void ValidateConfiguration(List<ShField> fields)
         {
+            Log.Debug("Trying to validate field configuration");
             var fieldIdsForEnsuringUniqueness = new List<Guid>();
             var fieldNamesForEnsuringUniqueness = new List<string>();
             foreach (var field in fields)
@@ -118,6 +124,7 @@ namespace Sherpa.Library.ContentTypes
 
         public void DeleteAllCustomFields()
         {
+            Log.Debug("Deleting all custom fields");
             Web web = ClientContext.Web;
             FieldCollection webFieldCollection = web.Fields;
             ClientContext.Load(webFieldCollection);

@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Reflection;
+using log4net;
 using Microsoft.SharePoint.Client;
 using Sherpa.Library.ContentTypes.Model;
 
@@ -9,6 +11,7 @@ namespace Sherpa.Library.ContentTypes
 {
     public class ContentTypeManager
     {
+        private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private ClientContext ClientContext { get; set; }
         private List<ShContentType> ContentTypes { get; set; }
 
@@ -38,6 +41,7 @@ namespace Sherpa.Library.ContentTypes
                 }
                 else
                 {
+                    Log.Debug("Creating content type " + contentType.DisplayName);
                     var contentTypeCreationInformation = contentType.GetContentTypeCreationInformation();
                     var newContentType = existingContentTypes.Add(contentTypeCreationInformation);
                     ClientContext.ExecuteQuery();
@@ -54,6 +58,8 @@ namespace Sherpa.Library.ContentTypes
 
         private void AddSiteColumnsToContentType(ShContentType configContentType)
         {
+            Log.Debug("Attempting to add fields to content type " + configContentType.DisplayName);
+
             Web web = ClientContext.Web;
             ContentTypeCollection contentTypes = web.ContentTypes;
             ClientContext.Load(contentTypes);
@@ -118,6 +124,7 @@ namespace Sherpa.Library.ContentTypes
 
         public void ValidateConfiguration(List<ShContentType> contentTypes)
         {
+            Log.Debug("Trying to validate content type configuration");
             var contentTypeIdsForEnsuringUniqueness = new List<string>();
             var contentTypeInternalNamesForEnsuringUniqueness = new List<string>();
             foreach (var contentType in contentTypes)

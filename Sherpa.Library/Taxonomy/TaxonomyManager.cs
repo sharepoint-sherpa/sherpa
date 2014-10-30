@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using log4net;
 using Microsoft.SharePoint.Client;
 using Microsoft.SharePoint.Client.Taxonomy;
 using Sherpa.Library.Taxonomy.Model;
@@ -9,6 +11,7 @@ namespace Sherpa.Library.Taxonomy
 {
     public class TaxonomyManager
     {
+        private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private readonly ShTermGroup _termGroup;
 
         public TaxonomyManager(){}
@@ -19,15 +22,15 @@ namespace Sherpa.Library.Taxonomy
 
         public void WriteTaxonomyToTermStore(ClientContext context)
         {
+            Log.Info("Taxonomy import started");
             ValidateConfiguration(_termGroup);
             TermStore termStore = GetTermStore(context);
 
             if (!IsCurrentUserTermStoreAdministrator(context, termStore))
             {
-                throw new Exception("Couldn't verify admin access. You must be a term store administrator to perform this operation");
+                Log.Warn("Couldn't verify admin access. You must be a term store administrator to perform this operation. Trying to continue...");
             }
 
-            Console.WriteLine("Taxonomy import started");
             var termGroup = termStore.Groups.ToList().FirstOrDefault(g => g.Id == _termGroup.Id) ??
                             termStore.CreateGroup(_termGroup.Title, _termGroup.Id);
                 

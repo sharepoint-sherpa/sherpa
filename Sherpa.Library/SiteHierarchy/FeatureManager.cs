@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
+using log4net;
 using Microsoft.SharePoint.Client;
 using Sherpa.Library.SiteHierarchy.Model;
 
@@ -7,6 +9,8 @@ namespace Sherpa.Library.SiteHierarchy
 {
     public class FeatureManager
     {
+        private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+
         public void ActivateSiteCollectionFeatures(ClientContext clientContext, List<ShFeature> siteFeatures, bool onlyContentTypeDependencyFeatures)
         {
             foreach (var featureActivation in siteFeatures)
@@ -49,6 +53,7 @@ namespace Sherpa.Library.SiteHierarchy
 
         private void ActivateWebFeature(ClientContext clientContext, ShFeature feature, Web web)
         {
+            Log.DebugFormat("Attempting to activating web feature {0}", feature.FeatureName);
             var featureCollection = web.Features;
             if (feature.ReactivateAlways) DeActivateFeatureInCollection(clientContext, feature, featureCollection);
             ActivateFeatureInCollection(clientContext, feature, featureCollection, FeatureDefinitionScope.Site);
@@ -56,6 +61,7 @@ namespace Sherpa.Library.SiteHierarchy
 
         private void ActivateSiteCollectionFeature(ClientContext clientContext, ShFeature feature)
         {
+            Log.DebugFormat("Attempting to activating site collection feature {0}", feature.FeatureName);
             var siteCollection = clientContext.Site;
             var featureCollection = siteCollection.Features;
             if (feature.ReactivateAlways) DeActivateFeatureInCollection(clientContext, feature, featureCollection);
@@ -80,7 +86,7 @@ namespace Sherpa.Library.SiteHierarchy
             {
                 try
                 {
-                    Console.WriteLine("Activating feature " + featureInfo.FeatureName);
+                    Log.Info("Activating feature " + featureInfo.FeatureName);
                     featureCollection.Add(featureInfo.FeatureId, true, scope);
                     clientContext.ExecuteQuery();
                 }
@@ -101,7 +107,7 @@ namespace Sherpa.Library.SiteHierarchy
 
             if (DoesFeatureExistInCollection(featureCollection, featureInfo.FeatureId))
             {
-                Console.WriteLine("Deactivating feature " + featureInfo.FeatureName);
+                Log.Info("Deactivating feature " + featureInfo.FeatureName);
                 featureCollection.Remove(featureInfo.FeatureId, true);
                 clientContext.ExecuteQuery();
             }

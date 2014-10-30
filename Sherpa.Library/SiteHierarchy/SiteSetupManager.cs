@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Linq;
+using System.Reflection;
+using log4net;
 using Microsoft.SharePoint.Client;
 using Sherpa.Library.SiteHierarchy.Model;
 
@@ -7,6 +9,7 @@ namespace Sherpa.Library.SiteHierarchy
 {
     public class SiteSetupManager : ISiteSetupManager
     {
+        private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         public readonly ShSiteCollection ConfigurationSiteCollection;
         private ClientContext ClientContext { get; set; }
         private FeatureManager FeatureManager { get; set; }
@@ -26,6 +29,7 @@ namespace Sherpa.Library.SiteHierarchy
         }
         public void SetupSites()
         {
+            Log.Debug("Starting SetupSites - setting up site collection");
             FeatureManager.ActivateSiteCollectionFeatures(ClientContext, ConfigurationSiteCollection.SiteFeatures);
             EnsureAndConfigureWebAndActivateFeatures(ClientContext, null, ConfigurationSiteCollection.RootWeb);
         }
@@ -63,6 +67,7 @@ namespace Sherpa.Library.SiteHierarchy
 
         private Web EnsureWeb(ClientContext context, Web parentWeb, ShWeb configWeb)
         {
+            Log.Debug("Ensuring web " + configWeb.Url);
             Web webToConfigure;
             if (parentWeb == null)
             {
