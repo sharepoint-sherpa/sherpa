@@ -1,18 +1,22 @@
 ﻿using System;
+using System.Reflection;
 using System.Security;
+using log4net;
 using Microsoft.SharePoint.Client;
 
 namespace Sherpa.Installer
 {
     public class AuthenticationHandler
     {
+        private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+
         public SharePointOnlineCredentials GetCredentialsForSharePointOnline(string userName, Uri urlToSite)
         {
             var password = new SecureString();
             var credentialsFromWindowsCredentialManager = GetCredentialsFromWindowsCredentialManager(urlToSite);
             if (credentialsFromWindowsCredentialManager != null)
             {
-                Console.WriteLine("Trying to authenticate with Windows Credentials Manager");
+                Log.Info("Trying to authenticate with Windows Credentials Manager");
                 userName = credentialsFromWindowsCredentialManager.UserName;
                 foreach (char c in credentialsFromWindowsCredentialManager.Password)
                 {
@@ -27,15 +31,10 @@ namespace Sherpa.Installer
                     var credentials = new SharePointOnlineCredentials(userName, password);
                     if (AuthenticateUser(credentials, urlToSite))
                     {
-                        Console.ForegroundColor = ConsoleColor.Green;
-                        Console.WriteLine("Account successfully authenticated!");
-                        Console.ResetColor();
-
+                        Log.Info("Account successfully authenticated with SPO");
                         return credentials;
                     }
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("Couldn't authenticate user. Try again.");
-                    Console.ResetColor();
+                    Log.Error("Couldn't authenticate user. Try again.");
                 }
                 else
                 {

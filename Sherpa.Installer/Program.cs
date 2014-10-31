@@ -19,43 +19,46 @@ namespace Sherpa.Installer
 
         static void Main(string[] args)
         {
-            XmlConfigurator.Configure();
+            XmlConfigurator.Configure(); //Initialize log4net
             Log.Debug("Sherpa application started");
-            PrintLogo();
 
             try
             {
-                if (!IsCorrectSharePointAssemblyVersionLoaded())
-                {
-                    Console.WriteLine("Old version of SharePoint assemblies loaded. Application cannot be run on a machine with SharePoint 2010 or older installed. ");
-                    Environment.Exit(1);
-                }
                 ProgramOptions = OptionsParser.ParseArguments(args);
                 UrlToSite = new Uri(ProgramOptions.UrlToSite);
+                Unmanaged = !string.IsNullOrEmpty(ProgramOptions.Operations);
             }
             catch (Exception)
             {
-                Console.WriteLine("Invalid parameters, application cannot continue");
+                Log.Fatal("Invalid parameters, application cannot continue");
                 Environment.Exit(1);
             }
-            PrintLogo();
-
+            if (!Unmanaged)
+            {
+                PrintLogo();
+            }
+            else
+            {
+                Log.Info("Sherpa initialized in unmanaged mode");
+            }
+            if (!IsCorrectSharePointAssemblyVersionLoaded())
+            {
+                Log.Fatal("Old version of SharePoint assemblies loaded. Application cannot be run on a machine with SharePoint 2010 or older installed. Content type installation only works with SharePoint 2013 SP1 and later.");
+                Environment.Exit(1);
+            }
             if (ProgramOptions.SharePointOnline)
             {
-                Console.WriteLine("Login with your password to {0}", ProgramOptions.UrlToSite);
                 var authenticationHandler = new AuthenticationHandler();
                 Credentials = authenticationHandler.GetCredentialsForSharePointOnline(ProgramOptions.UserName, UrlToSite);
+                Log.Debug("Authenticating with SPO credentials");
             }
             else
             {
                 Credentials = CredentialCache.DefaultCredentials;
-
-                using (new ClientContext(ProgramOptions.UrlToSite) { Credentials = Credentials })
-                {
-                    Console.WriteLine("Authenticated with default credentials");
-                }
+                Log.Debug("Authenticating with default credentials");
             }
             RunApplication();
+            Log.Debug("Application exiting");
         }
 
         private static void RunApplication()
@@ -64,19 +67,17 @@ namespace Sherpa.Installer
             {
                 InstallationManager = new InstallationManager(UrlToSite, Credentials, ProgramOptions.SharePointOnline, ProgramOptions.RootPath);
 
-                if (string.IsNullOrEmpty(ProgramOptions.Operations)) ShowStartScreenAndExecuteCommand();
+                if (!Unmanaged) ShowStartScreenAndExecuteCommand();
                 else
                 {
-                    Unmanaged = true;
-                    InstallationManager.InstallUnmanaged(ProgramOptions.SiteHierarchy, ProgramOptions.Operations);
+                    var operation = InstallationManager.GetInstallationOperationFromInput(ProgramOptions.Operations);
+                    InstallationManager.InstallOperation(operation, ProgramOptions.SiteHierarchy);
                 }
             }
             catch (Exception exception)
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("An exception occured: " + exception.Message);
-                Console.WriteLine(exception.StackTrace);
-                Console.ResetColor();
+                Log.Fatal("An exception occured: " + exception.Message);
+                Log.Debug(exception.StackTrace);
                 if (!Unmanaged) RunApplication();
             }
         }
@@ -105,64 +106,7 @@ namespace Sherpa.Installer
         private static void HandleCommandKeyPress(string input)
         {
             var operation = InstallationManager.GetInstallationOperationFromInput(input);
-            switch (operation)
-            {
-                case InstallationOperation.InstallTaxonomy:
-                {
-                    InstallationManager.SetupTaxonomy();
-                    break;
-                }
-                case InstallationOperation.UploadAndActivateSolution:
-                {
-                    InstallationManager.UploadAndActivateSandboxSolutions();
-                    break;
-                }
-                case InstallationOperation.InstallFieldsAndContentTypes:
-                {
-                    InstallationManager.CreateSiteColumnsAndContentTypes();
-                    break;
-                }
-                case InstallationOperation.ConfigureSites:
-                {
-                    InstallationManager.ConfigureSites();
-                    break;
-                }
-                case InstallationOperation.ImportSearch:
-                {
-                    InstallationManager.ImportSearchSettings();
-                    break;
-                }
-                case InstallationOperation.ExportTaxonomy:
-                {
-                    InstallationManager.ExportTaxonomyGroup();
-                    break;
-                }
-                case InstallationOperation.DeleteSites:
-                {
-                    InstallationManager.TeardownSites();
-                    break;
-                }
-                case InstallationOperation.DeleteFieldsAndContentTypes:
-                {
-                    InstallationManager.DeleteAllSherpaSiteColumnsAndContentTypes();
-                    break;
-                }
-                case InstallationOperation.ForceRecrawl:
-                {
-                    InstallationManager.ForceReCrawl();
-                    break;
-                }
-                case InstallationOperation.ExitApplication:
-                {
-                    Environment.Exit(0);
-                    break;
-                }
-                default:
-                {
-                    Console.WriteLine("Invalid input");
-                    break;
-                }
-            }
+            InstallationManager.InstallOperation(operation);
             ShowStartScreenAndExecuteCommand();
         }
 

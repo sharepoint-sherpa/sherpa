@@ -1,18 +1,20 @@
 ﻿using System;
+using System.Reflection;
 using CommandLine;
 using CommandLine.Text;
+using log4net;
 
 namespace Sherpa.Installer
 {
     public static class OptionsParser
     {
+        private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         public static Options ParseArguments(string[] args)
         {
             var options = new Options();
             if (args.Length == 0)
             {
-                Console.WriteLine(
-                    "You can start Sherpa from the command line to specify multiple arguments.");
+                Log.Info("You can start Sherpa from the command line to specify multiple arguments.");
 
                 Uri uriInput = null;
                 while (uriInput == null)
@@ -41,7 +43,7 @@ namespace Sherpa.Installer
             }
             else if (Parser.Default.ParseArguments(args, options))
             {
-                Console.WriteLine("Parsing arguments from the command line");
+                Log.Debug("Parsing arguments from the command line");
             }
 
             return options;
