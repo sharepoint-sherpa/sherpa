@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
 using System.Net;
+using System.Reflection;
+using log4net;
 using Microsoft.SharePoint.Client;
 using Microsoft.SharePoint.Client.Publishing;
 using File = System.IO.File;
@@ -9,6 +11,7 @@ namespace Sherpa.Library.Deploy
 {
     public class DeployManager : IDeployManager
     {
+        private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private readonly ICredentials _credentials;
         private readonly Uri _urlToWeb;
         private readonly bool _isSharePointOnline;
@@ -28,8 +31,8 @@ namespace Sherpa.Library.Deploy
         public void UploadDesignPackageToSiteAssets(ClientContext context, string localFilePath)
         {
                 var fileName = Path.GetFileName(localFilePath);
-                var extension = Path.GetExtension(fileName);
-                if (extension != null && extension.ToLower() != ".wsp")
+                var fileExtension = Path.GetExtension(fileName);
+                if (fileExtension != null && fileExtension.ToLower() != ".wsp")
                     throw new NotSupportedException("Only WSPs can be uploaded into the SharePoint solution store. " +
                                                     localFilePath + " is not a wsp");
                 if (string.IsNullOrEmpty(fileName) || _urlToWeb == null)
@@ -56,7 +59,7 @@ namespace Sherpa.Library.Deploy
 
         private void UploadFileToSharePointOnPrem(ClientContext context, string localFilePath, string fileName)
         {
-            Console.WriteLine("Uploading package {0} to library ", Path.GetFileName(localFilePath));
+            Log.InfoFormat("Uploading package {0} to library ", Path.GetFileName(localFilePath));
             try
             {
                 var siteAssetsLibrary = context.Web.Lists.EnsureSiteAssetsLibrary();
@@ -73,7 +76,7 @@ namespace Sherpa.Library.Deploy
             }
             catch (UnauthorizedAccessException)
             {
-                Console.WriteLine("Unauthorized to access " + localFilePath);
+                Log.Error("Unauthorized to access " + localFilePath);
             }
         }
 
@@ -90,7 +93,7 @@ namespace Sherpa.Library.Deploy
 
             using (var spWebClient = new SPWebClient())
             {
-                Console.WriteLine("Uploading package {0} to library ", Path.GetFileName(localPath));
+                Log.InfoFormat("Uploading package {0} to library ", Path.GetFileName(localPath));
                 var authCookie = ((SharePointOnlineCredentials)_credentials).GetAuthenticationCookie(targetSite);
                 spWebClient.CookieContainer = new CookieContainer();
                 spWebClient.CookieContainer.Add(new Cookie("FedAuth",
@@ -104,11 +107,11 @@ namespace Sherpa.Library.Deploy
                     writer.Write(File.ReadAllBytes(localPath));
                     writer.Close();
                     stream.Close();
-                    Console.WriteLine("Uploaded package {0} to library ", Path.GetFileName(localPath));
+                    Log.DebugFormat("Uploaded package {0} to library ", Path.GetFileName(localPath));
                 }
                 catch (WebException we)
                 {
-                    Console.WriteLine(we.Message);
+                    Log.Error(we.Message);
                 }
             }
         }
@@ -133,7 +136,7 @@ namespace Sherpa.Library.Deploy
             var stagedFileUrl = UriUtilities.CombineServerRelativeUri(context.Site.ServerRelativeUrl, siteRelativeUrlToLibrary, nameOfPackage + ".wsp");
             var packageInfo = GetPackageInfoWithLatestVersion(context, nameOfPackage, stagedFileUrl);
 
-            Console.WriteLine("Installing solution package " + GetFileNameFromPackageInfo(packageInfo));
+            Log.Info("Installing solution package " + GetFileNameFromPackageInfo(packageInfo));
             DesignPackage.Install(context, context.Site, packageInfo, stagedFileUrl);
             context.ExecuteQuery();
 
@@ -214,12 +217,11 @@ namespace Sherpa.Library.Deploy
                 ForceRecrawlOf(context.Web, context);
 
             }
-
         }
 
         private void ForceRecrawlOf(Web web, ClientContext context)
         {
-            Console.WriteLine("Scheduling full recrawl of: " + web.Url);
+            Log.Info("Scheduling full recrawl of: " + web.Url);
             context.Credentials = _credentials;
 
             context.Load(web, x => x.AllProperties, x => x.Webs);
@@ -241,7 +243,5 @@ namespace Sherpa.Library.Deploy
                 ForceRecrawlOf(subWeb, context);
             }
         }
-
     }
-
 }

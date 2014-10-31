@@ -53,7 +53,7 @@ namespace Sherpa.Library.SiteHierarchy
 
         private void ActivateWebFeature(ClientContext clientContext, ShFeature feature, Web web)
         {
-            Log.DebugFormat("Attempting to activating web feature {0}", feature.FeatureName);
+            Log.DebugFormat("Attempting to activate web feature {0}", feature.FeatureName);
             var featureCollection = web.Features;
             if (feature.ReactivateAlways) DeActivateFeatureInCollection(clientContext, feature, featureCollection);
             ActivateFeatureInCollection(clientContext, feature, featureCollection, FeatureDefinitionScope.Site);
@@ -61,7 +61,7 @@ namespace Sherpa.Library.SiteHierarchy
 
         private void ActivateSiteCollectionFeature(ClientContext clientContext, ShFeature feature)
         {
-            Log.DebugFormat("Attempting to activating site collection feature {0}", feature.FeatureName);
+            Log.DebugFormat("Attempting to activate site collection feature {0}", feature.FeatureName);
             var siteCollection = clientContext.Site;
             var featureCollection = siteCollection.Features;
             if (feature.ReactivateAlways) DeActivateFeatureInCollection(clientContext, feature, featureCollection);

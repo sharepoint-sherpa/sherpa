@@ -45,6 +45,7 @@ namespace Sherpa.Installer
             _isSharePointOnline = isSharePointOnline;
             _rootPath = rootPath ?? Environment.CurrentDirectory;
 
+            Log.Debug("Installation manager created");
             Log.DebugFormat("Site Url: {0}, Configpath: {1}, SPO: {2}", _urlToSite.AbsoluteUri, _rootPath, _isSharePointOnline);
         }
 
@@ -56,8 +57,8 @@ namespace Sherpa.Installer
         public void InstallOperation(InstallationOperation installationOperation, string siteHierarchyFileName)
         {
             Log.Debug("Starting InstallOperation");
-            Log.Debug("Site configuration: " + siteHierarchyFileName);
-            Log.Debug("Operation input: " + installationOperation);
+            Log.Debug("Site configuration file value: " + siteHierarchyFileName);
+            Log.Info("Installing operation " + installationOperation);
 
             if (installationOperation == InstallationOperation.Invalid || installationOperation == InstallationOperation.ExitApplication)
             {
@@ -68,10 +69,11 @@ namespace Sherpa.Installer
             var configurationFile = string.Empty;
             if (string.IsNullOrEmpty(siteHierarchyFileName))
             {
-                Log.Warn("Configuration filepath is empty - installing based on all files by convention");
+                Log.Info("No configuration file - convention mode");
             }
             else
             {
+                Log.Info("Executing operation based on file " + siteHierarchyFileName);
                 configurationFile = Path.Combine(ConfigurationDirectoryPath, siteHierarchyFileName);
                 useConfigurationForInstall = true;
                 if (!File.Exists(configurationFile))
