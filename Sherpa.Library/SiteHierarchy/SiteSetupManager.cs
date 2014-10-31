@@ -67,7 +67,7 @@ namespace Sherpa.Library.SiteHierarchy
 
         private Web EnsureWeb(ClientContext context, Web parentWeb, ShWeb configWeb)
         {
-            Log.Debug("Ensuring web " + configWeb.Url);
+            Log.Debug("Ensuring web with url " + configWeb.Url);
             Web webToConfigure;
             if (parentWeb == null)
             {
