@@ -106,7 +106,7 @@ namespace Sherpa.Installer
         private static void HandleCommandKeyPress(string input)
         {
             var operation = InstallationManager.GetInstallationOperationFromInput(input);
-            InstallationManager.InstallOperation(operation);
+            InstallationManager.InstallOperation(operation, ProgramOptions.SiteHierarchy);
             ShowStartScreenAndExecuteCommand();
         }
 
