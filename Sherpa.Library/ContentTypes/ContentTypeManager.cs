@@ -65,15 +65,15 @@ namespace Sherpa.Library.ContentTypes
             ClientContext.Load(contentTypes);
             ClientContext.ExecuteQuery();
             ContentType contentType = contentTypes.GetById(configContentType.ID);
-            FieldCollection fields = web.Fields;
+            FieldCollection webFields = web.Fields;
             ClientContext.Load(contentType);
-            ClientContext.Load(fields);
+            ClientContext.Load(webFields);
             ClientContext.ExecuteQuery();
 
             foreach (var fieldName in configContentType.Fields)
             {
                 // Need to load content type fields every iteration because fields are added to the collection
-                Field webField = fields.GetByInternalNameOrTitle(fieldName);
+                Field webField = webFields.GetByInternalNameOrTitle(fieldName);
                 FieldLinkCollection contentTypeFields = contentType.FieldLinks;
                 ClientContext.Load(contentTypeFields);
                 ClientContext.Load(webField);
@@ -87,7 +87,17 @@ namespace Sherpa.Library.ContentTypes
                 }
 
                 fieldLink.Required = configContentType.RequiredFields.Contains(fieldName);
-                fieldLink.Hidden = configContentType.HiddenFields.Contains(fieldName);
+                if (configContentType.HiddenFields.Contains(fieldName))
+                {
+                    fieldLink.Hidden = true;
+                    fieldLink.Required = false;
+                    //var hiddenField = contentType.Fields.FirstOrDefault(ct => ct.InternalName == fieldName);
+                    //if (hiddenField != null)
+                    //{
+                    //    hiddenField.Required = false;
+                    //    hiddenField.Update();
+                    //}
+                }
                 contentType.Update(true);
                 ClientContext.ExecuteQuery();
             }
