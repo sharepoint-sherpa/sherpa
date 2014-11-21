@@ -84,7 +84,9 @@ namespace Sherpa.Installer
 
         private static void ShowStartScreenAndExecuteCommand()
         {
-            Console.WriteLine("Application options");
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("# Available application operations #");
+            Console.ResetColor();
             Console.WriteLine("Press 1 to install managed metadata groups and term sets.");
             Console.WriteLine("Press 2 to upload and activate sandboxed solution.");
             Console.WriteLine("Press 3 to setup site columns and content types.");

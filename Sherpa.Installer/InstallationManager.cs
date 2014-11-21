@@ -58,7 +58,7 @@ namespace Sherpa.Installer
         {
             Log.Debug("Starting InstallOperation");
             Log.Debug("Site configuration file value: " + siteHierarchyFileName);
-            Log.Info("Installing operation " + installationOperation);
+            Log.Info("Executing operation " + installationOperation);
 
             if (installationOperation == InstallationOperation.Invalid || installationOperation == InstallationOperation.ExitApplication)
             {
@@ -227,7 +227,7 @@ namespace Sherpa.Installer
                     }
                 }
             }
-            Log.Debug("Completed unmanaged installation");
+            Log.Debug("Completed installation operation");
         }
 
         private void InstallAllTaxonomy(ClientContext context)

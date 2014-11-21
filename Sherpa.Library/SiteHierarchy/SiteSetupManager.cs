@@ -3,6 +3,7 @@ using System.Linq;
 using System.Reflection;
 using log4net;
 using Microsoft.SharePoint.Client;
+using Microsoft.SharePoint.Client.Publishing;
 using Sherpa.Library.SiteHierarchy.Model;
 
 namespace Sherpa.Library.SiteHierarchy
@@ -43,11 +44,11 @@ namespace Sherpa.Library.SiteHierarchy
         {
             var webToConfigure = EnsureWeb(context, parentWeb, configWeb);
 
-            SetWelcomePageUrlIfConfigured(context, webToConfigure, configWeb);
             FeatureManager.ActivateWebFeatures(context, webToConfigure, configWeb.WebFeatures);
             ListManager.CreateLists(context, webToConfigure, configWeb.Lists);
             QuicklaunchManager.CreateQuicklaunchNodes(context, webToConfigure, configWeb.Quicklaunch);
             PropertyManager.SetProperties(context, webToConfigure, configWeb.Properties);
+            SetWelcomePageUrlIfConfigured(context, webToConfigure, configWeb);
 
             foreach (ShWeb subWeb in configWeb.Webs)
             {
@@ -59,7 +60,9 @@ namespace Sherpa.Library.SiteHierarchy
         {
             if (!string.IsNullOrEmpty(configWeb.WelcomePageUrl))
             {
-                webToConfigure.RootFolder.WelcomePage = configWeb.WelcomePageUrl;
+                var rootFolder = webToConfigure.RootFolder;
+                rootFolder.WelcomePage = configWeb.WelcomePageUrl;
+                rootFolder.Update();
                 context.Load(webToConfigure.RootFolder);
                 context.ExecuteQuery();
             }
