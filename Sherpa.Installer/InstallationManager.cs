@@ -56,24 +56,23 @@ namespace Sherpa.Installer
 
         public void InstallOperation(InstallationOperation installationOperation, string siteHierarchyFileName)
         {
-            Log.Debug("Starting InstallOperation");
-            Log.Debug("Site configuration file value: " + siteHierarchyFileName);
             Log.Info("Executing operation " + installationOperation);
 
             if (installationOperation == InstallationOperation.Invalid || installationOperation == InstallationOperation.ExitApplication)
             {
-                Log.Fatal("Installation aborted based on user input");
+                Log.Warn("Installation aborted based on user input");
+                Environment.Exit(1);
                 return;
             }
             var useConfigurationForInstall = false;
             var configurationFile = string.Empty;
             if (string.IsNullOrEmpty(siteHierarchyFileName))
             {
-                Log.Info("No configuration file - convention mode");
+                Log.Info("No configuration file - convention mode enabled");
             }
             else
             {
-                Log.Info("Executing operation based on file " + siteHierarchyFileName);
+                Log.Debug("Site configuration file: " + siteHierarchyFileName);
                 configurationFile = Path.Combine(ConfigurationDirectoryPath, siteHierarchyFileName);
                 useConfigurationForInstall = true;
                 if (!File.Exists(configurationFile))
@@ -218,6 +217,11 @@ namespace Sherpa.Installer
                     case InstallationOperation.ForceRecrawl:
                     {
                         ForceReCrawl();
+                        break;
+                    }
+                    case InstallationOperation.ExitApplication:
+                    {
+                        Environment.Exit(1);
                         break;
                     }
                     default:
