@@ -78,7 +78,7 @@ namespace Sherpa.Installer
                 if (!File.Exists(configurationFile))
                 {
                     Log.Fatal("Couldn't find the configuration file " + configurationFile);
-                    return;
+                    throw new ArgumentException("Couldn't find the configuration file " + configurationFile);
                 }
             }
 

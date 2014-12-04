@@ -16,7 +16,7 @@ namespace Sherpa.Installer
         private static Uri UrlToSite { get; set; }
         private static bool Unmanaged { get; set; }
 
-        static void Main(string[] args)
+        static int Main(string[] args)
         {
             XmlConfigurator.Configure(); //Initialize log4net
             Log.Debug("Sherpa application started");
@@ -56,28 +56,29 @@ namespace Sherpa.Installer
                 Credentials = CredentialCache.DefaultCredentials;
                 Log.Debug("Authenticating with default credentials");
             }
-            RunApplication();
-            Log.Debug("Application exiting");
-        }
-
-        private static void RunApplication()
-        {
-            try
-            {
-                InstallationManager = new InstallationManager(UrlToSite, Credentials, ProgramOptions.SharePointOnline, ProgramOptions.RootPath);
-
-                if (!Unmanaged) ShowStartScreenAndExecuteCommand();
-                else
-                {
-                    var operation = InstallationManager.GetInstallationOperationFromInput(ProgramOptions.Operations);
-                    InstallationManager.InstallOperation(operation, ProgramOptions.SiteHierarchy);
-                }
+            try {
+                RunApplication();
+                Log.Debug("Application exiting");
             }
             catch (Exception exception)
             {
                 Log.Fatal("An exception occured: " + exception.Message);
                 Log.Debug(exception.StackTrace);
-                if (!Unmanaged) RunApplication();
+                if (Unmanaged) return 1;
+                RunApplication();
+            }
+            return 0;
+        }
+
+        private static void RunApplication()
+        {
+            InstallationManager = new InstallationManager(UrlToSite, Credentials, ProgramOptions.SharePointOnline, ProgramOptions.RootPath);
+
+            if (!Unmanaged) ShowStartScreenAndExecuteCommand();
+            else
+            {
+                var operation = InstallationManager.GetInstallationOperationFromInput(ProgramOptions.Operations);
+                InstallationManager.InstallOperation(operation, ProgramOptions.SiteHierarchy);
             }
         }
 
