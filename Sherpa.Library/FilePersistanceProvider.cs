@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Text;
 using Newtonsoft.Json;
 
 namespace Sherpa.Library
@@ -20,7 +21,7 @@ namespace Sherpa.Library
                     NullValueHandling = NullValueHandling.Ignore,
                     DefaultValueHandling = DefaultValueHandling.Ignore
                 });
-            File.WriteAllText(Path, result);
+            File.WriteAllText(Path, result, Encoding.UTF8);
         }
 
         public T Load()

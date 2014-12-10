@@ -190,6 +190,7 @@ namespace Sherpa.Library.Taxonomy
         {
             if (shTermGroup == null) throw new ArgumentNullException("shTermGroup");
 
+            Log.Debug("Validating taxonomy configuration");
             var termIdsForEnsuringUniqueness = new List<Guid> {shTermGroup.Id};
             foreach (var termSet in shTermGroup.TermSets)
             {
@@ -209,6 +210,7 @@ namespace Sherpa.Library.Taxonomy
                         throw new NotSupportedException("Found duplicate term names at the same level which is not supported. Term name " + term.Title);
                 }
             }
+            Log.Info("Taxonomy configuration validated");
         }
     }
 }
