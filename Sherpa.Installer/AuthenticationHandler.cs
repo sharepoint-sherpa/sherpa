@@ -13,88 +13,73 @@ namespace Sherpa.Installer
 
         public ICredentials GetSessionAuthCredentials(bool isSharePointOnline, string userName, Uri urlToSite)
         {
-            ICredentials credentials = null;
-            if (isSharePointOnline)
+            ICredentials credentials = GetCredentialsForSharePoint(userName, urlToSite, isSharePointOnline);
+            if (credentials != null)
             {
-                credentials = GetCredentialsForSharePointOnline(userName, urlToSite);
-                Log.Info("Authenticating with specified SPO credentials");
+                Log.Info("Authenticating with specified credentials");
             }
-            else
+            else if (!isSharePointOnline)
             {
-                credentials = GetCredentialsForSharePointOnPrem(userName, urlToSite);
-                if (credentials != null)
-                {
-                    Log.Info("Authenticating with specified credentials");
-                }
-                else
-                {
-                    credentials = CredentialCache.DefaultCredentials;
-                    Log.Info("Authenticating with default credentials");
-                }
+                credentials = CredentialCache.DefaultCredentials;
+                Log.Info("Authenticating with default credentials (on-prem)");
             }
+            
             return credentials;
         }
 
-        public SharePointOnlineCredentials GetCredentialsForSharePointOnline(string userName, Uri urlToSite)
+        public ICredentials GetCredentialsForSharePoint(string userName, Uri urlToSite, bool isSharePointOnline)
         {
-            var password = GetPasswordFromWindowsCredentialManager(userName, urlToSite);
-            while (true)
+            var credentials = GetCredentialsFromWindowsCredentialManager(urlToSite, false);
+            //If there is no creds specified in the credential manager and no username is set, we want to use default credentials
+            if (credentials == null && !string.IsNullOrEmpty(userName))
             {
-                if (password.Length == 0) password = PromptForPassword(userName);
+                var password = PromptForPassword(userName);
                 if (password != null && password.Length > 0)
                 {
-                    var credentials = new SharePointOnlineCredentials(userName, password);
-                    if (AuthenticateUser(credentials, urlToSite))
+                    if (isSharePointOnline)
                     {
-                        Log.Debug("Account successfully authenticated with SPO");
-                        return credentials;
+                        Log.Debug("Attempting to authenticate with SharePointOnlineCredentials");
+                        credentials = new SharePointOnlineCredentials(userName, password);
+                        if (!AuthenticateUser((SharePointOnlineCredentials) credentials, urlToSite))
+                        {
+                            Log.Error("There is a problem authenticating with the provided credentials");
+                            GetCredentialsForSharePoint(userName, urlToSite, false);
+                        }
+                    }
+                    else
+                    {
+                        try
+                        {
+                            Log.Debug("Attempting to authenticate with NetworkCredentials");
+                            credentials = new NetworkCredential(userName, password);
+                        }
+                        catch
+                        {
+                            Log.Error("There is a problem with the provided credentials");
+                            GetCredentialsForSharePoint(userName, urlToSite, false);
+                        }
                     }
                 }
-                else
-                {
-                    return GetCredentialsForSharePointOnline(userName, urlToSite);
-                }
             }
+
+            return credentials;
         }
 
-        public ICredentials GetCredentialsForSharePointOnPrem(string userName, Uri urlToSite)
+        private ICredentials GetCredentialsFromWindowsCredentialManager(Uri urlToSite, bool isSharePointOnline)
         {
-            var password = GetPasswordFromWindowsCredentialManager(userName, urlToSite);
-            //If there is no password specified in the credential manager and no username is set, we want to use default credentials
-            if (password.Length == 0 && string.IsNullOrEmpty(userName))
-            {
-                return null;
-            }
-            while (true)
-            {
-                if (password.Length == 0) 
-                    password = PromptForPassword(userName);
-                if (password != null && password.Length > 0)
-                {
-                    Log.Debug("Attempting to authenticate with NetworkCredentials");
-                    return new NetworkCredential(userName, password);
-                }
-                else
-                {
-                    return GetCredentialsForSharePointOnPrem(userName, urlToSite);
-                }
-            }
-        }
-
-        private SecureString GetPasswordFromWindowsCredentialManager(string userName, Uri urlToSite)
-        {
-            var password = new SecureString();
             var credentialsFromWindowsCredentialManager = GetCredentialsFromWindowsCredentialManager(urlToSite);
             if (credentialsFromWindowsCredentialManager != null)
             {
                 Log.Debug("Trying to authenticate with Windows Credentials Manager");
-                userName = credentialsFromWindowsCredentialManager.UserName;
+                var userName = credentialsFromWindowsCredentialManager.UserName;
+                var password = new SecureString();
                 foreach (char c in credentialsFromWindowsCredentialManager.Password)
                 {
                     password.AppendChar(c);
                 }
+                return isSharePointOnline ? (ICredentials) new SharePointOnlineCredentials(userName, password) : new NetworkCredential(userName, password);
             }
-            return password;
+            return null;
         }
 
         private static SecureString PromptForPassword(string userName)
@@ -112,6 +97,12 @@ namespace Sherpa.Installer
             return CredentialManager.ReadCredential(urlToSite.Host);
         }
 
+        /// <summary>
+        /// TODO: How to check authentication in on-prem scenarios?
+        /// </summary>
+        /// <param name="credentials"></param>
+        /// <param name="urlToSite"></param>
+        /// <returns></returns>
         private bool AuthenticateUser(SharePointOnlineCredentials credentials, Uri urlToSite)
         {
             try
