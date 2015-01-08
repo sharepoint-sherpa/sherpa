@@ -45,18 +45,11 @@ namespace Sherpa.Installer
                 Log.Fatal("Old version of SharePoint assemblies loaded. Application cannot be run on a machine with SharePoint 2010 or older installed. Content type installation only works with SharePoint 2013 SP1 and later.");
                 Environment.Exit(1);
             }
-            if (ProgramOptions.SharePointOnline)
+            try
             {
-                var authenticationHandler = new AuthenticationHandler();
-                Credentials = authenticationHandler.GetCredentialsForSharePointOnline(ProgramOptions.UserName, UrlToSite);
-                Log.Debug("Authenticating with SPO credentials");
-            }
-            else
-            {
-                Credentials = CredentialCache.DefaultCredentials;
-                Log.Debug("Authenticating with default credentials");
-            }
-            try {
+                var authManager = new AuthenticationHandler();
+                Credentials = authManager.GetSessionAuthCredentials(ProgramOptions.SharePointOnline, ProgramOptions.UserName, UrlToSite);
+
                 RunApplication();
                 Log.Debug("Application exiting");
             }
