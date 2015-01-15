@@ -61,7 +61,7 @@ namespace Sherpa.Installer
                     }
                 }
             }
-
+            
             return credentials;
         }
 
@@ -70,14 +70,20 @@ namespace Sherpa.Installer
             var credentialsFromWindowsCredentialManager = GetCredentialsFromWindowsCredentialManager(urlToSite);
             if (credentialsFromWindowsCredentialManager != null)
             {
-                Log.Debug("Trying to authenticate with Windows Credentials Manager");
+                Log.Debug("Trying to authenticate with credentials from Windows Credentials Manager");
                 var userName = credentialsFromWindowsCredentialManager.UserName;
                 var password = new SecureString();
                 foreach (char c in credentialsFromWindowsCredentialManager.Password)
                 {
                     password.AppendChar(c);
                 }
-                return isSharePointOnline ? (ICredentials) new SharePointOnlineCredentials(userName, password) : new NetworkCredential(userName, password);
+                if (isSharePointOnline)
+                {
+                    Log.Debug("Retrieved SPO credentials for user " + userName);
+                    return new SharePointOnlineCredentials(userName, password);
+                }
+                Log.Debug("Retrieved on-premises credentials for user " + userName);
+                return new NetworkCredential(userName, password);
             }
             return null;
         }
