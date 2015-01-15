@@ -38,7 +38,7 @@ namespace Sherpa.Installer
             }
             else
             {
-                Log.Info("Sherpa initialized in unmanaged mode");
+                Log.Info("Sherpa initialized in unattended mode");
             }
             if (!IsCorrectSharePointAssemblyVersionLoaded())
             {

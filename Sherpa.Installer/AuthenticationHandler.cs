@@ -29,7 +29,7 @@ namespace Sherpa.Installer
 
         public ICredentials GetCredentialsForSharePoint(string userName, Uri urlToSite, bool isSharePointOnline)
         {
-            var credentials = GetCredentialsFromWindowsCredentialManager(urlToSite, false);
+            var credentials = GetCredentialsFromWindowsCredentialManager(urlToSite, isSharePointOnline);
             //If there is no creds specified in the credential manager and no username is set, we want to use default credentials
             if (credentials == null && !string.IsNullOrEmpty(userName))
             {
