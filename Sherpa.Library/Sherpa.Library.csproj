@@ -64,6 +64,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="API\ITask.cs" />
     <Compile Include="ContentTypes\ContentTypeManager.cs" />
     <Compile Include="ContentTypes\FieldManager.cs" />
     <Compile Include="ContentTypes\Model\ShCalculatedProps.cs" />
@@ -71,6 +72,8 @@
     <Compile Include="ContentTypes\Model\ShField.cs" />
     <Compile Include="ContentTypes\Model\ShFieldRefs.cs" />
     <Compile Include="ContentTypes\Model\ShResultType.cs" />
+    <Compile Include="CustomTasks\CustomTasksManager.cs" />
+    <Compile Include="CustomTasks\ICustomTasksManager.cs" />
     <Compile Include="Deploy\DeployManager.cs" />
     <Compile Include="Deploy\IDeployManager.cs" />
     <Compile Include="Deploy\SPWebClient.cs">
@@ -85,6 +88,7 @@
     <Compile Include="SiteHierarchy\ISiteSetupManager.cs" />
     <Compile Include="SiteHierarchy\Model\ShList.cs" />
     <Compile Include="SiteHierarchy\Model\ShSiteCollection.cs" />
+    <Compile Include="SiteHierarchy\Model\ShTask.cs" />
     <Compile Include="SiteHierarchy\Model\ShWeb.cs" />
     <Compile Include="SiteHierarchy\Model\ShView.cs" />
     <Compile Include="SiteHierarchy\PropertyManager.cs" />

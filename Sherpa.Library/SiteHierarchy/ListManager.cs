@@ -17,6 +17,7 @@ namespace Sherpa.Library.SiteHierarchy
                 SetupList(context, web, list);
             }
         }
+        
         public void SetupList(ClientContext context, Web web, ShList listConfig)
         {
             var listCollection = web.Lists;

@@ -71,6 +71,12 @@
              "FeatureName" : "SearchConfigList"
           }
        ],
+       "CustomTaskTypes" :  [
+           {
+               Fullname :  "Sherpa.ExampleCustomTask.ExampleCustomTask",
+               DisplayName :  "Not in use"
+           }
+       ],
        "Webs"         : [
         {
             "Description": "Sherpa Subsite demo",

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Sherpa.Library.API;
 
 namespace Sherpa.Library.SiteHierarchy.Model
 {
@@ -12,6 +13,7 @@ namespace Sherpa.Library.SiteHierarchy.Model
         public int Language { get; set; }
         public List<ShWeb> Webs { get; set; }
         public List<ShFeature> WebFeatures { get; set; }
+        public List<ShTask> CustomTaskTypes { get; set; }
         public List<ShList> Lists { get; set; }
         public Dictionary<string, string> Quicklaunch { get; set; }
         public Dictionary<string, string> Properties { get; set; }
@@ -20,6 +22,7 @@ namespace Sherpa.Library.SiteHierarchy.Model
         {
             Webs = new List<ShWeb>();
             WebFeatures = new List<ShFeature>();
+            CustomTaskTypes = new List<ShTask>();
             Lists = new List<ShList>();
             Quicklaunch = new Dictionary<string, string>();
             Properties = new Dictionary<string, string>();

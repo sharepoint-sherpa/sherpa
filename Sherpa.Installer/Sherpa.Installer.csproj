@@ -115,6 +115,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="customtasks\" />
     <Folder Include="solutions\" />
   </ItemGroup>
   <ItemGroup>

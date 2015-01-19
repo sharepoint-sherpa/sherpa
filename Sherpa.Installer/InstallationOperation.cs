@@ -14,6 +14,7 @@
         DeleteFieldsAndContentTypes,
         ForceRecrawl,
         Invalid,
-        ExitApplication
+        ExitApplication,
+        ExecuteCustomTasks
     }
 }

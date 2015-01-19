@@ -8,6 +8,7 @@ using Microsoft.SharePoint.Client;
 using Sherpa.Library;
 using Sherpa.Library.ContentTypes;
 using Sherpa.Library.ContentTypes.Model;
+using Sherpa.Library.CustomTasks;
 using Sherpa.Library.Deploy;
 using Sherpa.Library.SiteHierarchy;
 using Sherpa.Library.SiteHierarchy.Model;
@@ -92,6 +93,12 @@ namespace Sherpa.Installer
                 }
                 switch (installationOperation)
                 {
+                    case InstallationOperation.ExecuteCustomTasks:
+                    {
+                        var customTasksManager = new CustomTasksManager(_rootPath);
+                        customTasksManager.ExecuteTasks(siteSetupManagerFromConfig.ConfigurationSiteCollection.RootWeb, context);
+                        break;
+                    }
                     case InstallationOperation.InstallTaxonomy:
                     {
                         if (useConfigurationForInstall)
@@ -450,6 +457,10 @@ namespace Sherpa.Installer
                 case 6:
                 {
                     return InstallationOperation.ExportTaxonomy;
+                }
+                case 7:
+                {
+                    return InstallationOperation.ExecuteCustomTasks;
                 }
                 case 8:
                 {
