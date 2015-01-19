@@ -147,7 +147,7 @@ namespace Sherpa.Library.ContentTypes.Model
                 "{11}{12}{13} {14}>",
                 ID.ToString("B"), InternalName, DisplayName, Type, Hidden,
                 Group, Description, required.ToString().ToUpper(),
-                ShowInNewForm, ShowInEditForm, ShowInDisplayForm,
+                ShowInNewForm.ToString().ToUpper(), ShowInEditForm.ToString().ToUpper(), ShowInDisplayForm.ToString().ToUpper(),
                 format, showField, openTermSet, additionalProperties);
 
             if (!string.IsNullOrEmpty(Default))
