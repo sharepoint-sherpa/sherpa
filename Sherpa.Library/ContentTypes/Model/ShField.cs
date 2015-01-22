@@ -20,6 +20,8 @@ namespace Sherpa.Library.ContentTypes.Model
         public int? Max { get; set; }
         public string ShowField { get; set; }
 
+        public string List { get; set; }
+
         public int? NumLines { get; set; }
         public bool RichText { get; set; }
         public string RichTextMode { get; set; }
@@ -78,6 +80,16 @@ namespace Sherpa.Library.ContentTypes.Model
                 case("HTML"):
                 {
                     const string additionalProps = "RichText=\"TRUE\" RichTextMode=\"FullHtml\" UnlimitedLengthInDocumentLibrary=\"TRUE\"";
+                    return GetFieldXml(false, additionalProps);
+                }
+                case ("Lookup"):
+                {
+                    string additionalProps = String.Format("List=\"{0}\" ShowField=\"{1}\" UnlimitedLengthInDocumentLibrary=\"FALSE\"", List, ShowField);
+                    return GetFieldXml(false, additionalProps);
+                }
+                case ("LookupMulti"):
+                {
+                    string additionalProps = String.Format("List=\"{0}\" ShowField=\"{1}\" UnlimitedLengthInDocumentLibrary=\"FALSE\"", List, ShowField);
                     return GetFieldXml(false, additionalProps);
                 }
                 case ("Note"):
