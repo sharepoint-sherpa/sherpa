@@ -145,7 +145,7 @@ namespace Sherpa.Library.ContentTypes.Model
                 "Group=\"{5}\" Description=\"{6}\" Required=\"{7}\" " +
                 "ShowInNewForm=\"{8}\" ShowInEditForm=\"{9}\" ShowInDisplayForm=\"{10}\"" +
                 "{11}{12}{13} {14}>",
-                ID.ToString("B"), InternalName, DisplayName, Type, Hidden,
+                ID.ToString("B"), InternalName.Trim(), DisplayName.Trim(), Type, Hidden,
                 Group, Description, required.ToString().ToUpper(),
                 ShowInNewForm.ToString().ToUpper(), ShowInEditForm.ToString().ToUpper(), ShowInDisplayForm.ToString().ToUpper(),
                 format, showField, openTermSet, additionalProperties);
