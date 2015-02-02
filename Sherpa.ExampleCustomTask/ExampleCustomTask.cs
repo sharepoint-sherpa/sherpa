@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using Microsoft.SharePoint.Client;
 using Sherpa.Library.API;
 using Sherpa.Library.SiteHierarchy.Model;

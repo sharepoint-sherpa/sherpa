@@ -73,8 +73,8 @@
        ],
        "CustomTaskTypes" :  [
            {
-               Fullname :  "Sherpa.ExampleCustomTask.ExampleCustomTask",
-               DisplayName :  "Not in use"
+               "Fullname" :  "Sherpa.ExampleCustomTask.ExampleCustomTask",
+               "DisplayName" :  "Not in use"
            }
        ],
        "Webs"         : [
