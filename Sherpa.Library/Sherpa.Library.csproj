@@ -76,9 +76,6 @@
     <Compile Include="CustomTasks\ICustomTasksManager.cs" />
     <Compile Include="Deploy\DeployManager.cs" />
     <Compile Include="Deploy\IDeployManager.cs" />
-    <Compile Include="Deploy\SPWebClient.cs">
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="SiteHierarchy\FeatureManager.cs" />
     <Compile Include="SiteHierarchy\ListManager.cs" />
     <Compile Include="SiteHierarchy\Model\ShFeature.cs" />

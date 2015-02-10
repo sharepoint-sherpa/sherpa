@@ -49,7 +49,7 @@ namespace Sherpa.Library.Deploy
                 if (_isSharePointOnline)
                 {
                     var fileUrl = UriUtilities.CombineAbsoluteUri(_urlToWeb.GetLeftPart(UriPartial.Authority), siteAssetsLibrary.RootFolder.ServerRelativeUrl, fileName);
-                    UploadFileToSharePointOnline(_urlToWeb.AbsoluteUri, fileUrl, localFilePath);
+                    UploadFileToSharePointOnline(context, localFilePath, fileUrl);
                 }
                 else
                 {
@@ -80,41 +80,28 @@ namespace Sherpa.Library.Deploy
             }
         }
 
-        /// <summary>
-        /// Actually uploads the package to the library
-        /// Starting point: http://blog.symprogress.com/2013/07/upload-wsp-file-to-office365-sp2013-using-webclient/
-        /// </summary>
-        /// <param name="siteUrl"></param>
-        /// <param name="fileUrl"></param>
-        /// <param name="localPath"></param>
-        private void UploadFileToSharePointOnline(string siteUrl, string fileUrl, string localPath)
+        private void UploadFileToSharePointOnline(ClientContext context, string localPath, string fileUrl)
         {
-            var targetSite = new Uri(siteUrl);
+            Log.InfoFormat("Uploading package {0} to library ", Path.GetFileName(localPath));
 
-            using (var spWebClient = new SPWebClient())
+            context.RequestTimeout = 1000000;
+            context.Credentials = _credentials;
+
+            var siteAssetsLibrary = context.Web.Lists.EnsureSiteAssetsLibrary();
+            using (var fs = new FileStream(localPath, FileMode.Open))
             {
-                Log.InfoFormat("Uploading package {0} to library ", Path.GetFileName(localPath));
-                var authCookie = ((SharePointOnlineCredentials)_credentials).GetAuthenticationCookie(targetSite);
-                spWebClient.CookieContainer = new CookieContainer();
-                spWebClient.CookieContainer.Add(new Cookie("FedAuth",
-                          authCookie.Replace("SPOIDCRL=", string.Empty),
-                          string.Empty, targetSite.Authority));
-                spWebClient.UseDefaultCredentials = false;
-                try
+                var flciNewFile = new FileCreationInformation
                 {
-                    Stream stream = spWebClient.OpenWrite(fileUrl, "PUT");
-                    var writer = new BinaryWriter(stream);
-                    writer.Write(File.ReadAllBytes(localPath));
-                    writer.Close();
-                    stream.Close();
-                    Log.DebugFormat("Uploaded package {0} to library ", Path.GetFileName(localPath));
-                }
-                catch (WebException we)
-                {
-                    Log.Error(we.Message);
-                }
+                    ContentStream = fs,
+                    Url = Path.GetFileName(fileUrl),
+                    Overwrite = true
+                };
+                Microsoft.SharePoint.Client.File uploadFile = siteAssetsLibrary.RootFolder.Files.Add(flciNewFile);
+                context.Load(uploadFile);
+                context.ExecuteQuery();
             }
         }
+
 
 
         /// <summary>
