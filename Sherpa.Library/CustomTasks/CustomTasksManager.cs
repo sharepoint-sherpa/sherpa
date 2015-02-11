@@ -38,7 +38,6 @@ namespace Sherpa.Library.CustomTasks
                 Tasks.TryGetValue(taskConfig.FullName, out taskTypeInfo);
                 if (taskTypeInfo != null)
                 {
-                    //void ExecuteOn(ShWeb web, ClientContext context);
                     var instance = (ITask)Activator.CreateInstance(taskTypeInfo.AsType());
                     instance.ExecuteOn(rootWeb,context);
                 }
