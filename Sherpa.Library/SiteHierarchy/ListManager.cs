@@ -3,6 +3,7 @@ using System.Linq;
 using System.Reflection;
 using log4net;
 using Microsoft.SharePoint.Client;
+using Sherpa.Library.ContentTypes.Model;
 using Sherpa.Library.SiteHierarchy.Model;
 
 namespace Sherpa.Library.SiteHierarchy
@@ -67,6 +68,7 @@ namespace Sherpa.Library.SiteHierarchy
                 list.Update();
                 context.ExecuteQuery();
 
+                var contentTypesToAdd = new List<ContentType>();
                 foreach (var configContentType in listConfig.ContentTypes)
                 {
                     Log.Debug("Attempting to add content type " + configContentType);
@@ -75,12 +77,19 @@ namespace Sherpa.Library.SiteHierarchy
                         var rootContenttype = rootWebContentTypes.FirstOrDefault(ct => ct.Name == configContentType);
                         if (rootContenttype != null)
                         {
-                            listContentTypes.AddExistingContentType(rootContenttype);
+                           // listContentTypes.AddExistingContentType(rootContenttype);
+                            contentTypesToAdd.Add(rootContenttype);
                         }
                     }
                 }
+
+                foreach (ContentType contentType in contentTypesToAdd)
+                {
+                    listContentTypes.AddExistingContentType(contentType);
+                }
+                
                 context.Load(listContentTypes);
-                context.LoadQuery(listContentTypes.Include(ct => ct.Name));
+                context.LoadQuery( listContentTypes.Include(ct => ct.Name) );
                 context.ExecuteQuery();
 
                 //Removing content types that are not in the configuration
