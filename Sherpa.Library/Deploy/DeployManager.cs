@@ -5,7 +5,6 @@ using System.Reflection;
 using log4net;
 using Microsoft.SharePoint.Client;
 using Microsoft.SharePoint.Client.Publishing;
-using File = System.IO.File;
 
 namespace Sherpa.Library.Deploy
 {
@@ -101,8 +100,6 @@ namespace Sherpa.Library.Deploy
                 context.ExecuteQuery();
             }
         }
-
-
 
         /// <summary>
         /// Activates a design package based on package name
