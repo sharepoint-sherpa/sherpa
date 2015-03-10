@@ -26,6 +26,13 @@ namespace Sherpa.Installer
                 ProgramOptions = OptionsParser.ParseArguments(args);
                 UrlToSite = new Uri(ProgramOptions.UrlToSite);
                 Unmanaged = !string.IsNullOrEmpty(ProgramOptions.Operations);
+                Log.Debug(string.Format("Sherpa started with the following options - URL: {0}, userName: {1}, configPath: {2}, spo: {3}, unmanaged: {4}", 
+                    ProgramOptions.UrlToSite,
+                    ProgramOptions.UserName,
+                    ProgramOptions.RootPath,
+                    ProgramOptions.SharePointOnline,
+                    Unmanaged
+                ));
             }
             catch (Exception)
             {
