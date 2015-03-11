@@ -1,9 +1,9 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using log4net;
 using Microsoft.SharePoint.Client;
-using Microsoft.SharePoint.Client.Publishing;
 using Sherpa.Library.SiteHierarchy.Model;
 
 namespace Sherpa.Library.SiteHierarchy
@@ -17,8 +17,9 @@ namespace Sherpa.Library.SiteHierarchy
         private QuicklaunchManager QuicklaunchManager { get; set; }
         private PropertyManager PropertyManager { get; set; }
         private ListManager ListManager { get; set; }
+        private ContentUploadManager ContentUploadManager { get; set; }
 
-        public SiteSetupManager(ClientContext clientContext, ShSiteCollection configurationSiteCollection)
+        public SiteSetupManager(ClientContext clientContext, ShSiteCollection configurationSiteCollection, string rootConfigurationPath)
         {
             ConfigurationSiteCollection = configurationSiteCollection;
             ClientContext = clientContext;
@@ -27,6 +28,9 @@ namespace Sherpa.Library.SiteHierarchy
             QuicklaunchManager = new QuicklaunchManager();
             PropertyManager = new PropertyManager();
             ListManager = new ListManager();
+
+            var contentConfigurationPath = Path.Combine(rootConfigurationPath, "content");
+            ContentUploadManager = new ContentUploadManager(contentConfigurationPath);
         }
         public void SetupSites()
         {
@@ -48,6 +52,7 @@ namespace Sherpa.Library.SiteHierarchy
             ListManager.CreateLists(context, webToConfigure, configWeb.Lists);
             QuicklaunchManager.CreateQuicklaunchNodes(context, webToConfigure, configWeb.Quicklaunch);
             PropertyManager.SetProperties(context, webToConfigure, configWeb.Properties);
+            ContentUploadManager.UploadFilesInFolder(context, webToConfigure, configWeb.ContentFolders);
             SetWelcomePageUrlIfConfigured(context, webToConfigure, configWeb);
 
             foreach (ShWeb subWeb in configWeb.Webs)

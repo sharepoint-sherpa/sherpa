@@ -85,20 +85,14 @@ namespace Sherpa.Installer
 
             using (var context = new ClientContext(_urlToSite) {Credentials = _credentials})
             {
-                var siteSetupManagerFromConfig = new SiteSetupManager(context, new ShSiteCollection());
+                var siteSetupManagerFromConfig = new SiteSetupManager(context, new ShSiteCollection(), _rootPath);
                 if (useConfigurationForInstall)
                 {
                     var filePersistanceProvider = new FilePersistanceProvider<ShSiteCollection>(configurationFile);
-                    siteSetupManagerFromConfig = new SiteSetupManager(context, filePersistanceProvider.Load());
+                    siteSetupManagerFromConfig = new SiteSetupManager(context, filePersistanceProvider.Load(), _rootPath);
                 }
                 switch (installationOperation)
                 {
-                    case InstallationOperation.ExecuteCustomTasks:
-                    {
-                        var customTasksManager = new CustomTasksManager(_rootPath);
-                        customTasksManager.ExecuteTasks(siteSetupManagerFromConfig.ConfigurationSiteCollection.RootWeb, context);
-                        break;
-                    }
                     case InstallationOperation.InstallTaxonomy:
                     {
                         if (useConfigurationForInstall)
@@ -184,6 +178,13 @@ namespace Sherpa.Installer
                         {
                             ImportAllSearchSettings(context);
                         }
+                        break;
+                    }
+                    case InstallationOperation.ExecuteCustomTasks:
+                    {
+                        //TODO: Refactor and allow both convention and configuration
+                        var customTasksManager = new CustomTasksManager(_rootPath);
+                        customTasksManager.ExecuteTasks(siteSetupManagerFromConfig.ConfigurationSiteCollection.RootWeb, context);
                         break;
                     }
                     case  InstallationOperation.DeleteSites:
@@ -353,7 +354,7 @@ namespace Sherpa.Installer
             foreach (var file in Directory.GetFiles(ConfigurationDirectoryPath, "*sitehierarchy.json", SearchOption.AllDirectories))
             {
                 var sitePersister = new FilePersistanceProvider<ShSiteCollection>(file);
-                var siteManager = new SiteSetupManager(context, sitePersister.Load());
+                var siteManager = new SiteSetupManager(context, sitePersister.Load(), _rootPath);
                 if (onlyContentTypeDependecyFeatures)
                 {
                     Log.Debug("ConfigureSitesFromAllSiteHierarchyFiles: Activating only content type dependecy features");

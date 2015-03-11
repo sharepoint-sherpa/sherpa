@@ -1,13 +1,18 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30501.0
+VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sherpa.Installer", "Sherpa.Installer\Sherpa.Installer.csproj", "{4D2343FE-553E-4EC9-9B90-4C2A98F2ACEF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sherpa.Library", "Sherpa.Library\Sherpa.Library.csproj", "{1F22D5D3-9C97-4470-B44C-E5A2B7ADED7F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sherpa.ExampleCustomTask", "Sherpa.ExampleCustomTask\Sherpa.ExampleCustomTask.csproj", "{0D12699F-074C-460C-BC44-126024756435}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "content", "content", "{5C0785D2-479D-4DA4-BD01-710826890C9F}"
+	ProjectSection(SolutionItems) = preProject
+		Sherpa.Installer\content\sherpa\myfile.txt = Sherpa.Installer\content\sherpa\myfile.txt
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
