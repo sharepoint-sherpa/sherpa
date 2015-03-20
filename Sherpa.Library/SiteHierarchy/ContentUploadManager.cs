@@ -49,7 +49,7 @@ namespace Sherpa.Library.SiteHierarchy
             }
             context.ExecuteQuery();
 
-            foreach (string filePath in Directory.GetFiles(_contentDirectoryPath, "*", SearchOption.AllDirectories))
+            foreach (string filePath in Directory.GetFiles(configRootFolder, "*", SearchOption.AllDirectories))
             {
                 var fileUrl = Url.Combine(uploadTargetFolder, filePath.Replace(configRootFolder, "").Replace("\\", "/"));
                 var newFile = new FileCreationInformation
