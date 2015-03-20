@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using Microsoft.SqlServer.Server;
 
 namespace Sherpa.Library.ContentTypes.Model
 {
@@ -36,6 +37,9 @@ namespace Sherpa.Library.ContentTypes.Model
         public Guid TermSetId { get; set; }
         public string TermSetName { get; set; }
         public bool OpenTermSet { get; set; }
+
+        public string UserSelectionMode { get; set; }
+        public string Mult { get; set; }
 
         public ShField()
         {
@@ -97,15 +101,25 @@ namespace Sherpa.Library.ContentTypes.Model
                     var options = NumLines != null && NumLines != 0 ? "NumLines=\"" + NumLines + "\"" : string.Empty;
                     options += RichText ? " RichText=\"TRUE\"" : string.Empty;
                     options += !string.IsNullOrEmpty(RichTextMode) ? String.Format(" RichTextMode=\"{0}\"", RichTextMode) : string.Empty;
-
                     return GetFieldXml(required, options);
                 }
-
+                case("UserMulti"):
+                {
+                    var options = string.Empty;
+                    options += GetXmlProperty("UserSelectionMode", UserSelectionMode);
+                    options += GetXmlProperty("Mult", Mult);
+                    return GetFieldXml(required, options);
+                }
                 default:
                 {
                     return GetFieldXml(required, string.Empty);
                 }
             }
+        }
+
+        private string GetXmlProperty(string name, string value)
+        {
+            return !string.IsNullOrEmpty(value) ? name+"=\""+value+"\" " : string.Empty+" ";
         }
 
         private string GetCalculatedFieldXmlContent()
