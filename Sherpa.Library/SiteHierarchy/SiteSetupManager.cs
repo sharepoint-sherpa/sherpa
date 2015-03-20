@@ -135,7 +135,9 @@ namespace Sherpa.Library.SiteHierarchy
             clientContext.Load(clientContext.Site.RootWeb.Webs);
             clientContext.ExecuteQuery();
 
-            foreach (var web in clientContext.Site.RootWeb.Webs)
+            var webs = clientContext.Site.RootWeb.Webs.ToList();
+
+            foreach (var web in webs)
             {
                 DeleteWeb(clientContext, web);
             }
