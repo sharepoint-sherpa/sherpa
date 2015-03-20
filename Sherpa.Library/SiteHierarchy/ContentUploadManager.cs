@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
+using log4net;
 using Microsoft.SharePoint.Client;
 using Sherpa.Library.SiteHierarchy.Model;
 using Flurl;
@@ -8,6 +10,8 @@ namespace Sherpa.Library.SiteHierarchy
 {
     public class ContentUploadManager
     {
+        private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+
         private readonly string _contentDirectoryPath;
         public ContentUploadManager(string rootConfigurationPath)
         {
@@ -24,8 +28,8 @@ namespace Sherpa.Library.SiteHierarchy
 
         public void UploadFilesInFolder(ClientContext context, Web web, ShContentFolder configFolder)
         {
-            if (configFolder == null) return;
-
+            Log.Info("Uploading files from contentfolder " + configFolder.FolderName);
+            
             var assetLibrary = web.Lists.GetByTitle(configFolder.ListName);
             context.Load(assetLibrary, l => l.RootFolder);
             context.ExecuteQuery();
