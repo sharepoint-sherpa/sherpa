@@ -68,6 +68,13 @@ namespace Sherpa.Library.Taxonomy
                 spTerm = parentTerm.CreateTerm(shTerm.Title, termStore.DefaultLanguage, shTerm.Id);
                 if (!string.IsNullOrEmpty(shTerm.CustomSortOrder)) spTerm.CustomSortOrder = shTerm.CustomSortOrder;
                 spTerm.IsAvailableForTagging = !shTerm.NotAvailableForTagging;
+                foreach(var prop in shTerm.CustomProperties) {
+                    spTerm.SetCustomProperty(prop.Key, prop.Value);
+                }         
+                foreach (var prop in shTerm.LocalCustomProperties)
+                {
+                    spTerm.SetLocalCustomProperty(prop.Key, prop.Value);
+                }
                 context.Load(spTerm);
                 context.ExecuteQuery();
             }
@@ -97,6 +104,7 @@ namespace Sherpa.Library.Taxonomy
             foreach (var spTermSet in spTermGroup.TermSets)
             {
                 var shTermSet = new ShTermSet(spTermSet.Id, spTermSet.Name);
+
                 AddTermsToConfig(context, spTermSet, shTermSet);
                 shTermGroup.TermSets.Add(shTermSet);
             }
