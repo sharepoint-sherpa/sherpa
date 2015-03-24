@@ -47,6 +47,10 @@ namespace Sherpa.Library.Taxonomy
                     spTermSet = termGroup.CreateTermSet(termSet.Title, termSet.Id, termStore.DefaultLanguage);
                     if (!string.IsNullOrEmpty(termSet.CustomSortOrder))
                         spTermSet.CustomSortOrder = termSet.CustomSortOrder;
+                    foreach (var prop in termSet.CustomProperties)
+                    {
+                        spTermSet.SetCustomProperty(prop.Key, prop.Value);
+                    }
                     context.Load(spTermSet, x => x.Terms);
                     context.ExecuteQuery();
                 }
