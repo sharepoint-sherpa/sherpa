@@ -24,7 +24,12 @@
                 "FolderName": "SiteAssets",
                 "ListName": "Site Assets",
                 "FolderUrl": "sherpa"
-            }
+            },
+			{
+				"FolderName": "PageLayouts",
+                "ListName": "Master Page Gallery",
+                "FolderUrl": "sherpa"
+			}
         ],
         "Description": "Sherpa Demo - root site",
         "Language": "1033",

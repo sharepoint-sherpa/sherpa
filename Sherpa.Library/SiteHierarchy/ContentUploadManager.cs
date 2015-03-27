@@ -5,6 +5,8 @@ using log4net;
 using Microsoft.SharePoint.Client;
 using Sherpa.Library.SiteHierarchy.Model;
 using Flurl;
+using System.Xml.Serialization;
+using System;
 
 namespace Sherpa.Library.SiteHierarchy
 {
@@ -53,6 +55,17 @@ namespace Sherpa.Library.SiteHierarchy
             }
             context.ExecuteQuery();
 
+            ShWebPartCollection webParts = null;
+            string path = Url.Combine(_contentDirectoryPath.Replace("\\", "/"), "manifest.xml");
+
+            XmlSerializer serializer = new XmlSerializer(typeof(ShWebPartCollection));
+
+            StreamReader reader = new StreamReader(path);
+            webParts = (ShWebPartCollection) serializer.Deserialize(reader);
+            reader.Close();
+
+            Console.WriteLine(webParts.WebParts.Length);
+
             foreach (string filePath in Directory.GetFiles(configRootFolder, "*", SearchOption.AllDirectories))
             {
                 var fileUrl = Url.Combine(uploadTargetFolder, filePath.Replace(configRootFolder, "").Replace("\\", "/"));
@@ -64,6 +77,21 @@ namespace Sherpa.Library.SiteHierarchy
                 };
                 Microsoft.SharePoint.Client.File uploadFile = assetLibrary.RootFolder.Files.Add(newFile);
                 context.Load(uploadFile);
+                context.ExecuteQuery();
+
+                Microsoft.SharePoint.Client.WebParts.LimitedWebPartManager limitedWebPartManager = uploadFile.GetLimitedWebPartManager(Microsoft.SharePoint.Client.WebParts.PersonalizationScope.Shared);
+
+                context.Load(limitedWebPartManager);
+                context.ExecuteQuery();
+
+                for (var i = 0; i < webParts.WebParts.Length; i++)
+                {
+                    var webPartXml = webParts.WebParts[i].Definition;
+                    var webPartDef = limitedWebPartManager.ImportWebPart(webPartXml);
+                    limitedWebPartManager.AddWebPart(webPartDef.WebPart, webParts.WebParts[i].WebPartZoneID, Int32.Parse(webParts.WebParts[i].WebPartOrder));
+                }
+                context.Load(uploadFile);
+                context.Load(limitedWebPartManager);
                 context.ExecuteQuery();
             }
             
