@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using log4net;
@@ -59,6 +60,7 @@ namespace Sherpa.Library.SiteHierarchy
                 var rootWeb = context.Site.RootWeb;
                 var rootWebContentTypes = rootWeb.ContentTypes;
                 var listContentTypes = list.ContentTypes;
+                context.Load(list.RootFolder);
                 context.Load(rootWebContentTypes);
                 context.Load(listContentTypes);
                 context.LoadQuery(rootWebContentTypes.Include(ct => ct.Name));
@@ -107,7 +109,15 @@ namespace Sherpa.Library.SiteHierarchy
                     Log.Debug("Attempting to delete content type " + contentTypesToRemove[i].Name);
                     contentTypesToRemove[i].DeleteObject();
                 }
-                context.ExecuteQuery();
+                try
+                {
+                    context.ExecuteQuery();
+                }
+                catch (Exception)
+                {
+                    Log.Info("Could not delete ContentTypes from list "+list.RootFolder.ServerRelativeUrl);
+                }
+                
             }
         }
 
