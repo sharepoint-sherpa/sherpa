@@ -9,8 +9,26 @@ namespace Sherpa.Library.SiteHierarchy.Model
 {
     [Serializable()]
     [System.Xml.Serialization.XmlRoot("Manifest")]
-    public class ShWebPartCollection
+    public class ShFileCollection
     {
+        [XmlArray("Files")]
+        [XmlArrayItem("File", typeof(ShFile))]
+        public ShFile[] Files { get; set; }
+        public ShFile GetFileByName(string fileName) {
+            for(int i = 0; i < Files.Length; i++) {
+                if(Files[i].Name.Equals(fileName)) {
+                    return Files[i];
+                }
+            }
+            return null;
+        }
+    }
+
+    [Serializable()]
+    public class ShFile
+    {
+        [System.Xml.Serialization.XmlElementAttribute("Name")]
+        public string Name { get; set; }
         [XmlArray("WebParts")]
         [XmlArrayItem("WebPart", typeof(ShWebPart))]
         public ShWebPart[] WebParts { get; set; }

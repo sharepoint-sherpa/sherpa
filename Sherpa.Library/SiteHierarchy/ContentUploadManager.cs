@@ -28,6 +28,23 @@ namespace Sherpa.Library.SiteHierarchy
             }
         }
 
+        private ShFileCollection GetManifestConfiguration(string folder)
+        {
+            ShFileCollection files = null;
+            string manifestPath = Url.Combine(folder.Replace("\\", "/"), "manifest.xml");
+
+            if (System.IO.File.Exists(manifestPath))
+            {
+                XmlSerializer serializer = new XmlSerializer(typeof(ShFileCollection));
+
+                StreamReader reader = new StreamReader(manifestPath);
+                files = (ShFileCollection)serializer.Deserialize(reader);
+                reader.Close();
+            }
+
+            return files;
+        }
+
         public void UploadFilesInFolder(ClientContext context, Web web, ShContentFolder configFolder)
         {
             Log.Info("Uploading files from contentfolder " + configFolder.FolderName);
@@ -55,19 +72,14 @@ namespace Sherpa.Library.SiteHierarchy
             }
             context.ExecuteQuery();
 
-            ShWebPartCollection webParts = null;
-            string path = Url.Combine(_contentDirectoryPath.Replace("\\", "/"), "manifest.xml");
-
-            XmlSerializer serializer = new XmlSerializer(typeof(ShWebPartCollection));
-
-            StreamReader reader = new StreamReader(path);
-            webParts = (ShWebPartCollection) serializer.Deserialize(reader);
-            reader.Close();
-
-            Console.WriteLine(webParts.WebParts.Length);
+            ShFileCollection files = GetManifestConfiguration(configRootFolder);
 
             foreach (string filePath in Directory.GetFiles(configRootFolder, "*", SearchOption.AllDirectories))
             {
+                if (filePath.Contains("manifest.xml")) { return; }
+
+                var fileName = filePath.Split('\\')[filePath.Split('\\').Length - 1];
+                var fileConfig = files.GetFileByName(fileName);
                 var fileUrl = Url.Combine(uploadTargetFolder, filePath.Replace(configRootFolder, "").Replace("\\", "/"));
                 var newFile = new FileCreationInformation
                 {
@@ -75,6 +87,7 @@ namespace Sherpa.Library.SiteHierarchy
                     Url = fileUrl,
                     Overwrite = true
                 };
+
                 Microsoft.SharePoint.Client.File uploadFile = assetLibrary.RootFolder.Files.Add(newFile);
                 context.Load(uploadFile);
                 context.ExecuteQuery();
@@ -84,17 +97,15 @@ namespace Sherpa.Library.SiteHierarchy
                 context.Load(limitedWebPartManager);
                 context.ExecuteQuery();
 
-                for (var i = 0; i < webParts.WebParts.Length; i++)
+                for (var i = 0; i < fileConfig.WebParts.Length; i++)
                 {
-                    var webPartXml = webParts.WebParts[i].Definition;
-                    var webPartDef = limitedWebPartManager.ImportWebPart(webPartXml);
-                    limitedWebPartManager.AddWebPart(webPartDef.WebPart, webParts.WebParts[i].WebPartZoneID, Int32.Parse(webParts.WebParts[i].WebPartOrder));
+                    var wp = fileConfig.WebParts[i];
+                    var webPartDef = limitedWebPartManager.ImportWebPart(wp.Definition);
+                    limitedWebPartManager.AddWebPart(webPartDef.WebPart, wp.WebPartZoneID, Int32.Parse(wp.WebPartOrder));
                 }
-                context.Load(uploadFile);
                 context.Load(limitedWebPartManager);
                 context.ExecuteQuery();
-            }
-            
+            }         
         }
     }
 }

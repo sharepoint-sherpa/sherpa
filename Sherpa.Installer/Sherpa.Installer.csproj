@@ -135,7 +135,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="content\PageLayouts\BlankWebPartPage.aspx" />
-    <Content Include="content\manifest.xml" />
+    <Content Include="content\PageLayouts\manifest.xml" />
     <Content Include="sherpa-icon.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
