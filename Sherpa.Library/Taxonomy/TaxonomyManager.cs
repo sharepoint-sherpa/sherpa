@@ -47,6 +47,10 @@ namespace Sherpa.Library.Taxonomy
                     spTermSet = termGroup.CreateTermSet(termSet.Title, termSet.Id, termStore.DefaultLanguage);
                     if (!string.IsNullOrEmpty(termSet.CustomSortOrder))
                         spTermSet.CustomSortOrder = termSet.CustomSortOrder;
+                    foreach (var prop in termSet.CustomProperties)
+                    {
+                        spTermSet.SetCustomProperty(prop.Key, prop.Value);
+                    }
                     context.Load(spTermSet, x => x.Terms);
                     context.ExecuteQuery();
                 }
@@ -68,6 +72,13 @@ namespace Sherpa.Library.Taxonomy
                 spTerm = parentTerm.CreateTerm(shTerm.Title, termStore.DefaultLanguage, shTerm.Id);
                 if (!string.IsNullOrEmpty(shTerm.CustomSortOrder)) spTerm.CustomSortOrder = shTerm.CustomSortOrder;
                 spTerm.IsAvailableForTagging = !shTerm.NotAvailableForTagging;
+                foreach(var prop in shTerm.CustomProperties) {
+                    spTerm.SetCustomProperty(prop.Key, prop.Value);
+                }         
+                foreach (var prop in shTerm.LocalCustomProperties)
+                {
+                    spTerm.SetLocalCustomProperty(prop.Key, prop.Value);
+                }
                 context.Load(spTerm);
                 context.ExecuteQuery();
             }
@@ -97,6 +108,7 @@ namespace Sherpa.Library.Taxonomy
             foreach (var spTermSet in spTermGroup.TermSets)
             {
                 var shTermSet = new ShTermSet(spTermSet.Id, spTermSet.Name);
+
                 AddTermsToConfig(context, spTermSet, shTermSet);
                 shTermGroup.TermSets.Add(shTermSet);
             }

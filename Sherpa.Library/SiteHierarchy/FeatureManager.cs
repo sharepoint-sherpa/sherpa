@@ -86,7 +86,7 @@ namespace Sherpa.Library.SiteHierarchy
             {
                 try
                 {
-                    Log.Info("Activating feature " + featureInfo.FeatureName);
+                    Log.Info("Activating feature   " + featureInfo.FeatureName);
                     featureCollection.Add(featureInfo.FeatureId, true, scope);
                     clientContext.ExecuteQuery();
                 }
