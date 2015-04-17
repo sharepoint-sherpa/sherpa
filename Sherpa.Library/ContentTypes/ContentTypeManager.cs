@@ -34,9 +34,9 @@ namespace Sherpa.Library.ContentTypes
 
             foreach (ShContentType contentType in ContentTypes)
             {
-                if ( existingContentTypes.Any( item => item.Id.ToString().Equals(contentType.ID.ToString(CultureInfo.InvariantCulture)) ) )
+                if ( existingContentTypes.Any(item => item.Id.ToString().Equals(contentType.ID.ToString(CultureInfo.InvariantCulture)) ) )
                 {
-                    // We want to add fields even if the content type exists (?)
+                    // We want to add fields even if the content type exists
                     AddSiteColumnsToContentType(contentType);
                 }
                 else
@@ -91,12 +91,6 @@ namespace Sherpa.Library.ContentTypes
                 {
                     fieldLink.Hidden = true;
                     fieldLink.Required = false;
-                    //var hiddenField = contentType.Fields.FirstOrDefault(ct => ct.InternalName == fieldName);
-                    //if (hiddenField != null)
-                    //{
-                    //    hiddenField.Required = false;
-                    //    hiddenField.Update();
-                    //}
                 }
                 contentType.Update(true);
                 ClientContext.ExecuteQuery();

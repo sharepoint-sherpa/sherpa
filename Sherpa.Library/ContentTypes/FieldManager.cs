@@ -31,19 +31,44 @@ namespace Sherpa.Library.ContentTypes
             ClientContext.ExecuteQuery();
 
             var termStoreId = new TaxonomyManager(null).GetTermStoreId(ClientContext);
-            foreach (ShField field in Fields.Where(field => !webFieldCollection.Any(item => item.InternalName == field.InternalName)))
+            foreach (ShField field in Fields)
             {
-                Log.Debug("Attempting to create field " + field.DisplayName);
-                if (field.Type.StartsWith("TaxonomyFieldType"))
+                var existingField = webFieldCollection.SingleOrDefault(item => item.InternalName == field.InternalName);
+                if (existingField == null)
                 {
-                    field.SspId = termStoreId;
-                    DeleteHiddenFieldForTaxonomyField(webFieldCollection, field.ID);
-                    CreateTaxonomyField(field, webFieldCollection);
+                    //Creating new field
+                    Log.Debug("Attempting to create field " + field.DisplayName);
+                    if (field.Type.StartsWith("TaxonomyFieldType"))
+                    {
+                        field.SspId = termStoreId;
+                        DeleteHiddenFieldForTaxonomyField(webFieldCollection, field.ID);
+                        CreateTaxonomyField(field, webFieldCollection);
+                    }
+                    else
+                    {
+                        CreateField(field, webFieldCollection);
+                    }
                 }
                 else
                 {
-                    CreateField(field, webFieldCollection);
+                    //Updating existing field
+                    UpdateExistingField(field, existingField);
                 }
+            }
+        }
+
+        /// <summary>
+        /// We don't want to update all properties of an existing field. For now, only the Hidden property is being updated.
+        /// </summary>
+        /// <param name="configField"></param>
+        /// <param name="existingField"></param>
+        private void UpdateExistingField(ShField configField, Field existingField)
+        {
+            if (configField.Hidden != existingField.Hidden)
+            {
+                existingField.Hidden = configField.Hidden;
+                existingField.Update();
+                ClientContext.ExecuteQuery();
             }
         }
 
