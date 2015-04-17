@@ -112,6 +112,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="content\SiteAssets\" />
     <Folder Include="customtasks\" />
     <Folder Include="solutions\" />
   </ItemGroup>
@@ -133,9 +134,8 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="content\SiteAssets\myfile.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    <Content Include="content\PageLayouts\BlankWebPartPage.aspx" />
+    <Content Include="content\PageLayouts\manifest.xml" />
     <Content Include="sherpa-icon.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

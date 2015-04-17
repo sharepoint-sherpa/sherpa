@@ -5,6 +5,8 @@ using log4net;
 using Microsoft.SharePoint.Client;
 using Sherpa.Library.SiteHierarchy.Model;
 using Flurl;
+using System.Xml.Serialization;
+using System;
 
 namespace Sherpa.Library.SiteHierarchy
 {
@@ -24,6 +26,23 @@ namespace Sherpa.Library.SiteHierarchy
             {
                 UploadFilesInFolder(context, web, folder);
             }
+        }
+
+        private ShFileCollection GetManifestConfiguration(string folder)
+        {
+            ShFileCollection files = null;
+            string manifestPath = Url.Combine(folder.Replace("\\", "/"), "manifest.xml");
+
+            if (System.IO.File.Exists(manifestPath))
+            {
+                XmlSerializer serializer = new XmlSerializer(typeof(ShFileCollection));
+
+                StreamReader reader = new StreamReader(manifestPath);
+                files = (ShFileCollection)serializer.Deserialize(reader);
+                reader.Close();
+            }
+
+            return files;
         }
 
         public void UploadFilesInFolder(ClientContext context, Web web, ShContentFolder configFolder)
@@ -53,8 +72,14 @@ namespace Sherpa.Library.SiteHierarchy
             }
             context.ExecuteQuery();
 
+            ShFileCollection files = GetManifestConfiguration(configRootFolder);
+
             foreach (string filePath in Directory.GetFiles(configRootFolder, "*", SearchOption.AllDirectories))
             {
+                if (filePath.Contains("manifest.xml")) { return; }
+
+                var fileName = filePath.Split('\\')[filePath.Split('\\').Length - 1];
+                var fileConfig = files.GetFileByName(fileName);
                 var fileUrl = Url.Combine(uploadTargetFolder, filePath.Replace(configRootFolder, "").Replace("\\", "/"));
                 var newFile = new FileCreationInformation
                 {
@@ -62,11 +87,25 @@ namespace Sherpa.Library.SiteHierarchy
                     Url = fileUrl,
                     Overwrite = true
                 };
+
                 Microsoft.SharePoint.Client.File uploadFile = assetLibrary.RootFolder.Files.Add(newFile);
                 context.Load(uploadFile);
                 context.ExecuteQuery();
-            }
-            
+
+                Microsoft.SharePoint.Client.WebParts.LimitedWebPartManager limitedWebPartManager = uploadFile.GetLimitedWebPartManager(Microsoft.SharePoint.Client.WebParts.PersonalizationScope.Shared);
+
+                context.Load(limitedWebPartManager);
+                context.ExecuteQuery();
+
+                for (var i = 0; i < fileConfig.WebParts.Length; i++)
+                {
+                    var wp = fileConfig.WebParts[i];
+                    var webPartDef = limitedWebPartManager.ImportWebPart(wp.Definition);
+                    limitedWebPartManager.AddWebPart(webPartDef.WebPart, wp.WebPartZoneID, Int32.Parse(wp.WebPartOrder));
+                }
+                context.Load(limitedWebPartManager);
+                context.ExecuteQuery();
+            }         
         }
     }
 }
