@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Text;
-using Microsoft.SqlServer.Server;
 
 namespace Sherpa.Library.ContentTypes.Model
 {
@@ -38,8 +37,8 @@ namespace Sherpa.Library.ContentTypes.Model
         public string TermSetName { get; set; }
         public bool OpenTermSet { get; set; }
 
+        // E.g. PeopleOnly
         public string UserSelectionMode { get; set; }
-        public string Mult { get; set; }
 
         public ShField()
         {
@@ -107,7 +106,7 @@ namespace Sherpa.Library.ContentTypes.Model
                 {
                     var options = string.Empty;
                     options += GetXmlProperty("UserSelectionMode", UserSelectionMode);
-                    options += GetXmlProperty("Mult", Mult);
+                    options += GetXmlProperty("Mult", "TRUE");
                     return GetFieldXml(required, options);
                 }
                 default:
