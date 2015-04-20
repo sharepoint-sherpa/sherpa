@@ -5,5 +5,6 @@
         public string FolderName { get; set; }
         public string FolderUrl { get; set; }
         public string ListName { get; set; }
+        public string PropertiesFile { get; set; }
     }
 }

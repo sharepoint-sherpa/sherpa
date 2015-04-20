@@ -14,8 +14,7 @@
     "SiteFeatures": [
         {
             "FeatureId": "57ff23fc-ec05-4dd8-b7ed-d93faa7c795d",
-            "FeatureName": "SiteHelp",
-            "ReactivateAlways": "true"
+            "FeatureName": "SiteHelp"
         }
     ],
     "RootWeb": {
@@ -24,6 +23,12 @@
                 "FolderName": "SiteAssets",
                 "ListName": "Site Assets",
                 "FolderUrl": "sherpa"
+            },
+            {
+                "FolderName": "PageLayouts",
+                "ListName": "Master Page Gallery",
+                "FolderUrl": "",
+                "PropertiesFile": "properties.json"
             }
         ],
         "Description": "Sherpa Demo - root site",
