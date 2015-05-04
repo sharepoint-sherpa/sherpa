@@ -76,6 +76,24 @@ namespace Sherpa.Library.ContentTypes
         {
             var fieldXml = field.GetFieldAsXml();
             Field newField = fields.AddFieldAsXml(fieldXml, true, AddFieldOptions.AddFieldInternalNameHint);
+            // code to handle lookup fields... 
+            if (field.Type == "Lookup" || field.Type == "LookupMulti")
+            {
+                var web = ClientContext.Web;
+                if (!web.IsObjectPropertyInstantiated("Lists"))
+                {
+                    ClientContext.Load(web, x => x.Lists);
+                    ClientContext.ExecuteQuery();
+                }
+                else if (!web.Lists.GetByTitle(field.List).IsPropertyAvailable("Title"))
+                {
+                    var list = web.Lists.GetByTitle(field.List);
+                    ClientContext.Load(list, x=>x.Id);
+                    ClientContext.ExecuteQuery();
+                }
+                field.List = web.Lists.GetByTitle(field.List).Id.ToString();
+            }
+
             ClientContext.Load(newField);
             ClientContext.ExecuteQuery();
         }
