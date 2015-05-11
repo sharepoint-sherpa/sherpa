@@ -1,10 +1,14 @@
 ﻿using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Reflection;
+using System.Web.Management;
 using log4net;
 using Microsoft.SharePoint.Client;
 using Sherpa.Library.SiteHierarchy.Model;
 using Flurl;
+using File = Microsoft.SharePoint.Client.File;
 
 namespace Sherpa.Library.SiteHierarchy
 {
@@ -53,20 +57,89 @@ namespace Sherpa.Library.SiteHierarchy
             }
             context.ExecuteQuery();
 
+            List<ShFileProperties> filePropertiesCollection = null;
+            if (!string.IsNullOrEmpty(configFolder.PropertiesFile))
+            {
+                var propertiesFilePath = Path.Combine(configRootFolder, configFolder.PropertiesFile);
+                var filePersistanceProvider = new FilePersistanceProvider<List<ShFileProperties>>(propertiesFilePath);
+                filePropertiesCollection = filePersistanceProvider.Load();
+            }
+
+            context.Load(context.Site, site => site.ServerRelativeUrl);
+            context.Load(context.Web, w => w.ServerRelativeUrl, w => w.Language);
+            context.ExecuteQuery();
+
             foreach (string filePath in Directory.GetFiles(configRootFolder, "*", SearchOption.AllDirectories))
             {
-                var fileUrl = Url.Combine(uploadTargetFolder, filePath.Replace(configRootFolder, "").Replace("\\", "/"));
+                var pathToFileFromRootFolder = filePath.Replace(configRootFolder, "");
+                var fileName = Path.GetFileName(pathToFileFromRootFolder);
+
+                if (!string.IsNullOrEmpty(configFolder.PropertiesFile) && configFolder.PropertiesFile == fileName)
+                {
+                    Log.DebugFormat("Skipping file upload of {0} since it's used as a configuration file", fileName);
+                    continue;
+                }
+                
+
+                var fileUrl = GetFileUrl(uploadTargetFolder, pathToFileFromRootFolder, filePropertiesCollection, fileName);
+                
                 var newFile = new FileCreationInformation
                 {
                     Content = System.IO.File.ReadAllBytes(filePath),
                     Url = fileUrl,
                     Overwrite = true
                 };
-                Microsoft.SharePoint.Client.File uploadFile = assetLibrary.RootFolder.Files.Add(newFile);
+                File uploadFile = assetLibrary.RootFolder.Files.Add(newFile);
                 context.Load(uploadFile);
                 context.ExecuteQuery();
+
+                ApplyFileProperties(context, filePropertiesCollection, uploadFile);
             }
-            
+        }
+
+        private string GetFileUrl(string uploadTargetFolder, string pathToFileFromRootFolder,
+            IEnumerable<ShFileProperties> filePropertiesCollection, string fileName)
+        {
+            var fileUrl = Url.Combine(uploadTargetFolder, pathToFileFromRootFolder.Replace("\\", "/"));
+
+            if (filePropertiesCollection != null)
+            {
+                var fileProperties = filePropertiesCollection.SingleOrDefault(f => f.Path == fileName);
+                if (fileProperties != null)
+                {
+                    fileUrl = Url.Combine(uploadTargetFolder, fileProperties.Url);
+                }
+            }
+            return fileUrl;
+        }
+
+        private void ApplyFileProperties(ClientContext context, IEnumerable<ShFileProperties> filePropertiesCollection, File uploadFile)
+        {
+            if (filePropertiesCollection != null)
+            {
+                var fileProperties = filePropertiesCollection.SingleOrDefault(f => f.Path == uploadFile.Name);
+                if (fileProperties != null)
+                {
+                    var item = uploadFile.ListItemAllFields;
+                    context.Load(item);
+                    foreach (KeyValuePair<string, string> property in fileProperties.Properties)
+                    {
+                        item[property.Key] = GetPropertyValueWithTokensReplaced(property.Value, context);
+                    }
+                    item.Update();
+                    context.ExecuteQuery();
+                }
+            }
+        }
+
+        public string GetPropertyValueWithTokensReplaced(string valueWithTokens, ClientContext context)
+        {
+            var propertyValueWithTokensReplaced = valueWithTokens
+                .Replace("~SiteCollection", context.Site.ServerRelativeUrl)
+                .Replace("~Site", context.Web.ServerRelativeUrl)
+                .Replace("$Resources:core,Culture;", new CultureInfo((int)context.Web.Language).Name);
+
+            return propertyValueWithTokensReplaced;
         }
     }
 }

@@ -87,12 +87,12 @@ namespace Sherpa.Library.ContentTypes.Model
                 }
                 case ("Lookup"):
                 {
-                    string additionalProps = String.Format("List=\"{0}\" ShowField=\"{1}\" UnlimitedLengthInDocumentLibrary=\"FALSE\"", List, ShowField);
+                    string additionalProps = String.Format("List=\"{0}\" UnlimitedLengthInDocumentLibrary=\"FALSE\"", List, ShowField);
                     return GetFieldXml(false, additionalProps);
                 }
                 case ("LookupMulti"):
                 {
-                    string additionalProps = String.Format("List=\"{0}\" ShowField=\"{1}\" UnlimitedLengthInDocumentLibrary=\"FALSE\"", List, ShowField);
+                    string additionalProps = String.Format("List=\"{0}\" UnlimitedLengthInDocumentLibrary=\"FALSE\"", List, ShowField);
                     return GetFieldXml(false, additionalProps);
                 }
                 case ("Note"):

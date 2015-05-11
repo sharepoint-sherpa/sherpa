@@ -122,6 +122,7 @@
     <Compile Include="FilePersistanceProvider.cs" />
     <Compile Include="IPersistanceProvider.cs" />
     <Compile Include="SiteHierarchy\ISiteSetupManager.cs" />
+    <Compile Include="SiteHierarchy\Model\ShFileProperties.cs" />
     <Compile Include="SiteHierarchy\Model\ShList.cs" />
     <Compile Include="SiteHierarchy\Model\ShSiteCollection.cs" />
     <Compile Include="SiteHierarchy\Model\ShTask.cs" />
