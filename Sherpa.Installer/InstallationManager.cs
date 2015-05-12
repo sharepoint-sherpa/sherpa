@@ -169,9 +169,16 @@ namespace Sherpa.Installer
                                 var fileName in
                                     siteSetupManagerFromConfig.ConfigurationSiteCollection.SearchConfigurations)
                             {
-                                var pathToSearchSettingsFile = Path.Combine(SearchDirectoryPath, fileName);
-                                Log.Info("Importing search configuration in " + fileName);
-                                searchMan.ImportSearchConfiguration(context, pathToSearchSettingsFile);
+                                try
+                                {
+                                    var pathToSearchSettingsFile = Path.Combine(SearchDirectoryPath, fileName);
+                                    Log.Info("Importing search configuration in " + fileName);
+                                    searchMan.ImportSearchConfiguration(context, pathToSearchSettingsFile);
+                                }
+                                catch (Exception e)
+                                {
+                                    Log.Error("Could not import seach configuration.", e);
+                                }
                             }
                         }
                         else
@@ -375,8 +382,14 @@ namespace Sherpa.Installer
             var pathToSearchXmls = Directory.GetFiles(SearchDirectoryPath);
             foreach (var pathToSearchXml in pathToSearchXmls)
             {
-                Log.Info("Importing search setting " + pathToSearchXml);
-                searchMan.ImportSearchConfiguration(context, pathToSearchXml);
+                try { 
+                    Log.Info("Importing search settings in file " + pathToSearchXml);
+                    searchMan.ImportSearchConfiguration(context, pathToSearchXml);
+                }
+                catch (Exception e)
+                {
+                    Log.Error("Could not import seach configuration.", e);
+                }
             }
         }
 

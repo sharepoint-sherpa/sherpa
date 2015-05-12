@@ -111,12 +111,32 @@
       "InternalName"    : "SherpaCalculatedField",
       "Type"            : "Calculated"
    },
-   {
-      "Description"  : "Example sitecolumn of type booleam",
-      "DisplayName"  : "Sherpa Boolean Field",
+    {
+        "Description": "Example sitecolumn of type booleam",
+        "DisplayName": "Sherpa Boolean Field",
+        "Group": "Sherpa Sitecolumns",
+        "ID": "8fcc712b-5f09-4027-8de9-427516647ef5",
+        "InternalName": "SherpaBooleanField",
+        "Type": "Boolean"
+    },
+    {
+        "Description": "Example sitecolumn of type Lookup",
+        "DisplayName": "Sherpa Lookup Field",
+        "Group": "Sherpa Sitecolumns",
+        "ID": "D5D2BF78-56A0-4636-851D-8C0CAF3144AB",
+        "InternalName": "SherpaLookupField",
+        "Type": "Lookup",
+        "List": "Lists/Log",
+        "ShowField": "Title"
+    },
+    {
+      "Description"  : "Example sitecolumn of type Lookup Multi",
+      "DisplayName"  : "Sherpa Multi Lookup Field",
       "Group"        : "Sherpa Sitecolumns",
-      "ID"           : "8fcc712b-5f09-4027-8de9-427516647ef5",
-      "InternalName" : "SherpaBooleanField",
-      "Type"         : "Boolean"
+      "ID"           : "88036D8C-F715-4DD0-85E9-43A0589282BE",
+      "InternalName" : "SherpaLookupMultiField",
+      "Type": "LookupMulti",
+      "List": "Lists/Log",
+      "ShowField": "Title"
    }
 ]

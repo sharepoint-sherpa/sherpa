@@ -34,7 +34,7 @@ namespace Sherpa.Library.ContentTypes
 
             foreach (ShContentType contentType in ContentTypes)
             {
-                if ( existingContentTypes.Any(item => item.Id.ToString().Equals(contentType.ID.ToString(CultureInfo.InvariantCulture)) ) )
+                if (existingContentTypes.Any(item => item.Id.ToString().Equals(contentType.ID.ToString(CultureInfo.InvariantCulture))))
                 {
                     // We want to add fields even if the content type exists
                     AddSiteColumnsToContentType(contentType);
@@ -73,27 +73,36 @@ namespace Sherpa.Library.ContentTypes
             foreach (var fieldName in configContentType.Fields)
             {
                 // Need to load content type fields every iteration because fields are added to the collection
-                Field webField = webFields.GetByInternalNameOrTitle(fieldName);
-                FieldLinkCollection contentTypeFields = contentType.FieldLinks;
-                ClientContext.Load(contentTypeFields);
-                ClientContext.Load(webField);
-                ClientContext.ExecuteQuery();
-
-                var fieldLink = contentTypeFields.FirstOrDefault(existingFieldName => existingFieldName.Name == fieldName);
-                if (fieldLink == null)
+                try
                 {
-                    var link = new FieldLinkCreationInformation { Field = webField };
-                    fieldLink = contentType.FieldLinks.Add(link);
-                }
+                    Field webField = webFields.GetByInternalNameOrTitle(fieldName);
+                    FieldLinkCollection contentTypeFields = contentType.FieldLinks;
+                    ClientContext.Load(contentTypeFields);
+                    ClientContext.Load(webField);
+                    ClientContext.ExecuteQuery();
 
-                fieldLink.Required = configContentType.RequiredFields.Contains(fieldName);
-                if (configContentType.HiddenFields.Contains(fieldName))
-                {
-                    fieldLink.Hidden = true;
-                    fieldLink.Required = false;
+
+                    var fieldLink = contentTypeFields.FirstOrDefault(existingFieldName => existingFieldName.Name == fieldName);
+                    if (fieldLink == null)
+                    {
+                        var link = new FieldLinkCreationInformation { Field = webField };
+                        fieldLink = contentType.FieldLinks.Add(link);
+                    }
+
+                    fieldLink.Required = configContentType.RequiredFields.Contains(fieldName);
+                    if (configContentType.HiddenFields.Contains(fieldName))
+                    {
+                        fieldLink.Hidden = true;
+                        fieldLink.Required = false;
+                    }
+                    contentType.Update(true);
+                    ClientContext.ExecuteQuery();
                 }
-                contentType.Update(true);
-                ClientContext.ExecuteQuery();
+                catch (Exception ex)
+                {
+                    Log.Info("Field " + fieldName + " does not exist. If this is a lookup field, run content type creation again after setting up site hierarchy");
+                    continue;
+                }
             }
         }
 

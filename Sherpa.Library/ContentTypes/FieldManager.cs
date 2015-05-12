@@ -74,8 +74,37 @@ namespace Sherpa.Library.ContentTypes
 
         private void CreateField(ShField field, FieldCollection fields)
         {
+            
+            // code to handle lookup fields. does not work if the list has not been created... 
+            if (field.Type == "Lookup" || field.Type == "LookupMulti")
+            {
+                var web = ClientContext.Web;
+                if (!web.IsObjectPropertyInstantiated("Lists"))
+                {
+                    ClientContext.Load(web, x => x.Lists);
+                    ClientContext.ExecuteQuery();
+                }
+                
+                var listTitle = field.List;
+                var list = web.Lists.GetByTitle(listTitle);
+                
+                try
+                {
+                    ClientContext.Load(list, x=>x.Id);
+                    ClientContext.ExecuteQuery();
+                    field.List = list.Id.ToString();
+                }
+                catch (Exception ex)
+                {
+                    Log.Info("Lookup field " + field.DisplayName + " id:" + field.ID + " cannot be created since the list " + listTitle + " has not been created. Please rund content type creation again after setting up the site hierarchy");
+                    return; 
+                }
+                
+            }
+
             var fieldXml = field.GetFieldAsXml();
             Field newField = fields.AddFieldAsXml(fieldXml, true, AddFieldOptions.AddFieldInternalNameHint);
+
             ClientContext.Load(newField);
             ClientContext.ExecuteQuery();
         }
