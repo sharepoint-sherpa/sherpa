@@ -90,6 +90,7 @@ namespace Sherpa.Library.SiteHierarchy
                     Overwrite = true
                 };
                 File uploadFile = assetLibrary.RootFolder.Files.Add(newFile);
+                
                 context.Load(uploadFile);
                 context.ExecuteQuery();
 
@@ -115,11 +116,13 @@ namespace Sherpa.Library.SiteHierarchy
 
         private void ApplyFileProperties(ClientContext context, IEnumerable<ShFileProperties> filePropertiesCollection, File uploadFile)
         {
+            var fileLevel = FileLevel.Published;
             if (filePropertiesCollection != null)
             {
                 var fileProperties = filePropertiesCollection.SingleOrDefault(f => f.Path == uploadFile.Name);
                 if (fileProperties != null)
                 {
+                    fileLevel = fileProperties.Level;
                     var item = uploadFile.ListItemAllFields;
                     context.Load(item);
                     foreach (KeyValuePair<string, string> property in fileProperties.Properties)
@@ -127,19 +130,18 @@ namespace Sherpa.Library.SiteHierarchy
                         item[property.Key] = GetPropertyValueWithTokensReplaced(property.Value, context);
                     }
                     item.Update();
-                    context.ExecuteQuery();
                 }
             }
+            uploadFile.PublishFileToLevel(fileLevel);
+            context.ExecuteQuery();
         }
 
         public string GetPropertyValueWithTokensReplaced(string valueWithTokens, ClientContext context)
         {
-            var propertyValueWithTokensReplaced = valueWithTokens
+            return valueWithTokens
                 .Replace("~SiteCollection", context.Site.ServerRelativeUrl)
                 .Replace("~Site", context.Web.ServerRelativeUrl)
                 .Replace("$Resources:core,Culture;", new CultureInfo((int)context.Web.Language).Name);
-
-            return propertyValueWithTokensReplaced;
         }
     }
 }
