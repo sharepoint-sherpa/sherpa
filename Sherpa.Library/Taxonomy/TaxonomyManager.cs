@@ -115,16 +115,35 @@ namespace Sherpa.Library.Taxonomy
             return shTermGroup;
         }
 
-        private void AddTermsToConfig(ClientContext context, TermSetItem spTerm, ShTermSetItem termItem)
+        private void AddTermsToConfig(ClientContext context, TermSetItem spTerm, ShTermSetItem shTermSetItem)
         {
-            context.Load(spTerm, t => t.Terms);
+            context.Load(spTerm, t => t.Terms.Include(
+                item => item.Id, 
+                item => item.IsAvailableForTagging, 
+                item => item.IsDeprecated,
+                item => item.IsReused,
+                item => item.Description,
+                item => item.Name,
+                item => item.LocalCustomProperties, 
+                item => item.Labels));
             context.ExecuteQuery();
 
             foreach (var spChildTerm in spTerm.Terms)
             {
                 var shTerm = new ShTerm(spChildTerm.Id, spChildTerm.Name);
+                foreach (var label in spChildTerm.Labels)
+                {
+                    shTerm.Labels.Add(new ShTermLabel
+                    {
+                        Language = label.Language, 
+                        Value = label.Value, 
+                        IsDefaultForLanguage = label.IsDefaultForLanguage
+                    });
+                }
+                shTerm.LocalCustomProperties = spChildTerm.LocalCustomProperties;
+                
                 AddTermsToConfig(context, spChildTerm, shTerm);
-                termItem.Terms.Add(shTerm);
+                shTermSetItem.Terms.Add(shTerm);
             }
         }
 

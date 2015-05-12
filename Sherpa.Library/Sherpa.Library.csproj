@@ -134,6 +134,7 @@
     <Compile Include="SiteHierarchy\QuicklaunchManager.cs" />
     <Compile Include="Taxonomy\Model\ShTaxonomyItem.cs" />
     <Compile Include="Taxonomy\Model\ShTerm.cs" />
+    <Compile Include="Taxonomy\Model\ShTermLabel.cs" />
     <Compile Include="Taxonomy\Model\ShTermSetItem.cs" />
     <Compile Include="Taxonomy\Model\ShTermSet.cs" />
     <Compile Include="Taxonomy\Model\ShTermGroup.cs" />

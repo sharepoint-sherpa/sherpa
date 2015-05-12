@@ -25,9 +25,23 @@ namespace Sherpa.Library.Taxonomy.Model
             Terms = new List<ShTerm>();
             CustomProperties = new Dictionary<string, string>();
         }
+
+        /// <summary>
+        /// Tells Newtonsoft Json.NET not to serialize based on condition
+        /// </summary>
+        /// <returns>true if it should be serialized, false if not</returns>
         public bool ShouldSerializeTerms()
         {
             return Terms.Count > 0;
+        }
+
+        /// <summary>
+        /// Tells Newtonsoft Json.NET not to serialize based on condition
+        /// </summary>
+        /// <returns>true if it should be serialized, false if not</returns>
+        public bool ShouldSerializeCustomProperties()
+        {
+            return CustomProperties.Count > 0;
         }
     }
 }
