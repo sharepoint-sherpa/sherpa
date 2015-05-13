@@ -4,6 +4,7 @@ namespace Sherpa.Library.SiteHierarchy.Model
 {
     public class ShSiteCollection
     {
+        public List<ShPermissionLevel> PermissionLevels { get; set; }
         public List<ShFeature> SiteFeatures { get; set; }
         public ShWeb RootWeb { get; set; }
 

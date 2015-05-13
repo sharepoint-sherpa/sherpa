@@ -5,6 +5,7 @@ using System.Reflection;
 using log4net;
 using Microsoft.SharePoint.Client;
 using Sherpa.Library.SiteHierarchy.Model;
+using System.Collections.Generic;
 
 namespace Sherpa.Library.SiteHierarchy
 {
@@ -35,8 +36,37 @@ namespace Sherpa.Library.SiteHierarchy
         public void SetupSites()
         {
             Log.Debug("Starting SetupSites - setting up site collection");
-            FeatureManager.ActivateSiteCollectionFeatures(ClientContext, ConfigurationSiteCollection.SiteFeatures);
-            EnsureAndConfigureWebAndActivateFeatures(ClientContext, null, ConfigurationSiteCollection.RootWeb);
+            //FeatureManager.ActivateSiteCollectionFeatures(ClientContext, ConfigurationSiteCollection.SiteFeatures);
+            //EnsureAndConfigureWebAndActivateFeatures(ClientContext, null, ConfigurationSiteCollection.RootWeb);
+            SetUpCustomPermissionLevels(ClientContext, ConfigurationSiteCollection.PermissionLevels);
+        }
+
+        public void SetUpCustomPermissionLevels(ClientContext context, List<ShPermissionLevel> permissionLevels)
+        {
+            foreach (var permissionLevel in permissionLevels)
+            {
+                context.Load(context.Site.RootWeb.RoleDefinitions);
+                context.ExecuteQuery();
+
+                var existing = context.Site.RootWeb.RoleDefinitions.FirstOrDefault(x => x.Name.Equals(permissionLevel.Name));
+                context.Load(existing);
+                context.ExecuteQuery();
+
+                if (existing == null)
+                {
+                    BasePermissions permissions = new BasePermissions();
+                    foreach (var basePermission in permissionLevel.BasePermissions)
+                    {
+                        permissions.Set(basePermission);
+                    }
+                    RoleDefinitionCreationInformation roleDefinitionCreationInfo = new RoleDefinitionCreationInformation();
+                    roleDefinitionCreationInfo.BasePermissions = permissions;
+                    roleDefinitionCreationInfo.Name = permissionLevel.Name;
+                    roleDefinitionCreationInfo.Description = permissionLevel.Description;
+                    RoleDefinition roleDefinition = context.Site.RootWeb.RoleDefinitions.Add(roleDefinitionCreationInfo);
+                    context.ExecuteQuery();
+                }
+            }
         }
 
         /// <summary>

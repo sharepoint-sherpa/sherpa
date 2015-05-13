@@ -126,6 +126,7 @@
     <Compile Include="SiteHierarchy\Model\ShFileProperties.cs" />
     <Compile Include="SiteHierarchy\Model\ShGroup.cs" />
     <Compile Include="SiteHierarchy\Model\ShList.cs" />
+    <Compile Include="SiteHierarchy\Model\ShPermissionLevel.cs" />
     <Compile Include="SiteHierarchy\Model\ShPermissionScheme.cs" />
     <Compile Include="SiteHierarchy\Model\ShRoleAssignment.cs" />
     <Compile Include="SiteHierarchy\Model\ShSiteCollection.cs" />
