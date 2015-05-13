@@ -12,7 +12,8 @@ namespace Sherpa.Library.SiteHierarchy.Model
         public bool OnQuickLaunch { get; set; }
         public string Description { get; set; }
         public List<ShView> Views { get; set; }
-        public List<string> ContentTypes { get; set; } 
+        public List<string> ContentTypes { get; set; }
+        public ShPermissionScheme PermissionScheme { get; set; }
 
         public ShList()
         {
