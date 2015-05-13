@@ -48,11 +48,8 @@ namespace Sherpa.Library.SiteHierarchy
                 context.Load(context.Site.RootWeb.RoleDefinitions);
                 context.ExecuteQuery();
 
-                var existing = context.Site.RootWeb.RoleDefinitions.FirstOrDefault(x => x.Name.Equals(permissionLevel.Name));
-                context.Load(existing);
-                context.ExecuteQuery();
-
-                if (existing == null)
+                var existingPermissionLevel = context.Site.RootWeb.RoleDefinitions.FirstOrDefault(x => x.Name.Equals(permissionLevel.Name));
+                if (existingPermissionLevel == null)
                 {
                     BasePermissions permissions = new BasePermissions();
                     foreach (var basePermission in permissionLevel.BasePermissions)
