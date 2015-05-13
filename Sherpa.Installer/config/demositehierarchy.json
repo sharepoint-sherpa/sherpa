@@ -11,6 +11,15 @@
     "SandboxedSolutions": [
         "demo.wsp"
     ],
+	"PermissionLevels": [
+    	{
+    		"Name": "List Item Creators",
+    		"Description": "Users in this group can add list items",
+    		"BasePermissions": [
+    			"AddListItems"
+    		]
+    	}
+    ],
     "SiteFeatures": [
         {
             "FeatureId": "57ff23fc-ec05-4dd8-b7ed-d93faa7c795d",
@@ -57,8 +66,41 @@
                         "RowLimit": "30",
                         "DefaultView": "false"
                     }
-                ]
-            }
+                ],
+				"PermissionScheme": {
+					"BreakInheritance": true,
+					"RemoveDefaultRoleAssignments": true,
+					"RoleAssignments": [
+						{
+								"Group": {
+									"AssociatedGroup": {
+										"Type": "Members",
+										"Web": "Current"
+									}
+									},
+									"PermissionLevel": "Edit"
+								},
+								{
+								"Group": {
+									"AssociatedGroup": {
+										"Type": "Visitors",
+										"Web": "Current"
+									}
+									},
+									"PermissionLevel": "Read"
+								},
+								{
+								"Group": {
+									"AssociatedGroup": {
+										"Type": "Owners",
+										"Web": "Current"
+									}
+									},
+									"PermissionLevel": "Full Control"
+								}
+							]
+						}
+				  }
         ],
         "Properties": {
             "sherpaversion": "1.0.0.0",
