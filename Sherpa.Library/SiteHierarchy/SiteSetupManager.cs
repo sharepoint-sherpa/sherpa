@@ -36,9 +36,9 @@ namespace Sherpa.Library.SiteHierarchy
         public void SetupSites()
         {
             Log.Debug("Starting SetupSites - setting up site collection");
-            //FeatureManager.ActivateSiteCollectionFeatures(ClientContext, ConfigurationSiteCollection.SiteFeatures);
-            //EnsureAndConfigureWebAndActivateFeatures(ClientContext, null, ConfigurationSiteCollection.RootWeb);
             SetUpCustomPermissionLevels(ClientContext, ConfigurationSiteCollection.PermissionLevels);
+            FeatureManager.ActivateSiteCollectionFeatures(ClientContext, ConfigurationSiteCollection.SiteFeatures);
+            EnsureAndConfigureWebAndActivateFeatures(ClientContext, null, ConfigurationSiteCollection.RootWeb);
         }
 
         public void SetUpCustomPermissionLevels(ClientContext context, List<ShPermissionLevel> permissionLevels)
