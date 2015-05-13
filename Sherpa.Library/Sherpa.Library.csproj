@@ -116,13 +116,17 @@
     <Compile Include="SiteHierarchy\ContentUploadManager.cs" />
     <Compile Include="SiteHierarchy\FeatureManager.cs" />
     <Compile Include="SiteHierarchy\ListManager.cs" />
+    <Compile Include="SiteHierarchy\Model\ShAssociatedGroup.cs" />
     <Compile Include="SiteHierarchy\Model\ShContentFolder.cs" />
     <Compile Include="SiteHierarchy\Model\ShFeature.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="FilePersistanceProvider.cs" />
     <Compile Include="IPersistanceProvider.cs" />
     <Compile Include="SiteHierarchy\ISiteSetupManager.cs" />
+    <Compile Include="SiteHierarchy\Model\ShGroup.cs" />
+    <Compile Include="SiteHierarchy\Model\ShPermissionScheme.cs" />
     <Compile Include="SiteHierarchy\Model\ShList.cs" />
+    <Compile Include="SiteHierarchy\Model\ShRoleAssignment.cs" />
     <Compile Include="SiteHierarchy\Model\ShSiteCollection.cs" />
     <Compile Include="SiteHierarchy\Model\ShTask.cs" />
     <Compile Include="SiteHierarchy\Model\ShWeb.cs" />

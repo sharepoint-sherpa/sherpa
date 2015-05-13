@@ -37,7 +37,7 @@ namespace Sherpa.Library.SiteHierarchy
             setupList.Update();
 
             SetupContentTypesOfList(context, setupList, listConfig);
-
+            SetupPermissionSchemeOfList(context, setupList, listConfig);
             SetupViewsOfList(context, setupList, listConfig);
         }
 
@@ -110,6 +110,95 @@ namespace Sherpa.Library.SiteHierarchy
                 context.ExecuteQuery();
             }
         }
+
+        private void SetupPermissionSchemeOfList(ClientContext context, List list, ShList listConfig)
+        {
+            if (listConfig.PermissionScheme != null)
+            {
+                if (listConfig.PermissionScheme.BreakInheritance)
+                {
+                    list.BreakRoleInheritance(true, false);
+                    list.Update();
+                    context.ExecuteQuery();
+                }
+                if (listConfig.PermissionScheme.RemoveDefaultRoleAssignments)
+                {
+                    context.Load(list.RoleAssignments);
+                    context.ExecuteQuery();
+                    for (var i = list.RoleAssignments.Count - 1; i >= 0; i--)
+                    {
+                        list.RoleAssignments[i].DeleteObject();
+                    }
+                }
+                foreach (var roleAssignment in listConfig.PermissionScheme.RoleAssignments)
+                {
+                    Group group = null;
+                    if (roleAssignment.Group.Name != "")
+                    {
+                        group = context.Web.SiteGroups.GetByName(roleAssignment.Group.Name);
+                    }
+                    else
+                    {
+                        group = GetAssociatedGroup(context, roleAssignment.Group.AssociatedGroup);
+                    }
+
+                    RoleDefinitionBindingCollection roleDefBinding = new RoleDefinitionBindingCollection(context);
+                    RoleDefinition roleDef = context.Web.RoleDefinitions.GetByName(roleAssignment.PermissionLevel);
+                    roleDefBinding.Add(roleDef);
+                    list.RoleAssignments.Add(group, roleDefBinding);
+                    context.Load(group);
+                    context.Load(roleDef);
+                    context.ExecuteQuery();
+                }
+            }
+        }
+
+        private Group GetAssociatedGroup(ClientContext context, ShAssociatedGroup assGroup) 
+        {
+            switch (assGroup.Web)
+            {
+                case "Current":
+                    {
+                        switch (assGroup.Type)
+                        {
+                            case "Visitors":
+                                {
+                                    return context.Web.AssociatedVisitorGroup;
+                                }
+                            case "Members":
+                                {
+                                    return context.Web.AssociatedMemberGroup;
+                                }
+                            case "Owners":
+                                {
+                                    return context.Web.AssociatedOwnerGroup;
+                                }
+                        }
+                    }
+                    break;
+                case "Root":
+                    {
+                        switch (assGroup.Type)
+                        {
+                            case "Visitors":
+                                {
+                                    return context.Site.RootWeb.AssociatedVisitorGroup;
+                                }
+                            case "Members":
+                                {
+                                    return context.Site.RootWeb.AssociatedMemberGroup;
+                                }
+                            case "Owners":
+                                {
+                                    return context.Site.RootWeb.AssociatedOwnerGroup;
+                                }
+                        }
+                    }
+                    break;
+            }
+            return null;
+        }
+
 
         private void SetupView(ClientContext context, List list, ShView view)
         {
