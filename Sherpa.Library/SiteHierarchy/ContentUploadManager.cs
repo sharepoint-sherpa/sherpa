@@ -92,6 +92,7 @@ namespace Sherpa.Library.SiteHierarchy
                 File uploadFile = assetLibrary.RootFolder.Files.Add(newFile);
                 
                 context.Load(uploadFile);
+                context.Load(uploadFile.ListItemAllFields.ParentList, l => l.ForceCheckout, l => l.EnableMinorVersions, l => l.EnableModeration);
                 context.ExecuteQuery();
 
                 ApplyFileProperties(context, filePropertiesCollection, uploadFile);
