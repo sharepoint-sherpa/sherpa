@@ -133,6 +133,7 @@
     <Compile Include="SiteHierarchy\Model\ShTask.cs" />
     <Compile Include="SiteHierarchy\Model\ShWeb.cs" />
     <Compile Include="SiteHierarchy\Model\ShView.cs" />
+    <Compile Include="SiteHierarchy\Model\ShWebPartReference.cs" />
     <Compile Include="SiteHierarchy\PropertyManager.cs" />
     <Compile Include="Deploy\SearchImportManager.cs" />
     <Compile Include="SiteHierarchy\SiteSetupManager.cs" />

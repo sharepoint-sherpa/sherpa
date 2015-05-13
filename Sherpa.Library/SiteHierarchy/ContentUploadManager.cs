@@ -3,9 +3,10 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Web.Management;
+using System.Xml;
 using log4net;
 using Microsoft.SharePoint.Client;
+using Microsoft.SharePoint.Client.WebParts;
 using Sherpa.Library.SiteHierarchy.Model;
 using Flurl;
 using File = Microsoft.SharePoint.Client.File;
@@ -22,24 +23,24 @@ namespace Sherpa.Library.SiteHierarchy
             _contentDirectoryPath = rootConfigurationPath;
         }
 
-        public void UploadFilesInFolder(ClientContext context, Web web, List<ShContentFolder> configFolders)
+        public void UploadFilesInFolder(ClientContext context, Web web, List<ShContentFolder> contentFolders)
         {
-            foreach (ShContentFolder folder in configFolders)
+            foreach (ShContentFolder folder in contentFolders)
             {
                 UploadFilesInFolder(context, web, folder);
             }
         }
 
-        public void UploadFilesInFolder(ClientContext context, Web web, ShContentFolder configFolder)
+        public void UploadFilesInFolder(ClientContext context, Web web, ShContentFolder contentFolder)
         {
-            Log.Info("Uploading files from contentfolder " + configFolder.FolderName);
+            Log.Info("Uploading files from contentfolder " + contentFolder.FolderName);
             
-            var assetLibrary = web.Lists.GetByTitle(configFolder.ListName);
+            var assetLibrary = web.Lists.GetByTitle(contentFolder.ListName);
             context.Load(assetLibrary, l => l.RootFolder);
             context.ExecuteQuery();
 
-            var uploadTargetFolder = Url.Combine(assetLibrary.RootFolder.ServerRelativeUrl, configFolder.FolderUrl);
-            var configRootFolder = Path.Combine(_contentDirectoryPath, configFolder.FolderName);
+            var uploadTargetFolder = Url.Combine(assetLibrary.RootFolder.ServerRelativeUrl, contentFolder.FolderUrl);
+            var configRootFolder = Path.Combine(_contentDirectoryPath, contentFolder.FolderName);
 
             if (!web.DoesFolderExists(uploadTargetFolder))
             {
@@ -58,9 +59,9 @@ namespace Sherpa.Library.SiteHierarchy
             context.ExecuteQuery();
 
             List<ShFileProperties> filePropertiesCollection = null;
-            if (!string.IsNullOrEmpty(configFolder.PropertiesFile))
+            if (!string.IsNullOrEmpty(contentFolder.PropertiesFile))
             {
-                var propertiesFilePath = Path.Combine(configRootFolder, configFolder.PropertiesFile);
+                var propertiesFilePath = Path.Combine(configRootFolder, contentFolder.PropertiesFile);
                 var filePersistanceProvider = new FilePersistanceProvider<List<ShFileProperties>>(propertiesFilePath);
                 filePropertiesCollection = filePersistanceProvider.Load();
             }
@@ -74,13 +75,12 @@ namespace Sherpa.Library.SiteHierarchy
                 var pathToFileFromRootFolder = filePath.Replace(configRootFolder, "");
                 var fileName = Path.GetFileName(pathToFileFromRootFolder);
 
-                if (!string.IsNullOrEmpty(configFolder.PropertiesFile) && configFolder.PropertiesFile == fileName)
+                if (!string.IsNullOrEmpty(contentFolder.PropertiesFile) && contentFolder.PropertiesFile == fileName)
                 {
                     Log.DebugFormat("Skipping file upload of {0} since it's used as a configuration file", fileName);
                     continue;
                 }
                 
-
                 var fileUrl = GetFileUrl(uploadTargetFolder, pathToFileFromRootFolder, filePropertiesCollection, fileName);
                 
                 var newFile = new FileCreationInformation
@@ -130,6 +130,8 @@ namespace Sherpa.Library.SiteHierarchy
                     {
                         item[property.Key] = GetPropertyValueWithTokensReplaced(property.Value, context);
                     }
+                    
+                    AddWebParts(context, uploadFile, fileProperties.WebParts, fileProperties.ReplaceWebParts);
                     item.Update();
                 }
             }
@@ -143,6 +145,48 @@ namespace Sherpa.Library.SiteHierarchy
                 .Replace("~SiteCollection", context.Site.ServerRelativeUrl)
                 .Replace("~Site", context.Web.ServerRelativeUrl)
                 .Replace("$Resources:core,Culture;", new CultureInfo((int)context.Web.Language).Name);
+        }
+
+        public void AddWebParts(ClientContext context, File uploadFile, List<ShWebPartReference> webPartReferences, bool replaceWebParts)
+        {
+            var limitedWebPartManager = uploadFile.GetLimitedWebPartManager(PersonalizationScope.Shared);
+
+            context.Load(limitedWebPartManager, manager => manager.WebParts);
+            context.ExecuteQuery();
+
+            if (limitedWebPartManager.WebParts.Count == 0 || replaceWebParts)
+            {
+                for (int i = limitedWebPartManager.WebParts.Count - 1; i >= 0; i--)
+                {
+                    limitedWebPartManager.WebParts[i].DeleteWebPart();
+                }
+                context.ExecuteQuery();
+
+                foreach (ShWebPartReference webPart in webPartReferences)
+                {
+                    //Convention: All webparts are located in the content/webparts folder
+                    var webPartPath = Path.Combine(_contentDirectoryPath, "webparts", webPart.FileName);
+                    var webPartFileContent = System.IO.File.ReadAllText(webPartPath);
+                    if (!System.IO.File.Exists(webPartPath))
+                    {
+                        Log.ErrorFormat("Webpart at path {0} not found", webPartPath);
+                        continue;
+                    }
+                    
+                    var webPartDefinition = limitedWebPartManager.ImportWebPart(webPartFileContent);
+                    if (webPart.PropertiesOverrides.Count > 0)
+                    {
+                        foreach (KeyValuePair<string, string> propertyOverride in webPart.PropertiesOverrides)
+                        {
+                            webPartDefinition.WebPart.Properties[propertyOverride.Key] = propertyOverride.Value;
+                        }
+                    }
+                    limitedWebPartManager.AddWebPart(webPartDefinition.WebPart, webPart.ZoneID, webPart.Order);
+                }
+
+                context.Load(limitedWebPartManager);
+                context.ExecuteQuery();
+            }
         }
     }
 }

@@ -7,12 +7,17 @@ namespace Sherpa.Library.SiteHierarchy.Model
     {
         public string Path { get; set; }
         public string Url { get; set; }
-        /* Published, Draft, CheckOut */
+        public bool ReplaceWebParts { get; set; }
+
+        /* Published, Draft, CheckOut (not supported) */
         public FileLevel Level { get; set; }
         public Dictionary<string, string> Properties { get; set; }
+        public List<ShWebPartReference> WebParts { get; set; }
 
         public ShFileProperties()
         {
+            Properties = new Dictionary<string, string>();
+            WebParts = new List<ShWebPartReference>();
             Level = FileLevel.Published;
         }
     }
