@@ -51,6 +51,7 @@ namespace Sherpa.Library.SiteHierarchy
                 var existingPermissionLevel = context.Site.RootWeb.RoleDefinitions.FirstOrDefault(x => x.Name.Equals(permissionLevel.Name));
                 if (existingPermissionLevel == null)
                 {
+                    Log.Info("Creating permission level " + permissionLevel.Name);
                     BasePermissions permissions = new BasePermissions();
                     foreach (var basePermission in permissionLevel.BasePermissions)
                     {
