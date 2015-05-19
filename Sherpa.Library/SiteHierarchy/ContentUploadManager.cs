@@ -131,8 +131,10 @@ namespace Sherpa.Library.SiteHierarchy
                     {
                         item[property.Key] = GetPropertyValueWithTokensReplaced(property.Value, context);
                     }
-                    
-                    AddWebParts(context, uploadFile, fileProperties.WebParts, fileProperties.ReplaceWebParts);
+                    if (uploadFile.Name.ToLower().EndsWith(".aspx"))
+                    {
+                        AddWebParts(context, uploadFile, fileProperties.WebParts, fileProperties.ReplaceWebParts);
+                    }                    
                     item.Update();
                 }
             }
@@ -150,6 +152,9 @@ namespace Sherpa.Library.SiteHierarchy
 
         public void AddWebParts(ClientContext context, File uploadFile, List<ShWebPartReference> webPartReferences, bool replaceWebParts)
         {
+            // we should be allowed to delete webparts (by using replaceWebparts and define no new ones
+            if (webPartReferences.Count <= 0 && !replaceWebParts) return;
+
             var limitedWebPartManager = uploadFile.GetLimitedWebPartManager(PersonalizationScope.Shared);
 
             context.Load(limitedWebPartManager, manager => manager.WebParts);
