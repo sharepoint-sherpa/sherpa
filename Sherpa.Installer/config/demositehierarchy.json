@@ -31,7 +31,8 @@
             {
                 "FolderName": "SiteAssets",
                 "ListName": "Site Assets",
-                "FolderUrl": "sherpa"
+                "FolderUrl": "sherpa",
+                "PropertiesFile": "properties.json"
             },
             {
                 "FolderName": "PageLayouts",
@@ -151,7 +152,8 @@
                             {
                                 "FolderName": "SiteAssets",
                                 "ListName": "Site Assets",
-                                "FolderUrl": "sherpa"
+                                "FolderUrl": "sherpa",
+                                "PropertiesFile": "properties.json"
                             }
                         ],
                         "Description": "Sherpa Subsite Subsite demo",

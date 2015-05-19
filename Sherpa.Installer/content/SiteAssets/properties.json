@@ -1,0 +1,10 @@
+﻿[
+    {
+        "Path": "myhtmlfile.html",
+        "Url": "anothername.txt"
+    },
+    {
+        "Path": "folder/myhtmlfile.html",
+        "Url": "folder/anothername.txt"
+    }
+]

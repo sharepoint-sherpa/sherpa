@@ -9,27 +9,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sherpa.Library", "Sherpa.Li
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sherpa.ExampleCustomTask", "Sherpa.ExampleCustomTask\Sherpa.ExampleCustomTask.csproj", "{0D12699F-074C-460C-BC44-126024756435}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "content", "content", "{5C0785D2-479D-4DA4-BD01-710826890C9F}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SiteAssets", "SiteAssets", "{0E8D7410-386A-481D-A6F8-4851C2EC20D2}"
-	ProjectSection(SolutionItems) = preProject
-		Sherpa.Installer\content\SiteAssets\myfile.txt = Sherpa.Installer\content\SiteAssets\myfile.txt
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PageLayouts", "PageLayouts", "{F1190659-1529-4555-A726-4408C7513A15}"
-	ProjectSection(SolutionItems) = preProject
-		Sherpa.Installer\content\PageLayouts\properties.json = Sherpa.Installer\content\PageLayouts\properties.json
-		Sherpa.Installer\content\PageLayouts\SherpaPageLayout.aspx = Sherpa.Installer\content\PageLayouts\SherpaPageLayout.aspx
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "config", "config", "{F923184A-80D1-4609-A7B2-27CCB5EDB799}"
-	ProjectSection(SolutionItems) = preProject
-		Sherpa.Installer\config\democontenttypes.json = Sherpa.Installer\config\democontenttypes.json
-		Sherpa.Installer\config\demofields.json = Sherpa.Installer\config\demofields.json
-		Sherpa.Installer\config\demositehierarchy.json = Sherpa.Installer\config\demositehierarchy.json
-		Sherpa.Installer\config\demotaxonomy.json = Sherpa.Installer\config\demotaxonomy.json
-	EndProjectSection
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,9 +30,5 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{0E8D7410-386A-481D-A6F8-4851C2EC20D2} = {5C0785D2-479D-4DA4-BD01-710826890C9F}
-		{F1190659-1529-4555-A726-4408C7513A15} = {5C0785D2-479D-4DA4-BD01-710826890C9F}
 	EndGlobalSection
 EndGlobal

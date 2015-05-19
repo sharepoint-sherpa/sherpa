@@ -72,7 +72,7 @@ namespace Sherpa.Library.SiteHierarchy
 
             foreach (string filePath in Directory.GetFiles(configRootFolder, "*", SearchOption.AllDirectories))
             {
-                var pathToFileFromRootFolder = filePath.Replace(configRootFolder, "");
+                var pathToFileFromRootFolder = filePath.Replace(configRootFolder.TrimEnd(new []{'\\'}) + "\\", "");
                 var fileName = Path.GetFileName(pathToFileFromRootFolder);
 
                 if (!string.IsNullOrEmpty(contentFolder.PropertiesFile) && contentFolder.PropertiesFile == fileName)
@@ -102,11 +102,12 @@ namespace Sherpa.Library.SiteHierarchy
         private string GetFileUrl(string uploadTargetFolder, string pathToFileFromRootFolder,
             IEnumerable<ShFileProperties> filePropertiesCollection, string fileName)
         {
-            var fileUrl = Url.Combine(uploadTargetFolder, pathToFileFromRootFolder.Replace("\\", "/"));
+            pathToFileFromRootFolder = pathToFileFromRootFolder.Replace("\\", "/");
+            var fileUrl = Url.Combine(uploadTargetFolder, pathToFileFromRootFolder);
 
             if (filePropertiesCollection != null)
             {
-                var fileProperties = filePropertiesCollection.SingleOrDefault(f => f.Path == fileName);
+                var fileProperties = filePropertiesCollection.SingleOrDefault(f => f.Path == pathToFileFromRootFolder);
                 if (fileProperties != null)
                 {
                     fileUrl = Url.Combine(uploadTargetFolder, fileProperties.Url);
