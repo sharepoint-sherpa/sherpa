@@ -17,6 +17,7 @@ namespace Sherpa.Library.SiteHierarchy.Model
         public ShSiteCollection()
         {
             SiteFeatures = new List<ShFeature>();
+            PermissionLevels = new List<ShPermissionLevel>();
         }
     }
 }
