@@ -118,28 +118,18 @@ namespace Sherpa.Library.SiteHierarchy
 
         private void ApplyFileProperties(ClientContext context, IEnumerable<ShFileProperties> filePropertiesCollection, File uploadFile)
         {
-            var fileLevel = FileLevel.Published;
             if (filePropertiesCollection != null)
             {
                 var fileProperties = filePropertiesCollection.SingleOrDefault(f => f.Path == uploadFile.Name);
                 if (fileProperties != null)
                 {
-                    fileLevel = fileProperties.Level;
-                    var item = uploadFile.ListItemAllFields;
-                    context.Load(item);
-                    foreach (KeyValuePair<string, string> property in fileProperties.Properties)
-                    {
-                        item[property.Key] = GetPropertyValueWithTokensReplaced(property.Value, context);
-                    }
-                    if (uploadFile.Name.ToLower().EndsWith(".aspx"))
-                    {
+                    uploadFile.SetFileProperties(fileProperties.Properties);
+                    if (uploadFile.Name.ToLower().EndsWith(".aspx")) 
                         AddWebParts(context, uploadFile, fileProperties.WebParts, fileProperties.ReplaceWebParts);
-                    }                    
-                    item.Update();
+                    uploadFile.PublishFileToLevel(fileProperties.Level);
+                    context.ExecuteQuery();
                 }
             }
-            uploadFile.PublishFileToLevel(fileLevel);
-            context.ExecuteQuery();
         }
 
         public string GetPropertyValueWithTokensReplaced(string valueWithTokens, ClientContext context)
