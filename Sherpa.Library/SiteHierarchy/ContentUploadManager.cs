@@ -123,7 +123,13 @@ namespace Sherpa.Library.SiteHierarchy
                 var fileProperties = filePropertiesCollection.SingleOrDefault(f => f.Path == uploadFile.Name);
                 if (fileProperties != null)
                 {
-                    uploadFile.SetFileProperties(fileProperties.Properties);
+                    var filePropertiesWithTokensReplaced = new Dictionary<string, string>();
+                    foreach (KeyValuePair<string, string> keyValuePair in fileProperties.Properties)
+                    {
+                        filePropertiesWithTokensReplaced.Add(keyValuePair.Key, GetPropertyValueWithTokensReplaced(keyValuePair.Value, context));
+                    }
+                    uploadFile.SetFileProperties(filePropertiesWithTokensReplaced);
+
                     if (uploadFile.Name.ToLower().EndsWith(".aspx")) 
                         AddWebParts(context, uploadFile, fileProperties.WebParts, fileProperties.ReplaceWebParts);
                     uploadFile.PublishFileToLevel(fileProperties.Level);
