@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -82,20 +83,28 @@ namespace Sherpa.Library.SiteHierarchy
                 }
                 
                 var fileUrl = GetFileUrl(uploadTargetFolder, pathToFileFromRootFolder, filePropertiesCollection, fileName);
-                
+
+                web.CheckOutFile(fileUrl);
+
                 var newFile = new FileCreationInformation
                 {
                     Content = System.IO.File.ReadAllBytes(filePath),
                     Url = fileUrl,
                     Overwrite = true
                 };
+
+
                 File uploadFile = assetLibrary.RootFolder.Files.Add(newFile);
                 
+
+
                 context.Load(uploadFile);
                 context.Load(uploadFile.ListItemAllFields.ParentList, l => l.ForceCheckout, l => l.EnableMinorVersions, l => l.EnableModeration);
                 context.ExecuteQuery();
 
                 ApplyFileProperties(context, filePropertiesCollection, uploadFile);
+                uploadFile.PublishFileToLevel(FileLevel.Published);
+                context.ExecuteQuery();
             }
         }
 
@@ -132,7 +141,6 @@ namespace Sherpa.Library.SiteHierarchy
 
                     if (uploadFile.Name.ToLower().EndsWith(".aspx")) 
                         AddWebParts(context, uploadFile, fileProperties.WebParts, fileProperties.ReplaceWebParts);
-                    uploadFile.PublishFileToLevel(fileProperties.Level);
                     context.ExecuteQuery();
                 }
             }
