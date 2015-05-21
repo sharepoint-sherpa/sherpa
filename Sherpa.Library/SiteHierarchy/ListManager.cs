@@ -225,6 +225,9 @@ namespace Sherpa.Library.SiteHierarchy
             }
             else if (!string.IsNullOrEmpty(view.Url))
             {
+                context.Load(list, x=>x.ParentWebUrl);
+                context.ExecuteQuery();
+
                 var serverRelativeUrl = UriUtilities.CombineServerRelativeUri(list.ParentWebUrl, view.Url);
                 setupView = viewCollection.FirstOrDefault(v => v.ServerRelativeUrl == serverRelativeUrl);
             }
