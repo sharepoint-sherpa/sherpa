@@ -148,9 +148,13 @@ namespace Sherpa.Library.SiteHierarchy
 
         public string GetPropertyValueWithTokensReplaced(string valueWithTokens, ClientContext context)
         {
+            var siteCollectionUrl = context.Site.ServerRelativeUrl == "/" ? string.Empty : context.Site.ServerRelativeUrl;
+            var webUrl = context.Web.ServerRelativeUrl == "/" ? string.Empty : context.Web.ServerRelativeUrl;
+            
+
             return valueWithTokens
-                .Replace("~SiteCollection", context.Site.ServerRelativeUrl)
-                .Replace("~Site", context.Web.ServerRelativeUrl)
+                .Replace("~SiteCollection", siteCollectionUrl)
+                .Replace("~Site", webUrl)
                 .Replace("$Resources:core,Culture;", new CultureInfo((int)context.Web.Language).Name);
         }
 
