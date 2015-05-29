@@ -339,7 +339,7 @@ namespace Sherpa.Installer
         {
             var contentTypePersister = new FilePersistanceProvider<List<ShContentType>>(filePath);
             var contentTypeManager = new ContentTypeManager(context, contentTypePersister.Load());
-            contentTypeManager.CreateContentTypes();
+            contentTypeManager.EnsureContentTypes();
         }
 
         private static void CreateFieldsFromFile(ClientContext context, string filePath)
