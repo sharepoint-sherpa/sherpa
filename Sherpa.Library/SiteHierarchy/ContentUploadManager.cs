@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -79,23 +80,25 @@ namespace Sherpa.Library.SiteHierarchy
                     Log.DebugFormat("Skipping file upload of {0} since it's used as a configuration file", fileName);
                     continue;
                 }
-                
+
                 var fileUrl = GetFileUrl(uploadTargetFolder, pathToFileFromRootFolder, filePropertiesCollection);
-                
+                web.CheckOutFile(fileUrl);
+
                 var newFile = new FileCreationInformation
                 {
                     Content = System.IO.File.ReadAllBytes(filePath),
                     Url = fileUrl,
                     Overwrite = true
                 };
-                
                 File uploadFile = assetLibrary.RootFolder.Files.Add(newFile);
-                
+
                 context.Load(uploadFile);
                 context.Load(uploadFile.ListItemAllFields.ParentList, l => l.ForceCheckout, l => l.EnableMinorVersions, l => l.EnableModeration);
                 context.ExecuteQuery();
 
                 ApplyFileProperties(context, filePropertiesCollection, uploadFile);
+                uploadFile.PublishFileToLevel(FileLevel.Published);
+                context.ExecuteQuery();
             }
         }
 
@@ -132,7 +135,6 @@ namespace Sherpa.Library.SiteHierarchy
 
                     if (uploadFile.Name.ToLower().EndsWith(".aspx")) 
                         AddWebParts(context, uploadFile, fileProperties.WebParts, fileProperties.ReplaceWebParts);
-                    uploadFile.PublishFileToLevel(fileProperties.Level);
                     context.ExecuteQuery();
                 }
             }
@@ -140,9 +142,13 @@ namespace Sherpa.Library.SiteHierarchy
 
         public string GetPropertyValueWithTokensReplaced(string valueWithTokens, ClientContext context)
         {
+            var siteCollectionUrl = context.Site.ServerRelativeUrl == "/" ? string.Empty : context.Site.ServerRelativeUrl;
+            var webUrl = context.Web.ServerRelativeUrl == "/" ? string.Empty : context.Web.ServerRelativeUrl;
+            
+
             return valueWithTokens
-                .Replace("~SiteCollection", context.Site.ServerRelativeUrl)
-                .Replace("~Site", context.Web.ServerRelativeUrl)
+                .Replace("~SiteCollection", siteCollectionUrl)
+                .Replace("~Site", webUrl)
                 .Replace("$Resources:core,Culture;", new CultureInfo((int)context.Web.Language).Name);
         }
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
+using System.Web.UI.WebControls;
 using log4net;
 using Microsoft.SharePoint.Client;
 using Sherpa.Library.ContentTypes.Model;
@@ -25,7 +26,7 @@ namespace Sherpa.Library.ContentTypes
             ClientContext = clientContext;
         }
 
-        public void CreateContentTypes()
+        public void EnsureContentTypes()
         {
             Web web = ClientContext.Web;
             ContentTypeCollection existingContentTypes = web.ContentTypes;
@@ -34,7 +35,26 @@ namespace Sherpa.Library.ContentTypes
 
             foreach (ShContentType contentType in ContentTypes)
             {
-                if (!existingContentTypes.Any(item => item.Id.ToString().Equals(contentType.ID.ToString(CultureInfo.InvariantCulture))))
+                var existingContentType = existingContentTypes.SingleOrDefault(
+                    item => item.Id.ToString().Equals(contentType.ID.ToString(CultureInfo.InvariantCulture)));
+                if (existingContentType != null)
+                {
+                    if (existingContentType.Group != contentType.Group)
+                    {
+                        Log.Debug("Updating group of content type " + contentType.DisplayName);
+                        existingContentType.Group = contentType.Group;
+                        existingContentType.Update(true);
+                        ClientContext.ExecuteQuery();
+                    }
+                    if (existingContentType.Name != contentType.DisplayName)
+                    {
+                        Log.Debug("Updating display name of content type " + contentType.DisplayName);
+                        existingContentType.Name = contentType.DisplayName;
+                        existingContentType.Update(true);
+                        ClientContext.ExecuteQuery();
+                    }
+                }
+                else
                 {
                     Log.Debug("Creating content type " + contentType.DisplayName);
                     var contentTypeCreationInformation = contentType.GetContentTypeCreationInformation();
@@ -46,6 +66,7 @@ namespace Sherpa.Library.ContentTypes
                     newContentType.Update(true);
                     ClientContext.ExecuteQuery();
                 }
+                Log.Debug("Adding fields to existing content type " + contentType.DisplayName);
                 // We want to add fields even if the content type exists
                 AddSiteColumnsToContentType(contentType);
             }

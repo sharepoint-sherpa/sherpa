@@ -225,7 +225,12 @@ namespace Sherpa.Library.SiteHierarchy
             }
             else if (!string.IsNullOrEmpty(view.Url))
             {
+                context.Load(list, x=>x.ParentWebUrl);
+                context.Load(list, x => x.ParentWeb);
+                context.ExecuteQuery();
+
                 var serverRelativeUrl = UriUtilities.CombineServerRelativeUri(list.ParentWebUrl, view.Url);
+                list.ParentWeb.CheckOutFile(serverRelativeUrl);
                 setupView = viewCollection.FirstOrDefault(v => v.ServerRelativeUrl == serverRelativeUrl);
             }
             if (setupView != null)
@@ -243,6 +248,10 @@ namespace Sherpa.Library.SiteHierarchy
                 setupView.RowLimit = view.RowLimit;
                 
                 setupView.Update();
+                if (!string.IsNullOrEmpty(view.Url))
+                {
+                    list.ParentWeb.CheckInFile(setupView.ServerRelativeUrl, CheckinType.MajorCheckIn, "updated by sherpa");
+                }
                 context.ExecuteQuery();
             }
         }
