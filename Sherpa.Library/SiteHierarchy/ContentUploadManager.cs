@@ -3,7 +3,6 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Xml;
 using log4net;
 using Microsoft.SharePoint.Client;
 using Microsoft.SharePoint.Client.WebParts;
@@ -81,7 +80,7 @@ namespace Sherpa.Library.SiteHierarchy
                     continue;
                 }
                 
-                var fileUrl = GetFileUrl(uploadTargetFolder, pathToFileFromRootFolder, filePropertiesCollection, fileName);
+                var fileUrl = GetFileUrl(uploadTargetFolder, pathToFileFromRootFolder, filePropertiesCollection);
                 
                 var newFile = new FileCreationInformation
                 {
@@ -89,6 +88,7 @@ namespace Sherpa.Library.SiteHierarchy
                     Url = fileUrl,
                     Overwrite = true
                 };
+                
                 File uploadFile = assetLibrary.RootFolder.Files.Add(newFile);
                 
                 context.Load(uploadFile);
@@ -100,7 +100,7 @@ namespace Sherpa.Library.SiteHierarchy
         }
 
         private string GetFileUrl(string uploadTargetFolder, string pathToFileFromRootFolder,
-            IEnumerable<ShFileProperties> filePropertiesCollection, string fileName)
+            IEnumerable<ShFileProperties> filePropertiesCollection)
         {
             pathToFileFromRootFolder = pathToFileFromRootFolder.Replace("\\", "/");
             var fileUrl = Url.Combine(uploadTargetFolder, pathToFileFromRootFolder);
