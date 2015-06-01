@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
-using System.Web.UI.WebControls;
 using log4net;
 using Microsoft.SharePoint.Client;
 using Sherpa.Library.ContentTypes.Model;
@@ -94,7 +93,8 @@ namespace Sherpa.Library.ContentTypes
                 }
                 catch (Exception ex)
                 {
-                    Log.ErrorFormat("Field {0} could not be removed from the content type {1} with error {2}",fieldNameToRemove, configContentType.DisplayName, ex.Message);
+                    Log.ErrorFormat("Field {0} could not be removed from the content type {1} with error {2}",
+                        fieldNameToRemove, configContentType.DisplayName, ex.Message);
                 }
             }
             foreach (var fieldName in configContentType.Fields)
@@ -108,13 +108,16 @@ namespace Sherpa.Library.ContentTypes
                 }
                 catch (Exception ex)
                 {
-                    Log.ErrorFormat("Field {0} could not be added to the content type {1} with error {2}", fieldName, configContentType.DisplayName, ex.Message);
-                    Log.Info("Field " + fieldName + " does not exist. If this is a lookup field, run content type creation again after setting up site hierarchy");
+                    Log.ErrorFormat("Field {0} could not be added to the content type {1} with error {2}", fieldName,
+                        configContentType.DisplayName, ex.Message);
+                    Log.Info("Field " + fieldName +
+                             " does not exist. If this is a lookup field, run content type creation again after setting up site hierarchy");
                 }
             }
         }
 
-        private void AddOrUpdateFieldOfContentType(ShContentType configContentType, FieldCollection webFields, string fieldName,
+        private void AddOrUpdateFieldOfContentType(ShContentType configContentType, FieldCollection webFields,
+            string fieldName,
             ContentType contentType)
         {
             // Need to load content type fields every iteration because fields are added to the collection
@@ -141,7 +144,8 @@ namespace Sherpa.Library.ContentTypes
             ClientContext.ExecuteQuery();
         }
 
-        private void RemoveFieldFromContentType(FieldCollection webFields, string fieldNameToRemove, ContentType contentType)
+        private void RemoveFieldFromContentType(FieldCollection webFields, string fieldNameToRemove,
+            ContentType contentType)
         {
             // Need to load content type fields every iteration because fields are added to the collection
             Field webField = webFields.GetByInternalNameOrTitle(fieldNameToRemove);
@@ -170,11 +174,17 @@ namespace Sherpa.Library.ContentTypes
             ClientContext.ExecuteQuery();
 
             var contentTypeGroups = new List<string>();
-            foreach (ShContentType contentType in ContentTypes.Where(contentType => !contentTypeGroups.Contains(contentType.Group)))
+            foreach (
+                ShContentType contentType in
+                    ContentTypes.Where(contentType => !contentTypeGroups.Contains(contentType.Group)))
             {
                 contentTypeGroups.Add(contentType.Group);
             }
-            List<ContentType> contentTypes = existingContentTypes.ToList().OrderBy(ct => ct.Id.ToString()).Where(ct => contentTypeGroups.Contains(ct.Group)).ToList();
+            List<ContentType> contentTypes =
+                existingContentTypes.ToList()
+                    .OrderBy(ct => ct.Id.ToString())
+                    .Where(ct => contentTypeGroups.Contains(ct.Group))
+                    .ToList();
 
             for (int i = contentTypes.Count - 1; i >= 0; i--)
             {
@@ -198,9 +208,13 @@ namespace Sherpa.Library.ContentTypes
             foreach (var contentType in contentTypes)
             {
                 if (contentTypeIdsForEnsuringUniqueness.Contains(contentType.ID))
-                    throw new NotSupportedException("One or more content types have the same Id which is not supported. Content Type Id " + contentType.ID);
+                    throw new NotSupportedException(
+                        "One or more content types have the same Id which is not supported. Content Type Id " +
+                        contentType.ID);
                 if (contentTypeInternalNamesForEnsuringUniqueness.Contains(contentType.InternalName))
-                    throw new NotSupportedException("One or more content types have the same InternalName which is not supported. Content Type Id " + contentType.InternalName);
+                    throw new NotSupportedException(
+                        "One or more content types have the same InternalName which is not supported. Content Type Id " +
+                        contentType.InternalName);
 
                 contentTypeIdsForEnsuringUniqueness.Add(contentType.ID);
                 contentTypeInternalNamesForEnsuringUniqueness.Add(contentType.InternalName);
