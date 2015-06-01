@@ -34,12 +34,7 @@ namespace Sherpa.Library.ContentTypes
 
             foreach (ShContentType contentType in ContentTypes)
             {
-                if (existingContentTypes.Any(item => item.Id.ToString().Equals(contentType.ID.ToString(CultureInfo.InvariantCulture))))
-                {
-                    // We want to add fields even if the content type exists
-                    AddSiteColumnsToContentType(contentType);
-                }
-                else
+                if (!existingContentTypes.Any(item => item.Id.ToString().Equals(contentType.ID.ToString(CultureInfo.InvariantCulture))))
                 {
                     Log.Debug("Creating content type " + contentType.DisplayName);
                     var contentTypeCreationInformation = contentType.GetContentTypeCreationInformation();
@@ -50,9 +45,9 @@ namespace Sherpa.Library.ContentTypes
                     newContentType.Name = contentType.DisplayName;
                     newContentType.Update(true);
                     ClientContext.ExecuteQuery();
-
-                    AddSiteColumnsToContentType(contentType);
                 }
+                // We want to add fields even if the content type exists
+                AddSiteColumnsToContentType(contentType);
             }
         }
 
@@ -70,40 +65,79 @@ namespace Sherpa.Library.ContentTypes
             ClientContext.Load(webFields);
             ClientContext.ExecuteQuery();
 
-            foreach (var fieldName in configContentType.Fields)
+            foreach (var fieldNameToRemove in configContentType.RemovedFields)
             {
-                // Need to load content type fields every iteration because fields are added to the collection
                 try
                 {
-                    Field webField = webFields.GetByInternalNameOrTitle(fieldName);
-                    FieldLinkCollection contentTypeFields = contentType.FieldLinks;
-                    ClientContext.Load(contentTypeFields);
-                    ClientContext.Load(webField);
-                    ClientContext.ExecuteQuery();
-
-
-                    var fieldLink = contentTypeFields.FirstOrDefault(existingFieldName => existingFieldName.Name == fieldName);
-                    if (fieldLink == null)
-                    {
-                        var link = new FieldLinkCreationInformation { Field = webField };
-                        fieldLink = contentType.FieldLinks.Add(link);
-                    }
-
-                    fieldLink.Required = configContentType.RequiredFields.Contains(fieldName);
-                    if (configContentType.HiddenFields.Contains(fieldName))
-                    {
-                        fieldLink.Hidden = true;
-                        fieldLink.Required = false;
-                    }
-                    contentType.Update(true);
-                    ClientContext.ExecuteQuery();
+                    RemoveFieldFromContentType(webFields, fieldNameToRemove, contentType);
                 }
                 catch (Exception ex)
                 {
-                    Log.Info("Field " + fieldName + " does not exist. If this is a lookup field, run content type creation again after setting up site hierarchy");
-                    continue;
+                    Log.ErrorFormat("Field {0} could not be removed from the content type {1} with error {2}",fieldNameToRemove, configContentType.DisplayName, ex.Message);
                 }
             }
+            foreach (var fieldName in configContentType.Fields)
+            {
+                // We don't want to add removed fields to the content type
+                if (configContentType.RemovedFields.Contains(fieldName)) continue;
+
+                try
+                {
+                    AddOrUpdateFieldOfContentType(configContentType, webFields, fieldName, contentType);
+                }
+                catch (Exception ex)
+                {
+                    Log.ErrorFormat("Field {0} could not be added to the content type {1} with error {2}", fieldName, configContentType.DisplayName, ex.Message);
+                    Log.Info("Field " + fieldName + " does not exist. If this is a lookup field, run content type creation again after setting up site hierarchy");
+                }
+            }
+        }
+
+        private void AddOrUpdateFieldOfContentType(ShContentType configContentType, FieldCollection webFields, string fieldName,
+            ContentType contentType)
+        {
+            // Need to load content type fields every iteration because fields are added to the collection
+            Field webField = webFields.GetByInternalNameOrTitle(fieldName);
+            FieldLinkCollection contentTypeFields = contentType.FieldLinks;
+            ClientContext.Load(contentTypeFields);
+            ClientContext.Load(webField);
+            ClientContext.ExecuteQuery();
+
+            var fieldLink = contentTypeFields.FirstOrDefault(existingFieldName => existingFieldName.Name == fieldName);
+            if (fieldLink == null)
+            {
+                var link = new FieldLinkCreationInformation {Field = webField};
+                fieldLink = contentType.FieldLinks.Add(link);
+            }
+
+            fieldLink.Required = configContentType.RequiredFields.Contains(fieldName);
+            if (configContentType.HiddenFields.Contains(fieldName))
+            {
+                fieldLink.Hidden = true;
+                fieldLink.Required = false;
+            }
+            contentType.Update(true);
+            ClientContext.ExecuteQuery();
+        }
+
+        private void RemoveFieldFromContentType(FieldCollection webFields, string fieldNameToRemove, ContentType contentType)
+        {
+            // Need to load content type fields every iteration because fields are added to the collection
+            Field webField = webFields.GetByInternalNameOrTitle(fieldNameToRemove);
+            FieldLinkCollection contentTypeFields = contentType.FieldLinks;
+            ClientContext.Load(contentTypeFields);
+            ClientContext.Load(webField);
+            ClientContext.ExecuteQuery();
+
+            var fieldLink =
+                contentTypeFields.FirstOrDefault(
+                    existingFieldName => existingFieldName.Name == fieldNameToRemove);
+            if (fieldLink != null)
+            {
+                fieldLink.DeleteObject();
+            }
+            contentType.Update(true);
+            ClientContext.ExecuteQuery();
         }
 
 
