@@ -11,14 +11,14 @@
     "SandboxedSolutions": [
         "demo.wsp"
     ],
-	"PermissionLevels": [
-    	{
-    		"Name": "List Item Creators",
-    		"Description": "Users in this group can add list items",
-    		"BasePermissions": [
-    			"AddListItems"
-    		]
-    	}
+    "PermissionLevels": [
+        {
+            "Name": "List Item Creators",
+            "Description": "Users in this group can add list items",
+            "BasePermissions": [
+                "AddListItems"
+            ]
+        }
     ],
     "SiteFeatures": [
         {
@@ -52,56 +52,60 @@
                 "TemplateType": "100",
                 "VersioningEnabled": "true",
                 "OnQuickLaunch": "true",
+                "Fields": [
+                    "URL",
+                    "_Comments"
+                ],
                 "Views": [
                     {
                         "Title": "The all-seeing view",
                         "Query": "<OrderBy><FieldRef Name='LinkTitle' Ascending='TRUE' /></OrderBy>",
-                        "ViewFields": [ "LinkTitle", "ID", "Author", "Editor", "_UIVersionString" ],
+                        "ViewFields": [ "LinkTitle", "URL", "_Comments", "Editor" ],
                         "RowLimit": "30",
                         "DefaultView": "true"
                     },
                     {
                         "Title": "My view",
                         "Query": "<Where><Eq><FieldRef Name='Author' /><Value Type='Integer'><UserID Type='Integer'/></Value></Eq></Where>",
-                        "ViewFields": [ "LinkTitle", "Author", "Editor", "_UIVersionString" ],
+                        "ViewFields": [ "LinkTitle", "URL", "_Comments", "Editor" ],
                         "RowLimit": "30",
                         "DefaultView": "false"
                     }
                 ],
-				"PermissionScheme": {
-					"BreakInheritance": true,
-					"RemoveDefaultRoleAssignments": true,
-					"RoleAssignments": [
-						{
-								"Group": {
-									"AssociatedGroup": {
-										"Type": "Members",
-										"Web": "Current"
-									}
-									},
-									"PermissionLevel": "Edit"
-								},
-								{
-								"Group": {
-									"AssociatedGroup": {
-										"Type": "Visitors",
-										"Web": "Current"
-									}
-									},
-									"PermissionLevel": "Read"
-								},
-								{
-								"Group": {
-									"AssociatedGroup": {
-										"Type": "Owners",
-										"Web": "Current"
-									}
-									},
-									"PermissionLevel": "Full Control"
-								}
-							]
-						}
-				  }
+                "PermissionScheme": {
+                    "BreakInheritance": true,
+                    "RemoveDefaultRoleAssignments": true,
+                    "RoleAssignments": [
+                        {
+                            "Group": {
+                                "AssociatedGroup": {
+                                    "Type": "Members",
+                                    "Web": "Current"
+                                }
+                            },
+                            "PermissionLevel": "Edit"
+                        },
+                        {
+                            "Group": {
+                                "AssociatedGroup": {
+                                    "Type": "Visitors",
+                                    "Web": "Current"
+                                }
+                            },
+                            "PermissionLevel": "Read"
+                        },
+                        {
+                            "Group": {
+                                "AssociatedGroup": {
+                                    "Type": "Owners",
+                                    "Web": "Current"
+                                }
+                            },
+                            "PermissionLevel": "Full Control"
+                        }
+                    ]
+                }
+            }
         ],
         "Properties": {
             "sherpaversion": "1.0.0.0",
@@ -137,7 +141,7 @@
                 "Description": "Sherpa Subsite demo",
                 "Language": "1033",
                 "Name": "Sherpa Subsite",
-                "Quicklaunch": {},
+                "Quicklaunch": { },
                 "Template": "STS#0",
                 "Url": "subsite1",
                 "WebFeatures": [

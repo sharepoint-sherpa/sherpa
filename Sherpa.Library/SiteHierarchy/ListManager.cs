@@ -37,9 +37,22 @@ namespace Sherpa.Library.SiteHierarchy
             setupList.EnableVersioning = listConfig.VersioningEnabled;
             setupList.Update();
 
+            SetupFieldsOfList(context, setupList, listConfig);
             SetupContentTypesOfList(context, setupList, listConfig);
             SetupPermissionSchemeOfList(context, setupList, listConfig);
             SetupViewsOfList(context, setupList, listConfig);
+        }
+
+        private void SetupFieldsOfList(ClientContext context, List setupList, ShList listConfig)
+        {
+            foreach (string fieldName in listConfig.Fields)
+            {
+                var field = context.Site.RootWeb.Fields.GetByInternalNameOrTitle(fieldName);
+                setupList.Fields.Add(field);
+            }
+            setupList.Update();
+            context.Load(setupList);
+            context.ExecuteQuery();
         }
 
         private void SetupViewsOfList(ClientContext context, List list, ShList listConfig)

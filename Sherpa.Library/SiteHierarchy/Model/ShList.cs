@@ -13,12 +13,14 @@ namespace Sherpa.Library.SiteHierarchy.Model
         public string Description { get; set; }
         public List<ShView> Views { get; set; }
         public List<string> ContentTypes { get; set; }
+        public List<string> Fields { get; set; }
         public ShPermissionScheme PermissionScheme { get; set; }
 
         public ShList()
         {
             Views = new List<ShView>();
             ContentTypes = new List<string>();
+            Fields = new List<string>();
         }
     }
 }
