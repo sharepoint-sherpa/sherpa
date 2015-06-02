@@ -47,8 +47,16 @@ namespace Sherpa.Library.SiteHierarchy
         {
             foreach (string fieldName in listConfig.Fields)
             {
-                var field = context.Site.RootWeb.Fields.GetByInternalNameOrTitle(fieldName);
-                setupList.Fields.Add(field);
+                if (!setupList.FieldExistsByName(fieldName))
+                {
+                    Log.DebugFormat("Adding field {0} to list {1}", fieldName, listConfig.Title);
+                    var field = context.Site.RootWeb.Fields.GetByInternalNameOrTitle(fieldName);
+                    setupList.Fields.Add(field);
+                }
+                else
+                {
+                    Log.DebugFormat("Field {0} was not added to list {1} because it already exists", fieldName, listConfig.Title);
+                }
             }
             setupList.Update();
             context.Load(setupList);
