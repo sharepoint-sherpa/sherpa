@@ -33,6 +33,7 @@ namespace Sherpa.Library.SiteHierarchy
                 setupList = listCollection.Add(listCreationInfo);
                 context.ExecuteQuery();
             }
+            setupList.Hidden = listConfig.Hidden;
             setupList.OnQuickLaunch = listConfig.OnQuickLaunch;
             setupList.EnableVersioning = listConfig.VersioningEnabled;
             setupList.Update();

@@ -10,6 +10,7 @@ namespace Sherpa.Library.SiteHierarchy.Model
         public int TemplateType { get; set; }
         public bool VersioningEnabled { get; set; }
         public bool OnQuickLaunch { get; set; }
+        public bool Hidden { get; set; }
         public string Description { get; set; }
         public List<ShView> Views { get; set; }
         public List<string> ContentTypes { get; set; }
