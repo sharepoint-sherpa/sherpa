@@ -16,6 +16,7 @@ namespace Sherpa.Library.SiteHierarchy
     public class ContentUploadManager
     {
         private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static Dictionary<string, DateTime> LastUpload = new Dictionary<string, DateTime>();
 
         private readonly string _contentDirectoryPath;
         public ContentUploadManager(string rootConfigurationPath)
@@ -70,7 +71,11 @@ namespace Sherpa.Library.SiteHierarchy
             context.Load(context.Web, w => w.ServerRelativeUrl, w => w.Language);
             context.ExecuteQuery();
 
-            foreach (string filePath in Directory.GetFiles(configRootFolder, "*", SearchOption.AllDirectories))
+            int filesUploaded = 0;
+
+            var files = Directory.GetFiles(configRootFolder, "*", SearchOption.AllDirectories).Where(f => !LastUpload.ContainsKey(contentFolder.FolderName) || new FileInfo(f).LastWriteTimeUtc > LastUpload[contentFolder.FolderName]);
+
+            foreach (string filePath in files)
             {
                 var pathToFileFromRootFolder = filePath.Replace(configRootFolder.TrimEnd(new []{'\\'}) + "\\", "");
                 var fileName = Path.GetFileName(pathToFileFromRootFolder);
@@ -99,7 +104,28 @@ namespace Sherpa.Library.SiteHierarchy
                 ApplyFileProperties(context, filePropertiesCollection, uploadFile);
                 uploadFile.PublishFileToLevel(FileLevel.Published);
                 context.ExecuteQuery();
+
+                filesUploaded++;
             }
+
+            if (filesUploaded == 0)
+            {
+                Log.Info("No files has been updated since last upload.");
+            }
+            else
+            {
+                Log.InfoFormat("{0} files has been uploaded", filesUploaded);
+            }
+
+            if (LastUpload.ContainsKey(contentFolder.FolderName))
+            {
+                LastUpload[contentFolder.FolderName] = DateTime.UtcNow;
+            }
+            else
+            {
+                LastUpload.Add(contentFolder.FolderName, DateTime.UtcNow);
+            }
+
         }
 
         private string GetFileUrl(string uploadTargetFolder, string pathToFileFromRootFolder,
