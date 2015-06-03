@@ -64,9 +64,19 @@ namespace Sherpa.Library.ContentTypes
         /// <param name="existingField"></param>
         private void UpdateExistingField(ShField configField, Field existingField)
         {
+            var fieldUpdated = false;
             if (configField.Hidden != existingField.Hidden)
             {
                 existingField.Hidden = configField.Hidden;
+                fieldUpdated = true;
+            }
+            if (configField.DisplayName != existingField.Title)
+            {
+                existingField.Title = configField.DisplayName;
+                fieldUpdated = true;
+            }
+            if (fieldUpdated)
+            {
                 existingField.Update();
                 ClientContext.ExecuteQuery();
             }
