@@ -15,6 +15,23 @@
 		{
 			"Location": "ScriptLink",
 			"ScriptSrc": "~sitecollection/SiteAssets/js/file.js"
+		},
+		{
+			"Id": "SiteMembers",
+			"Group": "UsersAndPermissions",
+			"Location": "Microsoft.SharePoint.SiteSettings",
+			"Description": "",
+			"Title": "Site Members",
+			"Sequence": "10002"
+		},
+		{
+		 "Id": "EmailSomeone",
+		 "Location": "EditControlBlock",
+		 "RegistrationId": "100",
+		 "RegistrationType": "List",
+		 "Sequence": "5",
+		 "Title": "Email someone",
+		 "Url": "javascript:EmailSomeone();"
 		}
 	],
     "PermissionLevels": [
