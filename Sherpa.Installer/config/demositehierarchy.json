@@ -11,6 +11,12 @@
     "SandboxedSolutions": [
         "demo.wsp"
     ],
+	"CustomActions": [
+		{
+			"Location": "ScriptLink",
+			"ScriptSrc": "~sitecollection/SiteAssets/js/file.js"
+		}
+	],
     "PermissionLevels": [
         {
             "Name": "List Item Creators",
