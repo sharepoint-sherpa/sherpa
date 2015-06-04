@@ -48,12 +48,17 @@ namespace Sherpa.Library.SiteHierarchy
             context.Load(site.UserCustomActions);
             context.ExecuteQuery();
 
-            foreach (var customAction in site.UserCustomActions)
+            for (var i = site.UserCustomActions.Count -1; i >= 0; i--)
             {
-                customAction.DeleteObject();
+                site.UserCustomActions[i].DeleteObject();
+            }
+
+            if (context.HasPendingRequest)
+            {
                 context.ExecuteQuery();
             }
-            foreach (var customAction in customActions)
+
+            foreach (ShCustomAction customAction in customActions)
             {
                 if (customAction.Location == null)
                 {
