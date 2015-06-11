@@ -25,6 +25,7 @@ namespace Sherpa.Library.ContentTypes.Model
         public int? NumLines { get; set; }
         public bool RichText { get; set; }
         public string RichTextMode { get; set; }
+        public bool UnlimitedLengthInDocumentLibrary { get; set; }
         
         public bool Required { get; set; }
         public bool Hidden { get; set; }
@@ -99,6 +100,9 @@ namespace Sherpa.Library.ContentTypes.Model
                 {
                     var options = NumLines != null && NumLines != 0 ? "NumLines=\"" + NumLines + "\"" : string.Empty;
                     options += RichText ? " RichText=\"TRUE\"" : string.Empty;
+                    options += UnlimitedLengthInDocumentLibrary
+                        ? " UnlimitedLengthInDocumentLibrary=\"TRUE\""
+                        : string.Empty;
                     options += !string.IsNullOrEmpty(RichTextMode) ? String.Format(" RichTextMode=\"{0}\"", RichTextMode) : string.Empty;
                     return GetFieldXml(required, options);
                 }
