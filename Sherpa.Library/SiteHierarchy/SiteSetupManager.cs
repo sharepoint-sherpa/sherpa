@@ -36,10 +36,61 @@ namespace Sherpa.Library.SiteHierarchy
         public void SetupSites()
         {
             Log.Debug("Starting SetupSites - setting up site collection");
+            SetUpCustomActions(ClientContext, ConfigurationSiteCollection.CustomActions);
             SetUpCustomPermissionLevels(ClientContext, ConfigurationSiteCollection.PermissionLevels);
             FeatureManager.ActivateSiteCollectionFeatures(ClientContext, ConfigurationSiteCollection.SiteFeatures);
             EnsureAndConfigureWebAndActivateFeatures(ClientContext, null, ConfigurationSiteCollection.RootWeb);
         }
+        public void SetUpCustomActions(ClientContext context, List<ShCustomAction> customActions)
+        {
+            Site site = context.Site;
+            context.Load(site);
+            context.Load(site.UserCustomActions);
+            context.ExecuteQuery();
+
+            for (var i = site.UserCustomActions.Count -1; i >= 0; i--)
+            {
+                site.UserCustomActions[i].DeleteObject();
+            }
+
+            if (context.HasPendingRequest)
+            {
+                context.ExecuteQuery();
+            }
+
+            foreach (ShCustomAction customAction in customActions)
+            {
+                if (customAction.Location == null)
+                {
+                    Log.Info("You need to specify Location for your Custom Action.");
+                    continue;
+                }
+
+                Log.InfoFormat("Adding custom action at Location '{0}'", customAction.Location);
+
+                UserCustomAction userCustomAction = site.UserCustomActions.Add();
+                userCustomAction.Location = customAction.Location;
+                userCustomAction.ScriptSrc = customAction.ScriptSrc;
+                userCustomAction.Sequence = customAction.Sequence;
+                userCustomAction.Description = customAction.Description;
+                userCustomAction.RegistrationId = customAction.RegistrationId;
+                userCustomAction.RegistrationType = customAction.RegistrationType;
+                userCustomAction.ScriptBlock = customAction.ScriptBlock;
+                userCustomAction.Title = customAction.Title;
+                userCustomAction.Name = customAction.Name;
+                userCustomAction.ImageUrl = customAction.ImageUrl;
+                userCustomAction.Group = customAction.Group;
+
+                try {
+                    userCustomAction.Update();
+                    context.ExecuteQuery();
+                    Log.Info("Custom action successfully added.");
+                } catch(Exception e) {
+                    Log.Error(e.Message);
+                }
+             }
+        }
+
 
         public void SetUpCustomPermissionLevels(ClientContext context, List<ShPermissionLevel> permissionLevels)
         {
