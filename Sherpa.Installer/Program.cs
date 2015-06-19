@@ -84,6 +84,7 @@ namespace Sherpa.Installer
 
         private static void ShowStartScreenAndExecuteCommand()
         {
+            Console.WriteLine("Configuring {0}", UrlToSite);
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("# Available application operations #");
             Console.ResetColor();
