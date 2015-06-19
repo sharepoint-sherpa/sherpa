@@ -58,12 +58,15 @@ namespace Sherpa.Installer
         public void InstallOperation(InstallationOperation installationOperation, string siteHierarchyFileName)
         {
             Log.Info("Executing operation " + installationOperation);
-
-            if (installationOperation == InstallationOperation.Invalid || installationOperation == InstallationOperation.ExitApplication)
+            if (installationOperation == InstallationOperation.Invalid)
+            {
+                Log.Warn("Invalid user input - get your act together Ole Martin");
+                return;
+            }
+            if (installationOperation == InstallationOperation.ExitApplication)
             {
                 Log.Warn("Installation aborted based on user input");
                 Environment.Exit(1);
-                return;
             }
             var useConfigurationForInstall = false;
             var configurationFile = string.Empty;
