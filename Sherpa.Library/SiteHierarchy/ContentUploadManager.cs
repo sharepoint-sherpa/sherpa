@@ -37,7 +37,7 @@ namespace Sherpa.Library.SiteHierarchy
             Log.Info("Uploading files from contentfolder " + contentFolder.FolderName);
             
             var assetLibrary = web.Lists.GetByTitle(contentFolder.ListName);
-            context.Load(assetLibrary, l => l.RootFolder);
+            context.Load(assetLibrary, l => l.Title, l => l.RootFolder);
             context.ExecuteQuery();
 
             var uploadTargetFolder = Url.Combine(assetLibrary.RootFolder.ServerRelativeUrl, contentFolder.FolderUrl);
@@ -85,7 +85,7 @@ namespace Sherpa.Library.SiteHierarchy
                     Log.DebugFormat("Skipping file upload of {0} since it's used as a configuration file", fileName);
                     continue;
                 }
-
+                Log.DebugFormat("Uploading file {0} to {1}", fileName, assetLibrary.Title);
                 var fileUrl = GetFileUrl(uploadTargetFolder, pathToFileFromRootFolder, filePropertiesCollection);
                 web.CheckOutFile(fileUrl);
 
@@ -166,12 +166,15 @@ namespace Sherpa.Library.SiteHierarchy
             }
         }
 
-        public string GetPropertyValueWithTokensReplaced(string valueWithTokens, ClientContext context)
+        public static string GetPropertyValueWithTokensReplaced(string valueWithTokens, ClientContext context)
         {
+            context.Load(context.Site, site => site.ServerRelativeUrl);
+            context.Load(context.Web, web => web.ServerRelativeUrl, web => web.Language);
+            context.ExecuteQuery();
+
             var siteCollectionUrl = context.Site.ServerRelativeUrl == "/" ? string.Empty : context.Site.ServerRelativeUrl;
             var webUrl = context.Web.ServerRelativeUrl == "/" ? string.Empty : context.Web.ServerRelativeUrl;
             
-
             return valueWithTokens
                 .Replace("~SiteCollection", siteCollectionUrl)
                 .Replace("~Site", webUrl)

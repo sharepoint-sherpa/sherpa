@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Web.UI.WebControls;
 using log4net;
 using Microsoft.SharePoint.Client;
 using Sherpa.Library.SiteHierarchy.Model;
@@ -43,6 +44,7 @@ namespace Sherpa.Library.SiteHierarchy
         }
         public void SetUpCustomActions(ClientContext context, List<ShCustomAction> customActions)
         {
+            Log.Info("Adding custom actions");
             Site site = context.Site;
             context.Load(site);
             context.Load(site.UserCustomActions);
@@ -50,7 +52,11 @@ namespace Sherpa.Library.SiteHierarchy
 
             for (var i = site.UserCustomActions.Count -1; i >= 0; i--)
             {
-                site.UserCustomActions[i].DeleteObject();
+                var customAction = site.UserCustomActions[i];
+                if (customActions.SingleOrDefault(ca => ca.ScriptSrc == customAction.ScriptSrc) != null)
+                {
+                    customAction.DeleteObject();
+                }
             }
 
             if (context.HasPendingRequest)
@@ -62,20 +68,21 @@ namespace Sherpa.Library.SiteHierarchy
             {
                 if (customAction.Location == null)
                 {
-                    Log.Info("You need to specify Location for your Custom Action.");
+                    Log.Error("You need to specify a location for your Custom Action. Ignoring " + customAction.ScriptSrc);
                     continue;
                 }
 
-                Log.InfoFormat("Adding custom action at Location '{0}'", customAction.Location);
+                Log.DebugFormat("Adding custom action with src '{0}' at location '{1}'", customAction.ScriptSrc, customAction.Location);
 
                 UserCustomAction userCustomAction = site.UserCustomActions.Add();
                 userCustomAction.Location = customAction.Location;
-                userCustomAction.ScriptSrc = customAction.ScriptSrc;
                 userCustomAction.Sequence = customAction.Sequence;
+                userCustomAction.ScriptSrc = customAction.ScriptSrc;
+                userCustomAction.ScriptBlock = customAction.ScriptBlock;
+
                 userCustomAction.Description = customAction.Description;
                 userCustomAction.RegistrationId = customAction.RegistrationId;
                 userCustomAction.RegistrationType = customAction.RegistrationType;
-                userCustomAction.ScriptBlock = customAction.ScriptBlock;
                 userCustomAction.Title = customAction.Title;
                 userCustomAction.Name = customAction.Name;
                 userCustomAction.ImageUrl = customAction.ImageUrl;
@@ -84,7 +91,7 @@ namespace Sherpa.Library.SiteHierarchy
                 try {
                     userCustomAction.Update();
                     context.ExecuteQuery();
-                    Log.Info("Custom action successfully added.");
+                    Log.Debug("Custom action successfully added.");
                 } catch(Exception e) {
                     Log.Error(e.Message);
                 }
@@ -131,13 +138,22 @@ namespace Sherpa.Library.SiteHierarchy
             ListManager.CreateLists(context, webToConfigure, configWeb.Lists);
             QuicklaunchManager.CreateQuicklaunchNodes(context, webToConfigure, configWeb.Quicklaunch);
             PropertyManager.SetProperties(context, webToConfigure, configWeb.Properties);
-            ContentUploadManager.UploadFilesInFolder(context, webToConfigure, configWeb.ContentFolders);
+            //ContentUploadManager.UploadFilesInFolder(context, webToConfigure, configWeb.ContentFolders);
+            
             SetWelcomePageUrlIfConfigured(context, webToConfigure, configWeb);
+            SetAlternateCssUrlForWeb(context, configWeb, webToConfigure);
 
             foreach (ShWeb subWeb in configWeb.Webs)
             {
                 EnsureAndConfigureWebAndActivateFeatures(context, webToConfigure, subWeb);
             }
+        }
+
+        private static void SetAlternateCssUrlForWeb(ClientContext context, ShWeb configWeb, Web webToConfigure)
+        {
+            webToConfigure.AlternateCssUrl = ContentUploadManager.GetPropertyValueWithTokensReplaced(configWeb.AlternateCssUrl, context);
+            webToConfigure.Update();
+            context.ExecuteQuery();
         }
 
         private void SetWelcomePageUrlIfConfigured(ClientContext context, Web webToConfigure, ShWeb configWeb)
