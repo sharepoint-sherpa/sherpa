@@ -103,6 +103,9 @@
     <None Include="config\demotaxonomy.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="content\SiteAssets\IgnoredFile.less">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="content\SiteAssets\properties.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

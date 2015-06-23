@@ -71,10 +71,20 @@ namespace Sherpa.Library.SiteHierarchy
             context.Load(context.Web, w => w.ServerRelativeUrl, w => w.Language);
             context.ExecuteQuery();
 
+            String[] excludedFileExtensions = { };
+            if (!string.IsNullOrEmpty(contentFolder.ExcludeExtensions))
+            {
+                excludedFileExtensions = contentFolder.ExcludeExtensions.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+            }
+            var files = Directory.GetFiles(configRootFolder, "*", SearchOption.AllDirectories).Where(s =>
+            {
+                var extension = Path.GetExtension(s);
+                return extension != null && !excludedFileExtensions.Contains(extension.ToLower());
+            }).Where(f => 
+                !LastUpload.ContainsKey(contentFolder.FolderName) || new FileInfo(f).LastWriteTimeUtc > LastUpload[contentFolder.FolderName]
+            );
+
             int filesUploaded = 0;
-
-            var files = Directory.GetFiles(configRootFolder, "*", SearchOption.AllDirectories).Where(f => !LastUpload.ContainsKey(contentFolder.FolderName) || new FileInfo(f).LastWriteTimeUtc > LastUpload[contentFolder.FolderName]);
-
             foreach (string filePath in files)
             {
                 var pathToFileFromRootFolder = filePath.Replace(configRootFolder.TrimEnd(new []{'\\'}) + "\\", "");

@@ -55,6 +55,7 @@
                 "FolderName": "SiteAssets",
                 "ListName": "Site Assets",
                 "FolderUrl": "sherpa",
+                "ExcludeExtensions": ".less,.ts",
                 "PropertiesFile": "properties.json"
             },
             {
