@@ -138,7 +138,7 @@ namespace Sherpa.Library.SiteHierarchy
             ListManager.CreateLists(context, webToConfigure, configWeb.Lists);
             QuicklaunchManager.CreateQuicklaunchNodes(context, webToConfigure, configWeb.Quicklaunch);
             PropertyManager.SetProperties(context, webToConfigure, configWeb.Properties);
-            //ContentUploadManager.UploadFilesInFolder(context, webToConfigure, configWeb.ContentFolders);
+            ContentUploadManager.UploadFilesInFolder(context, webToConfigure, configWeb.ContentFolders);
             
             SetWelcomePageUrlIfConfigured(context, webToConfigure, configWeb);
             SetAlternateCssUrlForWeb(context, configWeb, webToConfigure);
