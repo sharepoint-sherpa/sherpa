@@ -75,6 +75,11 @@ namespace Sherpa.Library.ContentTypes
                 existingField.Title = configField.DisplayName;
                 fieldUpdated = true;
             }
+            if (configField.Group != existingField.Group)
+            {
+                existingField.Group = configField.Group;
+                fieldUpdated = true;
+            }
             if (fieldUpdated)
             {
                 existingField.Update();
