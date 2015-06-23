@@ -76,13 +76,10 @@ namespace Sherpa.Library.SiteHierarchy
             {
                 excludedFileExtensions = contentFolder.ExcludeExtensions.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
             }
-            var files = Directory.GetFiles(configRootFolder, "*", SearchOption.AllDirectories).Where(s =>
-            {
-                var extension = Path.GetExtension(s);
-                return extension != null && !excludedFileExtensions.Contains(extension.ToLower());
-            }).Where(f => 
-                !LastUpload.ContainsKey(contentFolder.FolderName) || new FileInfo(f).LastWriteTimeUtc > LastUpload[contentFolder.FolderName]
-            );
+            var files = Directory.GetFiles(configRootFolder, "*", SearchOption.AllDirectories)
+                .Where(file => !excludedFileExtensions.Contains(Path.GetExtension(file).ToLower())).ToList()
+                .Where(f => !LastUpload.ContainsKey(contentFolder.FolderName) || new FileInfo(f).LastWriteTimeUtc > LastUpload[contentFolder.FolderName]
+            ).ToList();
 
             int filesUploaded = 0;
             foreach (string filePath in files)
