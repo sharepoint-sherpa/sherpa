@@ -81,6 +81,9 @@ namespace Sherpa.Installer
         [Option("conf", HelpText = "For unmanaged execution, specify the file name of the main site hierarchy configuration file. The file must reside in the config folder.")]
         public string SiteHierarchy { get; set; }
 
+        [Option('v', "verbose", HelpText = "Write everything to console")]
+        public bool Verbose { get; set; }
+
         [HelpOption]
         public string GetUsage()
         {
