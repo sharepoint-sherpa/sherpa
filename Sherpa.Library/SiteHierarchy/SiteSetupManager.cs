@@ -53,10 +53,7 @@ namespace Sherpa.Library.SiteHierarchy
             for (var i = site.UserCustomActions.Count -1; i >= 0; i--)
             {
                 var customAction = site.UserCustomActions[i];
-                if (customActions.SingleOrDefault(ca => ca.ScriptSrc == customAction.ScriptSrc) != null)
-                {
-                    customAction.DeleteObject();
-                }
+                customAction.DeleteObject();
             }
 
             if (context.HasPendingRequest)
@@ -151,15 +148,20 @@ namespace Sherpa.Library.SiteHierarchy
 
         private static void SetAlternateCssUrlForWeb(ClientContext context, ShWeb configWeb, Web webToConfigure)
         {
-            webToConfigure.AlternateCssUrl = ContentUploadManager.GetPropertyValueWithTokensReplaced(configWeb.AlternateCssUrl, context);
-            webToConfigure.Update();
-            context.ExecuteQuery();
+            if (!string.IsNullOrEmpty(configWeb.AlternateCssUrl))
+            {
+                Log.Debug("Setting AlternateCssUrl for web " + configWeb.Name);
+                webToConfigure.AlternateCssUrl = ContentUploadManager.GetPropertyValueWithTokensReplaced(configWeb.AlternateCssUrl, context);
+                webToConfigure.Update();
+                context.ExecuteQuery();
+            }
         }
 
         private void SetWelcomePageUrlIfConfigured(ClientContext context, Web webToConfigure, ShWeb configWeb)
         {
             if (!string.IsNullOrEmpty(configWeb.WelcomePageUrl))
             {
+                Log.Debug("Setting WelcomePageUrl for web " + configWeb.Name);
                 var rootFolder = webToConfigure.RootFolder;
                 rootFolder.WelcomePage = configWeb.WelcomePageUrl;
                 rootFolder.Update();
@@ -183,7 +185,7 @@ namespace Sherpa.Library.SiteHierarchy
 
                 if (webToConfigure == null)
                 {
-                    Console.WriteLine("Creating web " + configWeb.Url);
+                    Log.Info("Creating web " + configWeb.Url);
                     webToConfigure = parentWeb.Webs.Add(GetWebCreationInformationFromConfig(configWeb));
                 }
             }
