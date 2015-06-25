@@ -109,7 +109,7 @@ namespace Sherpa.Library.ContentTypes
                     ClientContext.ExecuteQuery();
                     field.List = list.Id.ToString();
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     Log.Info("Lookup field " + field.DisplayName + " id:" + field.ID + " cannot be created since the list " + listTitle + " has not been created. Please rund content type creation again after setting up the site hierarchy");
                     return; 
