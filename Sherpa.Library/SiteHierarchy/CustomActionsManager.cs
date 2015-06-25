@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace Sherpa.Library.SiteHierarchy
 {
-    public class CustomActionManager
+    public class CustomActionsManager
     {
         private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 

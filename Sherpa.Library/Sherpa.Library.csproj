@@ -114,7 +114,7 @@
     <Compile Include="Deploy\IDeployManager.cs" />
     <Compile Include="SharePointContext.cs" />
     <Compile Include="SiteHierarchy\ContentUploadManager.cs" />
-    <Compile Include="SiteHierarchy\CustomActionManager.cs" />
+    <Compile Include="SiteHierarchy\CustomActionsManager.cs" />
     <Compile Include="SiteHierarchy\FeatureManager.cs" />
     <Compile Include="SiteHierarchy\ListManager.cs" />
     <Compile Include="SiteHierarchy\Model\ShAssociatedGroup.cs" />
@@ -136,6 +136,7 @@
     <Compile Include="SiteHierarchy\Model\ShWeb.cs" />
     <Compile Include="SiteHierarchy\Model\ShView.cs" />
     <Compile Include="SiteHierarchy\Model\ShWebPartReference.cs" />
+    <Compile Include="SiteHierarchy\PermissionManager.cs" />
     <Compile Include="SiteHierarchy\PropertyManager.cs" />
     <Compile Include="Deploy\SearchImportManager.cs" />
     <Compile Include="SiteHierarchy\SiteSetupManager.cs" />
