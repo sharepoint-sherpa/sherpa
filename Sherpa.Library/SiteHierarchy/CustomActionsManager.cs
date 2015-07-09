@@ -13,6 +13,11 @@ namespace Sherpa.Library.SiteHierarchy
 
         public void SetUpCustomActions(ClientContext context, string CustomActionsPrefix, List<ShCustomAction> customActions)
         {
+            if (CustomActionsPrefix != null || CustomActionsPrefix.Equals(String.Empty)) {
+                Log.Info("You need to set the property 'CustomActionsPrefix' which will be used for the Custom Action Name.");
+                return; 
+            }
+
             Log.Info("Adding custom actions");
             Site site = context.Site;
             context.Load(site);
