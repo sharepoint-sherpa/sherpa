@@ -21,6 +21,7 @@ namespace Sherpa.Library.SiteHierarchy.Model
             SiteFeatures = new List<ShFeature>();
             PermissionLevels = new List<ShPermissionLevel>();
             CustomActions = new List<ShCustomAction>();
+            CustomActionsPrefix = "";
         }
     }
 }
