@@ -63,7 +63,10 @@ namespace Sherpa.Installer
         [ParserState]
         public IParserState LastParserState { get; set; }
 
-        [Option("url", Required = true, HelpText = "Full URL to the target SharePoint site collection")]
+        [Option("setup", Required = false, HelpText = "From your Enviromnent.json file")]
+        public string Setup { get; set; }
+
+        [Option("url", Required = false, HelpText = "Full URL to the target SharePoint site collection")]
         public string UrlToSite { get; set; }
 
         [Option('u', "userName", HelpText = "Username@domain whos credentials will be used during installation (spo only)")]

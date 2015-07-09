@@ -1,0 +1,10 @@
+﻿[
+	{
+		"Name": "test",
+        "UrlToSite": "",
+        "UserName": "",
+        "RootPath": "",
+        "SiteHierarchy": "",
+		"SharePointOnline": true
+	}
+]

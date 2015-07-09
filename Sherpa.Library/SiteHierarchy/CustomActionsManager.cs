@@ -13,12 +13,6 @@ namespace Sherpa.Library.SiteHierarchy
 
         public void SetUpCustomActions(ClientContext context, string CustomActionsPrefix, List<ShCustomAction> customActions)
         {
-            if (CustomActionsPrefix != null || CustomActionsPrefix.Equals(String.Empty))
-            {
-                Log.Info("You need to set the property 'CustomActionsPrefix' which will be used for the Custom Action Name.");
-                return; 
-            }
-
             Log.Info("Adding custom actions");
             Site site = context.Site;
             context.Load(site);
@@ -28,10 +22,14 @@ namespace Sherpa.Library.SiteHierarchy
             for (var i = site.UserCustomActions.Count - 1; i >= 0; i--)
             {
                 var customAction = site.UserCustomActions[i];
-                if (customAction.Name.StartsWith(CustomActionsPrefix))
+                if (!CustomActionsPrefix.Equals(String.Empty) && !customAction.Name.StartsWith(CustomActionsPrefix))
                 {
-                    customAction.DeleteObject();
+                    Log.InfoFormat("Keeping custom action with src '{0}' at location '{1}'", site.UserCustomActions[i].ScriptSrc, site.UserCustomActions[i].Location);
+                    continue;
                 }
+                Log.InfoFormat("Removing custom action with src '{0}' at location '{1}'", site.UserCustomActions[i].ScriptSrc, site.UserCustomActions[i].Location);
+                customAction.DeleteObject();
+                
             }
 
             if (context.HasPendingRequest)
@@ -47,14 +45,14 @@ namespace Sherpa.Library.SiteHierarchy
                     continue;
                 }
 
-                Log.DebugFormat("Adding custom action with src '{0}' at location '{1}'", customAction.ScriptSrc, customAction.Location);
+                Log.InfoFormat("Adding custom action with src '{0}' at location '{1}'", customAction.ScriptSrc, customAction.Location);
 
                 UserCustomAction userCustomAction = site.UserCustomActions.Add();
                 userCustomAction.Location = customAction.Location;
                 userCustomAction.Sequence = customAction.Sequence;
                 userCustomAction.ScriptSrc = customAction.ScriptSrc;
                 userCustomAction.ScriptBlock = customAction.ScriptBlock;
-                userCustomAction.Name = CustomActionsPrefix + "_" + customAction.ScriptSrc.Split('/')[customAction.ScriptSrc.Split('/').Length - 1].Replace(".", "");
+                userCustomAction.Name = (!CustomActionsPrefix.Equals(String.Empty) ? (CustomActionsPrefix + "_") : "") + customAction.ScriptSrc.Split('/')[customAction.ScriptSrc.Split('/').Length - 1].Replace(".", "");
                 userCustomAction.Description = customAction.Description;
                 userCustomAction.RegistrationType = customAction.RegistrationType;
                 userCustomAction.Title = customAction.Title;
@@ -65,7 +63,7 @@ namespace Sherpa.Library.SiteHierarchy
                 {
                     userCustomAction.Update();
                     context.ExecuteQuery();
-                    Log.Debug("Custom action successfully added.");
+                    Log.Info("Custom action successfully added.");
                 }
                 catch (Exception e)
                 {
