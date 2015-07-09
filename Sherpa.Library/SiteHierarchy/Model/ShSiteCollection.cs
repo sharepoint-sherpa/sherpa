@@ -9,6 +9,7 @@ namespace Sherpa.Library.SiteHierarchy.Model
         public List<ShCustomAction> CustomActions { get; set; }
         public ShWeb RootWeb { get; set; }
 
+        public string CustomActionsPrefix { get; set; }
         public string[] SandboxedSolutions { get; set; }
         public string[] FieldConfigurations { get; set; }
         public string[] ContentTypeConfigurations { get; set; }

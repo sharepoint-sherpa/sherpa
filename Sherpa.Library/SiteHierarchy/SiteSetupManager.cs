@@ -39,7 +39,7 @@ namespace Sherpa.Library.SiteHierarchy
         public void SetupSites()
         {
             Log.Debug("Starting SetupSites - setting up site collection");
-            CustomActionsManager.SetUpCustomActions(ClientContext, ConfigurationSiteCollection.CustomActions);
+            CustomActionsManager.SetUpCustomActions(ClientContext, ConfigurationSiteCollection.CustomActionsPrefix, ConfigurationSiteCollection.CustomActions);
             PermissionManager.SetUpCustomPermissionLevels(ClientContext, ConfigurationSiteCollection.PermissionLevels);
             FeatureManager.ActivateSiteCollectionFeatures(ClientContext, ConfigurationSiteCollection.SiteFeatures);
             EnsureAndConfigureWebAndActivateFeatures(ClientContext, null, ConfigurationSiteCollection.RootWeb);
