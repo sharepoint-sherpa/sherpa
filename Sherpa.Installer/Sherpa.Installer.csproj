@@ -83,6 +83,8 @@
     <Compile Include="AuthenticationHandler.cs" />
     <Compile Include="CredentialManager.cs" />
     <Compile Include="InstallationOperation.cs" />
+    <Compile Include="Model\ShEnvironment.cs" />
+    <Compile Include="Model\ShSetup.cs" />
     <Compile Include="OptionsParser.cs" />
     <Compile Include="InstallationManager.cs" />
     <Compile Include="PasswordReader.cs" />
@@ -115,6 +117,7 @@
     <Content Include="content\PageLayouts\properties.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="Environments.json" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

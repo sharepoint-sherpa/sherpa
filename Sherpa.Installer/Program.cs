@@ -4,6 +4,10 @@ using System.Net;
 using System.Reflection;
 using log4net;
 using log4net.Config;
+using Sherpa.Library;
+using Sherpa.Installer.Model;
+using System.IO;
+using System.Collections.Generic;
 
 namespace Sherpa.Installer
 {
@@ -21,11 +25,31 @@ namespace Sherpa.Installer
             XmlConfigurator.Configure(); //Initialize log4net
             Log.Debug("Sherpa application started");
 
+
             try
             {
                 ProgramOptions = OptionsParser.ParseArguments(args);
+                if (!string.IsNullOrEmpty(ProgramOptions.Setup))
+                {
+                    try
+                    {
+                        var filePath = Path.Combine(Path.GetDirectoryName(Path.GetDirectoryName(System.IO.Directory.GetCurrentDirectory())), "Environments.json");
+                        var setupPersister = new FilePersistanceProvider<List<ShEnvironment>>(filePath);
+                        List<ShEnvironment> environments = setupPersister.Load();
+                        var env = environments.FirstOrDefault(e => e.Name == ProgramOptions.Setup);
+                        ProgramOptions.UrlToSite = env.UrlToSite;
+                        ProgramOptions.UserName = env.UserName;
+                        ProgramOptions.RootPath = env.RootPath;
+                        ProgramOptions.SharePointOnline = env.SharePointOnline;
+                        ProgramOptions.SiteHierarchy = env.SiteHierarchy;
+                    } catch(Exception) {
+                        Log.Fatal("The supplied setup options are not valid.");
+                        Environment.Exit(1);
+                    }
+                }
                 UrlToSite = new Uri(ProgramOptions.UrlToSite);
                 Unmanaged = !string.IsNullOrEmpty(ProgramOptions.Operations);
+
                 Log.Debug(string.Format("Sherpa started with the following options - URL: {0}, userName: {1}, configPath: {2}, spo: {3}, unmanaged: {4}", 
                     ProgramOptions.UrlToSite,
                     ProgramOptions.UserName,
@@ -34,7 +58,7 @@ namespace Sherpa.Installer
                     Unmanaged
                 ));
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 Log.Fatal("Invalid parameters, application cannot continue");
                 Environment.Exit(1);
