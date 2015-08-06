@@ -26,6 +26,7 @@ namespace Sherpa.Library.ContentTypes.Model
         public bool RichText { get; set; }
         public string RichTextMode { get; set; }
         public bool UnlimitedLengthInDocumentLibrary { get; set; }
+        public bool AppendOnly { get; set; }
         
         public bool Required { get; set; }
         public bool Hidden { get; set; }
@@ -104,6 +105,7 @@ namespace Sherpa.Library.ContentTypes.Model
                         ? " UnlimitedLengthInDocumentLibrary=\"TRUE\""
                         : string.Empty;
                     options += !string.IsNullOrEmpty(RichTextMode) ? String.Format(" RichTextMode=\"{0}\"", RichTextMode) : string.Empty;
+                    options += String.Format(" AppendOnly=\"{0}\"", AppendOnly.ToString().ToUpper());
                     return GetFieldXml(required, options);
                 }
                 case("UserMulti"):
