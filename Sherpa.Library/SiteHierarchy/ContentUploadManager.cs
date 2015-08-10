@@ -175,9 +175,13 @@ namespace Sherpa.Library.SiteHierarchy
 
         public static string GetPropertyValueWithTokensReplaced(string valueWithTokens, ClientContext context)
         {
-            context.Load(context.Site, site => site.ServerRelativeUrl);
-            context.Load(context.Web, web => web.ServerRelativeUrl, web => web.Language);
-            context.ExecuteQuery();
+            //Check if we have the context info we need, in which case we don't want to ExecuteQuery
+            if(context.Site == null || context.Web == null)
+            {
+                context.Load(context.Site, site => site.ServerRelativeUrl);
+                context.Load(context.Web, web => web.ServerRelativeUrl, web => web.Language);
+                context.ExecuteQuery();
+            }
 
             var siteCollectionUrl = context.Site.ServerRelativeUrl == "/" ? string.Empty : context.Site.ServerRelativeUrl;
             var webUrl = context.Web.ServerRelativeUrl == "/" ? string.Empty : context.Web.ServerRelativeUrl;
@@ -216,13 +220,17 @@ namespace Sherpa.Library.SiteHierarchy
                         Log.ErrorFormat("Webpart at path {0} not found", webPartPath);
                         continue;
                     }
-                    
+
+                    //Token replacement in the webpart XML
+                    webPartFileContent = GetPropertyValueWithTokensReplaced(webPartFileContent, context);
                     var webPartDefinition = limitedWebPartManager.ImportWebPart(webPartFileContent);
                     if (webPart.PropertiesOverrides.Count > 0)
                     {
                         foreach (KeyValuePair<string, string> propertyOverride in webPart.PropertiesOverrides)
                         {
-                            webPartDefinition.WebPart.Properties[propertyOverride.Key] = propertyOverride.Value;
+                            //Token replacement in the PropertiesOverrides JSON array
+                            var propOverrideValue = GetPropertyValueWithTokensReplaced(propertyOverride.Value, context);
+                            webPartDefinition.WebPart.Properties[propertyOverride.Key] = propOverrideValue;
                         }
                     }
                     limitedWebPartManager.AddWebPart(webPartDefinition.WebPart, webPart.ZoneID, webPart.Order);
