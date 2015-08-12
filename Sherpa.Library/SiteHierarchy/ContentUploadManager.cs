@@ -35,12 +35,34 @@ namespace Sherpa.Library.SiteHierarchy
         public void UploadFilesInFolder(ClientContext context, Web web, ShContentFolder contentFolder)
         {
             Log.Info("Uploading files from contentfolder " + contentFolder.FolderName);
-            
-            var assetLibrary = web.Lists.GetByTitle(contentFolder.ListName);
-            context.Load(assetLibrary, l => l.Title, l => l.RootFolder);
-            context.ExecuteQuery();
 
-            var uploadTargetFolder = Url.Combine(assetLibrary.RootFolder.ServerRelativeUrl, contentFolder.FolderUrl);
+            var uploadTargetFolder = String.Empty;
+            Microsoft.SharePoint.Client.Folder rootFolder = null;
+
+            if (contentFolder.ListUrl != null)
+            {
+                context.Load(web, w => w.ServerRelativeUrl);
+                context.ExecuteQuery();
+
+                var rootFolderServerRelativeUrl = Url.Combine(web.ServerRelativeUrl, contentFolder.ListUrl);
+                rootFolder = web.GetFolderByServerRelativeUrl(rootFolderServerRelativeUrl);
+                context.Load(rootFolder);
+                context.ExecuteQuery();
+
+                uploadTargetFolder = Url.Combine(rootFolderServerRelativeUrl, contentFolder.FolderUrl);                
+            } else {
+                if (contentFolder.ListName == null)
+                {
+                    Log.ErrorFormat("You need to specify either ListName or ListUrl for the Content Folder {0}", contentFolder.FolderName);
+                    return;
+                }
+                var assetLibrary = web.Lists.GetByTitle(contentFolder.ListName);
+                context.Load(assetLibrary, l => l.Title, l => l.RootFolder);
+                context.ExecuteQuery();
+                rootFolder = assetLibrary.RootFolder;
+                uploadTargetFolder = Url.Combine(assetLibrary.RootFolder.ServerRelativeUrl, contentFolder.FolderUrl);
+            }
+
             var configRootFolder = Path.Combine(_contentDirectoryPath, contentFolder.FolderName);
 
             if (!web.DoesFolderExists(uploadTargetFolder))
@@ -92,7 +114,7 @@ namespace Sherpa.Library.SiteHierarchy
                     Log.DebugFormat("Skipping file upload of {0} since it's used as a configuration file", fileName);
                     continue;
                 }
-                Log.DebugFormat("Uploading file {0} to {1}", fileName, assetLibrary.Title);
+                Log.DebugFormat("Uploading file {0} to {1}", fileName, contentFolder.ListUrl);
                 var fileUrl = GetFileUrl(uploadTargetFolder, pathToFileFromRootFolder, filePropertiesCollection);
                 web.CheckOutFile(fileUrl);
 
@@ -102,7 +124,7 @@ namespace Sherpa.Library.SiteHierarchy
                     Url = fileUrl,
                     Overwrite = true
                 };
-                File uploadFile = assetLibrary.RootFolder.Files.Add(newFile);
+                File uploadFile = rootFolder.Files.Add(newFile);
 
                 context.Load(uploadFile);
                 context.Load(uploadFile.ListItemAllFields.ParentList, l => l.ForceCheckout, l => l.EnableMinorVersions, l => l.EnableModeration);

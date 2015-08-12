@@ -63,7 +63,14 @@
                 "ListName": "Master Page Gallery",
                 "FolderUrl": "",
                 "PropertiesFile": "properties.json"
-            }
+            },
+			{
+                "FolderName": "SiteAssets",
+                "ListUrl": "SiteAssets",
+                "FolderUrl": "sherpa",
+                "ExcludeExtensions": ".less,.ts",
+                "PropertiesFile": "properties.json"
+            },
         ],
         "Description": "Sherpa Demo - root site",
         "Language": "1033",
