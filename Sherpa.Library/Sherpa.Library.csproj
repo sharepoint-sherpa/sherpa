@@ -118,6 +118,7 @@
     <Compile Include="SiteHierarchy\FeatureManager.cs" />
     <Compile Include="SiteHierarchy\ListManager.cs" />
     <Compile Include="SiteHierarchy\Model\ShAssociatedGroup.cs" />
+    <Compile Include="SiteHierarchy\Model\ShComposedLook.cs" />
     <Compile Include="SiteHierarchy\Model\ShContentFolder.cs" />
     <Compile Include="SiteHierarchy\Model\ShCustomAction.cs" />
     <Compile Include="SiteHierarchy\Model\ShFeature.cs" />

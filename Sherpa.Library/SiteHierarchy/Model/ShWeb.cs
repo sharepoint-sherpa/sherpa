@@ -16,6 +16,7 @@ namespace Sherpa.Library.SiteHierarchy.Model
         public List<ShTask> CustomTaskTypes { get; set; }
         public List<ShList> Lists { get; set; }
         public List<ShContentFolder> ContentFolders { get; set; }
+        public ShComposedLook ComposedLook { get; set; }
         public Dictionary<string, string> Quicklaunch { get; set; }
         public Dictionary<string, string> Properties { get; set; }
 
@@ -28,6 +29,7 @@ namespace Sherpa.Library.SiteHierarchy.Model
             Quicklaunch = new Dictionary<string, string>();
             Properties = new Dictionary<string, string>();
             ContentFolders = new List<ShContentFolder>();
+            ComposedLook = new ShComposedLook();
         }
     }
 }

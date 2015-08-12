@@ -79,6 +79,12 @@
             {
                 "Title": "Log Lady",
                 "Description": "For logging things",
+				"ComposedLook": {
+					"Name": "SherpaComposedLook",
+					"Title": "SherpaComposedLook",
+					"ThemeUrl": "palette015.spcolor",
+					"FontSchemeUrl": "SharePointPersonality.spfont"
+				},
                 "Url": "Lists/Log",
                 "TemplateType": "100",
                 "VersioningEnabled": "true",
