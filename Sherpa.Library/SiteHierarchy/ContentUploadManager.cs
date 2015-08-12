@@ -113,13 +113,8 @@ namespace Sherpa.Library.SiteHierarchy
                 {
                     Log.DebugFormat("Skipping file upload of {0} since it's used as a configuration file", fileName);
                     continue;
-<<<<<<< HEAD
                 }
                 Log.DebugFormat("Uploading file {0} to {1}", fileName, contentFolder.ListUrl);
-=======
-                }
-                Log.DebugFormat("Uploading file {0} to {1}", fileName, assetLibrary.Title);
->>>>>>> origin/master
                 var fileUrl = GetFileUrl(uploadTargetFolder, pathToFileFromRootFolder, filePropertiesCollection);
                 web.CheckOutFile(fileUrl);
 
@@ -129,11 +124,7 @@ namespace Sherpa.Library.SiteHierarchy
                     Url = fileUrl,
                     Overwrite = true
                 };
-<<<<<<< HEAD
                 File uploadFile = rootFolder.Files.Add(newFile);
-=======
-                File uploadFile = assetLibrary.RootFolder.Files.Add(newFile);
->>>>>>> origin/master
 
                 context.Load(uploadFile);
                 context.Load(uploadFile.ListItemAllFields.ParentList, l => l.ForceCheckout, l => l.EnableMinorVersions, l => l.EnableModeration);
