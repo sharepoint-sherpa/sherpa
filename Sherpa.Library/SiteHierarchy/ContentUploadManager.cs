@@ -36,10 +36,10 @@ namespace Sherpa.Library.SiteHierarchy
         {
             Log.Info("Uploading files from contentfolder " + contentFolder.FolderName);
 
-            var uploadTargetFolder = String.Empty;
-            Microsoft.SharePoint.Client.Folder rootFolder = null;
+            string uploadTargetFolder;
+            Folder rootFolder;
 
-            if (contentFolder.ListUrl != null)
+            if (!string.IsNullOrEmpty(contentFolder.ListUrl))
             {
                 context.Load(web, w => w.ServerRelativeUrl);
                 context.ExecuteQuery();
@@ -50,17 +50,18 @@ namespace Sherpa.Library.SiteHierarchy
                 context.ExecuteQuery();
 
                 uploadTargetFolder = Url.Combine(rootFolderServerRelativeUrl, contentFolder.FolderUrl);                
-            } else {
-                if (contentFolder.ListName == null)
-                {
-                    Log.ErrorFormat("You need to specify either ListName or ListUrl for the Content Folder {0}", contentFolder.FolderName);
-                    return;
-                }
+            } else if (!string.IsNullOrEmpty(contentFolder.ListName)) 
+            {
                 var assetLibrary = web.Lists.GetByTitle(contentFolder.ListName);
                 context.Load(assetLibrary, l => l.Title, l => l.RootFolder);
                 context.ExecuteQuery();
                 rootFolder = assetLibrary.RootFolder;
                 uploadTargetFolder = Url.Combine(assetLibrary.RootFolder.ServerRelativeUrl, contentFolder.FolderUrl);
+            }
+            else
+            {
+                Log.ErrorFormat("You need to specify either ListName or ListUrl for the Content Folder {0}", contentFolder.FolderName);
+                return;
             }
 
             var configRootFolder = Path.Combine(_contentDirectoryPath, contentFolder.FolderName);

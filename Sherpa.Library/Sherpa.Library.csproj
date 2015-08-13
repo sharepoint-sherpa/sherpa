@@ -113,6 +113,7 @@
     <Compile Include="Deploy\DeployManager.cs" />
     <Compile Include="Deploy\IDeployManager.cs" />
     <Compile Include="SharePointContext.cs" />
+    <Compile Include="SiteHierarchy\ComposedLookManager.cs" />
     <Compile Include="SiteHierarchy\ContentUploadManager.cs" />
     <Compile Include="SiteHierarchy\CustomActionsManager.cs" />
     <Compile Include="SiteHierarchy\FeatureManager.cs" />

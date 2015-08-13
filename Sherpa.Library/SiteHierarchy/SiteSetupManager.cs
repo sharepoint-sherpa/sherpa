@@ -1,15 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
-using System.Web;
-using System.Web.Hosting;
-using System.Web.UI;
-using System.Web.UI.WebControls;
-using Flurl;
 using Sherpa.Library.SiteHierarchy.Model;
-using System.IO;
-using System.Linq;
 using System.Reflection;
 using log4net;
 using Microsoft.SharePoint.Client;
@@ -29,6 +20,7 @@ namespace Sherpa.Library.SiteHierarchy
         private ContentUploadManager ContentUploadManager { get; set; }
         private CustomActionsManager CustomActionsManager { get; set; }
         private PermissionManager PermissionManager { get; set; }
+        private ComposedLookManager ComposedLookManager { get; set; }
 
         public SiteSetupManager(ClientContext clientContext, ShSiteCollection configurationSiteCollection, string rootConfigurationPath)
         {
@@ -41,6 +33,7 @@ namespace Sherpa.Library.SiteHierarchy
             ListManager = new ListManager();
             CustomActionsManager = new CustomActionsManager();
             PermissionManager = new PermissionManager();
+            ComposedLookManager = new ComposedLookManager();
 
             var contentConfigurationPath = Path.Combine(rootConfigurationPath, "content");
             ContentUploadManager = new ContentUploadManager(contentConfigurationPath);
@@ -67,102 +60,17 @@ namespace Sherpa.Library.SiteHierarchy
             ListManager.CreateLists(context, webToConfigure, configWeb.Lists);
             QuicklaunchManager.CreateQuicklaunchNodes(context, webToConfigure, configWeb.Quicklaunch);
             PropertyManager.SetProperties(context, webToConfigure, configWeb.Properties);
-            ContentUploadManager.UploadFilesInFolder(context, webToConfigure, configWeb.ContentFolders);            
+            ContentUploadManager.UploadFilesInFolder(context, webToConfigure, configWeb.ContentFolders);
+            ComposedLookManager.SetComposedLook(context, configWeb, webToConfigure, configWeb.ComposedLook);
+     
             SetWelcomePageUrlIfConfigured(context, webToConfigure, configWeb);
             SetAlternateCssUrlForWeb(context, configWeb, webToConfigure);
-            AddComposedLooks(context, configWeb, webToConfigure, configWeb.ComposedLook);
 
             foreach (ShWeb subWeb in configWeb.Webs)
             {
                 EnsureAndConfigureWebAndActivateFeatures(context, webToConfigure, subWeb);
             }
         }
-
-        private void AddComposedLooks(Microsoft.SharePoint.Client.ClientContext context, ShWeb configWeb, Web web, ShComposedLook composedLook)
-        {
-            if (composedLook != null)
-            {
-                Log.Debug("Setting Composed Look for web " + configWeb.Name);
-                var themeUrl = string.Empty;
-                var fontSchemeUrl = string.Empty;
-
-                List themeList = web.GetCatalog(124);
-                web.Context.Load(themeList);
-                web.Context.ExecuteQuery();
-
-                // We are assuming that the theme exists
-                CamlQuery query = new CamlQuery();
-                string camlString = @"
-                <View>
-                    <Query>                
-                        <Where>
-                            <Eq>
-                                <FieldRef Name='Name' />
-                                <Value Type='Text'>{0}</Value>
-                            </Eq>
-                        </Where>
-                        </Query>
-                </View>";
-                camlString = string.Format(camlString, composedLook.Name);
-                query.ViewXml = camlString;
-                var found = themeList.GetItems(query);
-                web.Context.Load(found);
-                web.Context.ExecuteQuery();
-
-                if (found.Count == 0)
-                {
-                    if (!web.IsObjectPropertyInstantiated("ServerRelativeUrl"))
-                    {
-                        context.Load(web);
-                        context.ExecuteQuery();
-                    }
-
-
-                    ListItemCreationInformation itemInfo = new ListItemCreationInformation();
-                    Microsoft.SharePoint.Client.ListItem item = themeList.AddItem(itemInfo);
-                    item["Name"] = composedLook.Name;
-                    item["Title"] = composedLook.Title;
-                    if (!string.IsNullOrEmpty(composedLook.ThemeUrl))
-                    {
-                        themeUrl = Url.Combine(web.ServerRelativeUrl, string.Format("/_catalogs/theme/15/{0}", System.IO.Path.GetFileName(composedLook.ThemeUrl)));
-                        item["ThemeUrl"] = themeUrl;
-                    }
-                    if (!string.IsNullOrEmpty(composedLook.FontSchemeUrl))
-                    {
-                        fontSchemeUrl = Url.Combine(web.ServerRelativeUrl, string.Format("/_catalogs/theme/15/{0}", System.IO.Path.GetFileName(composedLook.FontSchemeUrl)));
-                        item["FontSchemeUrl"] = fontSchemeUrl;
-                    }
-                    if (string.IsNullOrEmpty(composedLook.MasterPageUrl))
-                    {
-                        item["MasterPageUrl"] = Url.Combine(web.ServerRelativeUrl, "/_catalogs/masterpage/seattle.master");
-                    }
-                    else
-                    {
-                        item["MasterPageUrl"] = Url.Combine(web.ServerRelativeUrl, string.Format("/_catalogs/masterpage/{0}", Path.GetFileName(composedLook.MasterPageUrl)));
-                    }
-                    item["DisplayOrder"] = 11;
-                    item.Update();
-                    context.ExecuteQuery();
-                }
-                else
-                {
-                    Microsoft.SharePoint.Client.ListItem item = found[0];
-                    themeUrl = MakeAsRelativeUrl((item["ThemeUrl"] as FieldUrlValue).Url);
-                    fontSchemeUrl = MakeAsRelativeUrl((item["FontSchemeUrl"] as FieldUrlValue).Url);
-                }
-
-                web.ApplyTheme(themeUrl, fontSchemeUrl, null, false);
-                context.ExecuteQuery();
-            }
-
-        }
-
-        private string MakeAsRelativeUrl(string urlToProcess)
-        {
-            Uri uri = new Uri(urlToProcess);
-            return uri.AbsolutePath;
-        }
-
         private static void SetAlternateCssUrlForWeb(ClientContext context, ShWeb configWeb, Web webToConfigure)
         {
             if (!string.IsNullOrEmpty(configWeb.AlternateCssUrl))
