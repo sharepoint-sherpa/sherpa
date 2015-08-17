@@ -140,11 +140,11 @@ namespace Sherpa.Library.SiteHierarchy
 
             if (filesUploaded == 0)
             {
-                Log.Info("No files has been updated since last upload.");
+                Log.Info("No files updated since last upload.");
             }
             else
             {
-                Log.InfoFormat("{0} files has been uploaded", filesUploaded);
+                Log.InfoFormat("{0} file(s) uploaded", filesUploaded);
             }
 
             if (LastUpload.ContainsKey(contentFolder.FolderName))
