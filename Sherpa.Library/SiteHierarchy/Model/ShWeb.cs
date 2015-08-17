@@ -29,7 +29,6 @@ namespace Sherpa.Library.SiteHierarchy.Model
             Quicklaunch = new Dictionary<string, string>();
             Properties = new Dictionary<string, string>();
             ContentFolders = new List<ShContentFolder>();
-            ComposedLook = new ShComposedLook();
         }
     }
 }

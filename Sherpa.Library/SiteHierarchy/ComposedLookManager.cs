@@ -89,7 +89,6 @@ namespace Sherpa.Library.SiteHierarchy
                 web.ApplyTheme(themeUrl, fontSchemeUrl, null, false);
                 context.ExecuteQuery();
             }
-
         }
     }
 }
