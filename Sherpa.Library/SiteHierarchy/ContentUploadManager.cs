@@ -4,12 +4,17 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Xml;
+using System.Xml.Linq;
+using System.Xml.XPath;
 using log4net;
 using Microsoft.SharePoint.Client;
 using Microsoft.SharePoint.Client.WebParts;
+using Newtonsoft.Json.Linq;
 using Sherpa.Library.SiteHierarchy.Model;
 using Flurl;
 using File = Microsoft.SharePoint.Client.File;
+using Formatting = Newtonsoft.Json.Formatting;
 
 namespace Sherpa.Library.SiteHierarchy
 {
@@ -179,7 +184,7 @@ namespace Sherpa.Library.SiteHierarchy
         {
             if (filePropertiesCollection != null)
             {
-                var fileProperties = filePropertiesCollection.SingleOrDefault(f => f.Path == uploadFile.Name);
+                var fileProperties = filePropertiesCollection.SingleOrDefault(f => f.Url == uploadFile.Name);
                 if (fileProperties != null)
                 {
                     var filePropertiesWithTokensReplaced = new Dictionary<string, string>();
@@ -211,7 +216,13 @@ namespace Sherpa.Library.SiteHierarchy
             
             return valueWithTokens
                 .Replace("~SiteCollection", siteCollectionUrl)
+                .Replace("~sitecollection", siteCollectionUrl)
+                .Replace("&#126;SiteCollection", siteCollectionUrl)
+                .Replace("&#126;sitecollection", siteCollectionUrl)
                 .Replace("~Site", webUrl)
+                .Replace("~site", webUrl)
+                .Replace("&#126;Site", webUrl)
+                .Replace("&#126;site", webUrl)
                 .Replace("$Resources:core,Culture;", new CultureInfo((int)context.Web.Language).Name);
         }
 
@@ -246,22 +257,51 @@ namespace Sherpa.Library.SiteHierarchy
 
                     //Token replacement in the webpart XML
                     webPartFileContent = GetPropertyValueWithTokensReplaced(webPartFileContent, context);
+
+                    //Overriding DataProviderJSON properties if specified. Need to use different approach (Update XML directly before import)
+                    if (webPart.DataProviderJSONOverrides.Count > 0)
+                    {
+                        webPartFileContent = ReplaceDataProviderJSONPropertyOverrides(context, webPart, webPartFileContent);
+                    }
+
                     var webPartDefinition = limitedWebPartManager.ImportWebPart(webPartFileContent);
                     if (webPart.PropertiesOverrides.Count > 0)
                     {
-                        foreach (KeyValuePair<string, string> propertyOverride in webPart.PropertiesOverrides)
-                        {
-                            //Token replacement in the PropertiesOverrides JSON array
-                            var propOverrideValue = GetPropertyValueWithTokensReplaced(propertyOverride.Value, context);
-                            webPartDefinition.WebPart.Properties[propertyOverride.Key] = propOverrideValue;
-                        }
+                        HandleWebPartPropertyOverrides(context, webPart, webPartDefinition);
                     }
                     limitedWebPartManager.AddWebPart(webPartDefinition.WebPart, webPart.ZoneID, webPart.Order);
+                    context.Load(limitedWebPartManager);
+                    context.ExecuteQuery();
                 }
-
-                context.Load(limitedWebPartManager);
-                context.ExecuteQuery();
             }
+        }
+
+        private void HandleWebPartPropertyOverrides(ClientContext context, ShWebPartReference webPart, WebPartDefinition webPartXml)
+        {
+            foreach (KeyValuePair<string, string> propertyOverride in webPart.PropertiesOverrides)
+            {
+                //Token replacement in the PropertiesOverrides JSON array
+                var propOverrideValue = GetPropertyValueWithTokensReplaced(propertyOverride.Value, context);
+                webPartXml.WebPart.Properties[propertyOverride.Key] = propOverrideValue;
+            }
+        }
+
+        private string ReplaceDataProviderJSONPropertyOverrides(ClientContext context, ShWebPartReference webPart, string webPartcontent)
+        {
+            XmlReader reader = XmlReader.Create(new StringReader(webPartcontent));
+            XElement doc = XElement.Load(reader);
+            var dataProviderJsonElement = doc.XPathSelectElement(".//*[local-name() = 'property' and @name='DataProviderJSON']");
+
+            dynamic dataProviderJson = JObject.Parse(dataProviderJsonElement.Value);
+
+            foreach (KeyValuePair<string, string> keyValuePair in webPart.DataProviderJSONOverrides)
+            {
+                var propOverrideValue = GetPropertyValueWithTokensReplaced(keyValuePair.Value, context);
+                dataProviderJson[keyValuePair.Key] = propOverrideValue;
+            }
+            
+            dataProviderJsonElement.Value = JObject.FromObject(dataProviderJson).ToString();
+            return doc.ToString();
         }
     }
 }
