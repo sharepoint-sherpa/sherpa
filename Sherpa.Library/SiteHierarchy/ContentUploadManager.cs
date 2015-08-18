@@ -241,8 +241,8 @@ namespace Sherpa.Library.SiteHierarchy
                 for (int i = limitedWebPartManager.WebParts.Count - 1; i >= 0; i--)
                 {
                     limitedWebPartManager.WebParts[i].DeleteWebPart();
+                    context.ExecuteQuery();
                 }
-                context.ExecuteQuery();
 
                 foreach (ShWebPartReference webPart in webPartReferences)
                 {
@@ -259,16 +259,12 @@ namespace Sherpa.Library.SiteHierarchy
                     webPartFileContent = GetPropertyValueWithTokensReplaced(webPartFileContent, context);
 
                     //Overriding DataProviderJSON properties if specified. Need to use different approach (Update XML directly before import)
-                    if (webPart.DataProviderJSONOverrides.Count > 0)
+                    if (webPart.PropertiesOverrides.Count > 0 || webPart.DataProviderJSONOverrides.Count > 0)
                     {
-                        webPartFileContent = ReplaceDataProviderJSONPropertyOverrides(context, webPart, webPartFileContent);
+                        webPartFileContent = ReplaceWebPartPropertyOverrides(context, webPart, webPartFileContent);
                     }
 
                     var webPartDefinition = limitedWebPartManager.ImportWebPart(webPartFileContent);
-                    if (webPart.PropertiesOverrides.Count > 0)
-                    {
-                        HandleWebPartPropertyOverrides(context, webPart, webPartDefinition);
-                    }
                     limitedWebPartManager.AddWebPart(webPartDefinition.WebPart, webPart.ZoneID, webPart.Order);
                     context.Load(limitedWebPartManager);
                     context.ExecuteQuery();
@@ -276,32 +272,37 @@ namespace Sherpa.Library.SiteHierarchy
             }
         }
 
-        private void HandleWebPartPropertyOverrides(ClientContext context, ShWebPartReference webPart, WebPartDefinition webPartXml)
+        private string  ReplaceWebPartPropertyOverrides(ClientContext context, ShWebPartReference webPart, string webPartcontent)
         {
+            XmlReader reader = XmlReader.Create(new StringReader(webPartcontent));
+            XElement doc = XElement.Load(reader);
             foreach (KeyValuePair<string, string> propertyOverride in webPart.PropertiesOverrides)
             {
                 //Token replacement in the PropertiesOverrides JSON array
                 var propOverrideValue = GetPropertyValueWithTokensReplaced(propertyOverride.Value, context);
-                webPartXml.WebPart.Properties[propertyOverride.Key] = propOverrideValue;
+                SetPropertyValueInXmlDocument(doc, propertyOverride.Key, propOverrideValue);
             }
-        }
-
-        private string ReplaceDataProviderJSONPropertyOverrides(ClientContext context, ShWebPartReference webPart, string webPartcontent)
-        {
-            XmlReader reader = XmlReader.Create(new StringReader(webPartcontent));
-            XElement doc = XElement.Load(reader);
-            var dataProviderJsonElement = doc.XPathSelectElement(".//*[local-name() = 'property' and @name='DataProviderJSON']");
-
-            dynamic dataProviderJson = JObject.Parse(dataProviderJsonElement.Value);
-
             foreach (KeyValuePair<string, string> keyValuePair in webPart.DataProviderJSONOverrides)
             {
                 var propOverrideValue = GetPropertyValueWithTokensReplaced(keyValuePair.Value, context);
-                dataProviderJson[keyValuePair.Key] = propOverrideValue;
+                SetPropertyValueInXmlDocument(doc, "DataProviderJSON", propOverrideValue, keyValuePair.Key);
             }
-            
-            dataProviderJsonElement.Value = JObject.FromObject(dataProviderJson).ToString();
+
             return doc.ToString();
         }
-    }
+
+        public static void SetPropertyValueInXmlDocument(XElement doc, string propertyName, string value, string jsonPropertyName = null)
+        {
+            var element = doc.XPathSelectElement(".//*[local-name() = '" + propertyName + "']") ??
+            doc.XPathSelectElement(".//*[local-name() = 'property' and @name='" + propertyName + "']");
+            
+            if (!string.IsNullOrWhiteSpace(jsonPropertyName))
+            {
+                dynamic dp = JObject.Parse(element.Value);
+                dp[jsonPropertyName] = value;
+                value = JObject.FromObject(dp).ToString();
+            }
+            element.Value = value;
+        }
+    }
 }
