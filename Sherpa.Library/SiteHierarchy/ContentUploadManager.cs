@@ -299,14 +299,28 @@ namespace Sherpa.Library.SiteHierarchy
         {
             var element = doc.XPathSelectElement(".//*[local-name() = '" + propertyName + "']") ??
             doc.XPathSelectElement(".//*[local-name() = 'property' and @name='" + propertyName + "']");
-            
-            if (!string.IsNullOrWhiteSpace(jsonPropertyName))
+
+            if (element != null)
             {
-                dynamic dp = JObject.Parse(element.Value);
-                dp[jsonPropertyName] = value;
-                value = JObject.FromObject(dp).ToString();
+                if (!string.IsNullOrWhiteSpace(jsonPropertyName))
+                {
+                    dynamic dp = JObject.Parse(element.Value);
+                    dp[jsonPropertyName] = value;
+                    value = JObject.FromObject(dp).ToString();
+                }
+                try
+                {
+                    element.Value = value;
+                }
+                catch (Exception e)
+                {
+                    Log.Error("Could not set web part value of property " + propertyName);
+                }
             }
-            element.Value = value;
+            else
+            {
+                Log.Error("Could not find web part element " + propertyName);
+            }
         }
     }
 }
