@@ -44,6 +44,10 @@ namespace Sherpa.Library.SiteHierarchy
             string uploadTargetFolder;
             Folder rootFolder;
 
+            web.Lists.EnsureSiteAssetsLibrary();
+            context.Load(web.Lists);
+            context.ExecuteQuery();
+
             if (!string.IsNullOrEmpty(contentFolder.ListUrl))
             {
                 context.Load(web, w => w.ServerRelativeUrl);
