@@ -33,9 +33,9 @@ namespace Sherpa.Library.SiteHierarchy
                 setupList = listCollection.Add(listCreationInfo);
                 context.ExecuteQuery();
             }
-            setupList.Hidden = listConfig.Hidden;
-            setupList.OnQuickLaunch = listConfig.OnQuickLaunch;
-            setupList.EnableVersioning = listConfig.VersioningEnabled;
+            if (listConfig.Hidden.HasValue) setupList.Hidden = listConfig.Hidden.Value;
+            if (listConfig.OnQuickLaunch.HasValue) setupList.OnQuickLaunch = listConfig.OnQuickLaunch.Value;
+            if (listConfig.VersioningEnabled.HasValue) setupList.EnableVersioning = listConfig.VersioningEnabled.Value;
             setupList.Update();
 
             SetupFieldsOfList(context, setupList, listConfig);
