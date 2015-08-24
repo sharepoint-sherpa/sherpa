@@ -80,6 +80,11 @@ namespace Sherpa.Library.ContentTypes
                 existingField.Group = configField.Group;
                 fieldUpdated = true;
             }
+            if (configField.Default != existingField.DefaultValue && !string.IsNullOrEmpty(configField.Default))
+            {
+                existingField.DefaultValue = configField.Default;
+                fieldUpdated = true;
+            }
             if (fieldUpdated)
             {
                 existingField.Update();
