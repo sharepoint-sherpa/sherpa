@@ -66,7 +66,7 @@ namespace Sherpa.Installer
         [Option("url", Required = true, HelpText = "Full URL to the target SharePoint site collection")]
         public string UrlToSite { get; set; }
 
-        [Option('u', "userName", HelpText = "Username@domain whos credentials will be used during installation (spo only)")]
+        [Option('u', "userName", HelpText = "Username@domain whos credentials will be used during installation")]
         public string UserName { get; set; }
 
         [Option("spo", HelpText = "Specify if the solution is targeting SharePoint Online")]
