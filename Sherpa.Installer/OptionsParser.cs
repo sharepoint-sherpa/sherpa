@@ -83,6 +83,9 @@ namespace Sherpa.Installer
 
         [Option('v', "verbose", HelpText = "Write everything to console")]
         public bool Verbose { get; set; }
+        
+        [Option("inc", HelpText = "Specify if you want to use the incremental upload feature (i.e. only upload changed files)")]
+        public bool IncrementalUpload { get; set; }
 
         [HelpOption]
         public string GetUsage()

@@ -72,7 +72,7 @@ namespace Sherpa.Installer
 
         private static void RunApplication()
         {
-            InstallationManager = new InstallationManager(UrlToSite, Credentials, ProgramOptions.SharePointOnline, ProgramOptions.RootPath);
+            InstallationManager = new InstallationManager(UrlToSite, Credentials, ProgramOptions.SharePointOnline, ProgramOptions.RootPath, ProgramOptions.IncrementalUpload);
 
             if (!Unmanaged) ShowStartScreenAndExecuteCommand();
             else

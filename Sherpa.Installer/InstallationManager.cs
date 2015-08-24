@@ -24,6 +24,7 @@ namespace Sherpa.Installer
         private readonly ICredentials _credentials;
         private readonly Uri _urlToSite;
         private readonly bool _isSharePointOnline;
+        private readonly bool _incrementalUpload;
         private readonly string _rootPath;
 
         private string ConfigurationDirectoryPath
@@ -39,13 +40,13 @@ namespace Sherpa.Installer
             get { return Path.Combine(_rootPath, "search"); }
         }
 
-        public InstallationManager(Uri urlToSite, ICredentials credentials, bool isSharePointOnline, string rootPath)
+        public InstallationManager(Uri urlToSite, ICredentials credentials, bool isSharePointOnline, string rootPath, bool incrementalUpload)
         {
             _urlToSite = urlToSite;
             _credentials = credentials;
             _isSharePointOnline = isSharePointOnline;
             _rootPath = rootPath ?? Environment.CurrentDirectory;
-
+            _incrementalUpload = incrementalUpload;
             Log.Debug("Installation manager created");
             Log.DebugFormat("Site Url: {0}, Configpath: {1}, SPO: {2}", _urlToSite.AbsoluteUri, _rootPath, _isSharePointOnline);
         }
@@ -60,7 +61,7 @@ namespace Sherpa.Installer
             Log.Info("Executing operation " + installationOperation);
             if (installationOperation == InstallationOperation.Invalid)
             {
-                Log.Warn("Invalid user input - get your act together Ole Martin");
+                Log.Warn("Invalid user input");
                 return;
             }
             if (installationOperation == InstallationOperation.ExitApplication)
@@ -88,11 +89,11 @@ namespace Sherpa.Installer
 
             using (var context = new ClientContext(_urlToSite) {Credentials = _credentials})
             {
-                var siteSetupManagerFromConfig = new SiteSetupManager(context, new ShSiteCollection(), _rootPath);
+                var siteSetupManagerFromConfig = new SiteSetupManager(context, new ShSiteCollection(), _rootPath, _incrementalUpload);
                 if (useConfigurationForInstall)
                 {
                     var filePersistanceProvider = new FilePersistanceProvider<ShSiteCollection>(configurationFile);
-                    siteSetupManagerFromConfig = new SiteSetupManager(context, filePersistanceProvider.Load(), _rootPath);
+                    siteSetupManagerFromConfig = new SiteSetupManager(context, filePersistanceProvider.Load(), _rootPath, _incrementalUpload);
                 }
                 switch (installationOperation)
                 {
@@ -364,7 +365,7 @@ namespace Sherpa.Installer
             foreach (var file in Directory.GetFiles(ConfigurationDirectoryPath, "*sitehierarchy.json", SearchOption.AllDirectories))
             {
                 var sitePersister = new FilePersistanceProvider<ShSiteCollection>(file);
-                var siteManager = new SiteSetupManager(context, sitePersister.Load(), _rootPath);
+                var siteManager = new SiteSetupManager(context, sitePersister.Load(), _rootPath, _incrementalUpload);
                 if (onlyContentTypeDependecyFeatures)
                 {
                     Log.Debug("ConfigureSitesFromAllSiteHierarchyFiles: Activating only content type dependecy features");

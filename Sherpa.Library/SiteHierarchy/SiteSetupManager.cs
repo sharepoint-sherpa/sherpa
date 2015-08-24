@@ -22,7 +22,7 @@ namespace Sherpa.Library.SiteHierarchy
         private PermissionManager PermissionManager { get; set; }
         private ComposedLookManager ComposedLookManager { get; set; }
 
-        public SiteSetupManager(ClientContext clientContext, ShSiteCollection configurationSiteCollection, string rootConfigurationPath)
+        public SiteSetupManager(ClientContext clientContext, ShSiteCollection configurationSiteCollection, string rootConfigurationPath, bool incrementalUpload)
         {
             ConfigurationSiteCollection = configurationSiteCollection;
             ClientContext = clientContext;
@@ -36,7 +36,7 @@ namespace Sherpa.Library.SiteHierarchy
             ComposedLookManager = new ComposedLookManager();
 
             var contentConfigurationPath = Path.Combine(rootConfigurationPath, "content");
-            ContentUploadManager = new ContentUploadManager(contentConfigurationPath);
+            ContentUploadManager = new ContentUploadManager(contentConfigurationPath, incrementalUpload);
         }
         public void SetupSites()
         {

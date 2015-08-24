@@ -14,7 +14,6 @@ using Newtonsoft.Json.Linq;
 using Sherpa.Library.SiteHierarchy.Model;
 using Flurl;
 using File = Microsoft.SharePoint.Client.File;
-using Formatting = Newtonsoft.Json.Formatting;
 
 namespace Sherpa.Library.SiteHierarchy
 {
@@ -22,13 +21,18 @@ namespace Sherpa.Library.SiteHierarchy
     {
         private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private static Dictionary<string, DateTime> LastUpload = new Dictionary<string, DateTime>();
+        private static bool IncrementalUpload;
 
         private readonly string _contentDirectoryPath;
         public ContentUploadManager(string rootConfigurationPath)
         {
             _contentDirectoryPath = rootConfigurationPath;
         }
-
+        public ContentUploadManager(string rootConfigurationPath, bool incrementalUpload)
+        {
+            _contentDirectoryPath = rootConfigurationPath;
+            IncrementalUpload = incrementalUpload;
+        }
         public void UploadFilesInFolder(ClientContext context, Web web, List<ShContentFolder> contentFolders)
         {
             foreach (ShContentFolder folder in contentFolders)
@@ -109,9 +113,12 @@ namespace Sherpa.Library.SiteHierarchy
                 excludedFileExtensions = contentFolder.ExcludeExtensions.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
             }
             var files = Directory.GetFiles(configRootFolder, "*", SearchOption.AllDirectories)
-                .Where(file => !excludedFileExtensions.Contains(Path.GetExtension(file).ToLower())).ToList()
-                .Where(f => !LastUpload.ContainsKey(contentFolder.FolderName) || new FileInfo(f).LastWriteTimeUtc > LastUpload[contentFolder.FolderName]
-            ).ToList();
+                .Where(file => !excludedFileExtensions.Contains(Path.GetExtension(file).ToLower())).ToList();
+
+            if (IncrementalUpload)
+            {
+                files = files.Where(f =>!LastUpload.ContainsKey(contentFolder.FolderName) || new FileInfo(f).LastWriteTimeUtc > LastUpload[contentFolder.FolderName]).ToList();
+            }
 
             int filesUploaded = 0;
             foreach (string filePath in files)
