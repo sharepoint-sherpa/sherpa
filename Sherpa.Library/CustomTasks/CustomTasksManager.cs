@@ -38,8 +38,12 @@ namespace Sherpa.Library.CustomTasks
                 Tasks.TryGetValue(taskConfig.FullName, out taskTypeInfo);
                 if (taskTypeInfo != null)
                 {
-                    var instance = (ITask)Activator.CreateInstance(taskTypeInfo.AsType());
-                    instance.ExecuteOn(rootWeb,context);
+                    var instance = (ITask) Activator.CreateInstance(taskTypeInfo.AsType());
+                    instance.ExecuteOn(rootWeb, context);
+                }
+                else
+                {
+                    Log.ErrorFormat("Could not find loaded task with name {0}", taskConfig.FullName);
                 }
             }
             foreach (var web in rootWeb.Webs)
