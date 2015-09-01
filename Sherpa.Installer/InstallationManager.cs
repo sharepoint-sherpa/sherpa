@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Reflection;
 using log4net;
@@ -51,6 +52,12 @@ namespace Sherpa.Installer
             Log.DebugFormat("Site Url: {0}, Configpath: {1}, SPO: {2}", _urlToSite.AbsoluteUri, _rootPath, _isSharePointOnline);
         }
 
+        private static string FindFileInDirectory(string rootDirectory, string searchPattern)
+        {
+            return
+                Directory.GetFiles(rootDirectory, searchPattern, SearchOption.AllDirectories)
+                    .FirstOrDefault();
+        }
         public void InstallOperation(InstallationOperation installationOperation)
         {
             InstallOperation(installationOperation, string.Empty);
@@ -78,7 +85,7 @@ namespace Sherpa.Installer
             else
             {
                 Log.Debug("Site configuration file: " + siteHierarchyFileName);
-                configurationFile = Path.Combine(ConfigurationDirectoryPath, siteHierarchyFileName);
+                configurationFile = FindFileInDirectory(ConfigurationDirectoryPath, siteHierarchyFileName);
                 useConfigurationForInstall = true;
                 if (!File.Exists(configurationFile))
                 {
@@ -104,7 +111,7 @@ namespace Sherpa.Installer
                             foreach (var filename in siteSetupManagerFromConfig.ConfigurationSiteCollection.TaxonomyConfigurations)
                             {
                                 InstallTaxonomyFromSingleFile(context,
-                                    Path.Combine(ConfigurationDirectoryPath, filename));
+                                    FindFileInDirectory(ConfigurationDirectoryPath, filename));
                             }
                         }
                         else
@@ -121,7 +128,7 @@ namespace Sherpa.Installer
                             foreach (var filename in siteSetupManagerFromConfig.ConfigurationSiteCollection.SandboxedSolutions)
                             {
                                 UploadAndActivatePackage(context, deployManager,
-                                    Path.Combine(SolutionsDirectoryPath, filename));
+                                    FindFileInDirectory(SolutionsDirectoryPath, filename));
                             }
                         }
                         else
@@ -137,12 +144,12 @@ namespace Sherpa.Installer
                             siteSetupManagerFromConfig.ActivateContentTypeDependencyFeatures();
                             foreach (var fileName in siteSetupManagerFromConfig.ConfigurationSiteCollection.FieldConfigurations)
                             {
-                                var filePath = Path.Combine(ConfigurationDirectoryPath, fileName);
+                                var filePath = FindFileInDirectory(ConfigurationDirectoryPath, fileName);
                                 CreateFieldsFromFile(context, filePath);
                             }
                             foreach (var fileName in siteSetupManagerFromConfig.ConfigurationSiteCollection.ContentTypeConfigurations)
                             {
-                                var filePath = Path.Combine(ConfigurationDirectoryPath, fileName);
+                                var filePath = FindFileInDirectory(ConfigurationDirectoryPath, fileName);
                                 CreateContentTypesFromFile(context, filePath);
                             }
                         }
@@ -175,7 +182,7 @@ namespace Sherpa.Installer
                             {
                                 try
                                 {
-                                    var pathToSearchSettingsFile = Path.Combine(SearchDirectoryPath, fileName);
+                                    var pathToSearchSettingsFile = FindFileInDirectory(SearchDirectoryPath, fileName);
                                     Log.Info("Importing search configuration in " + fileName);
                                     searchMan.ImportSearchConfiguration(context, pathToSearchSettingsFile);
                                 }
@@ -211,14 +218,14 @@ namespace Sherpa.Installer
                                 var fileName in
                                     siteSetupManagerFromConfig.ConfigurationSiteCollection.ContentTypeConfigurations)
                             {
-                                var filePath = Path.Combine(ConfigurationDirectoryPath, fileName);
+                                var filePath = FindFileInDirectory(ConfigurationDirectoryPath, fileName);
                                 DeleteContentTypesSpecifiedInFile(context, filePath);
                             }
                             foreach (
                                 var fileName in
                                     siteSetupManagerFromConfig.ConfigurationSiteCollection.FieldConfigurations)
                             {
-                                var filePath = Path.Combine(ConfigurationDirectoryPath, fileName);
+                                var filePath = FindFileInDirectory(ConfigurationDirectoryPath, fileName);
                                 DeleteFieldsSpecifiedInFile(context, filePath);
                             }
                         }
