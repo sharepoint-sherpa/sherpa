@@ -234,7 +234,8 @@ namespace Sherpa.Library.SiteHierarchy
                 .Replace("~site", webUrl)
                 .Replace("&#126;Site", webUrl)
                 .Replace("&#126;site", webUrl)
-                .Replace("$Resources:core,Culture;", new CultureInfo((int)context.Web.Language).Name);
+                .Replace("$Resources:core,Culture;", new CultureInfo((int)context.Web.Language).Name)
+                .Replace("|NewGuid|", Guid.NewGuid().ToString());
         }
 
         public void AddWebParts(ClientContext context, File uploadFile, List<ShWebPartReference> webPartReferences, bool replaceWebParts)
