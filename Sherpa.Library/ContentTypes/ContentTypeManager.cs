@@ -135,11 +135,8 @@ namespace Sherpa.Library.ContentTypes
             }
 
             fieldLink.Required = configContentType.RequiredFields.Contains(fieldName);
-            if (configContentType.HiddenFields.Contains(fieldName))
-            {
-                fieldLink.Hidden = true;
-                fieldLink.Required = false;
-            }
+            fieldLink.Hidden = configContentType.HiddenFields.Contains(fieldName);
+
             contentType.Update(true);
             ClientContext.ExecuteQuery();
         }
