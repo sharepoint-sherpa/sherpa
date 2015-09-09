@@ -87,7 +87,7 @@ namespace Sherpa.Library.ContentTypes
             }
             if (fieldUpdated)
             {
-                existingField.Update();
+                existingField.UpdateAndPushChanges(true);
                 ClientContext.ExecuteQuery();
             }
         }
