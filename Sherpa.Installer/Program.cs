@@ -18,6 +18,7 @@ namespace Sherpa.Installer
 
         static int Main(string[] args)
         {
+            Console.ResetColor();
             XmlConfigurator.Configure(); //Initialize log4net
             Log.Debug("Sherpa application started");
 
@@ -84,10 +85,21 @@ namespace Sherpa.Installer
 
         private static void ShowStartScreenAndExecuteCommand()
         {
-            Console.WriteLine("Configuring {0}", UrlToSite);
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("# Available application operations #");
             Console.ResetColor();
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine("Configuring '{0}'", UrlToSite);
+            if (String.IsNullOrEmpty(ProgramOptions.SiteHierarchy))
+            {
+                Console.ForegroundColor = ConsoleColor.Magenta;
+                Console.WriteLine("No configuration file specified - convention mode enabled");
+            }
+            else
+            {
+                Console.WriteLine("Using configuration file '{0}'", ProgramOptions.SiteHierarchy);
+            }
+
+            Console.ResetColor();
+            Console.WriteLine("# Available application operations #");
             Console.WriteLine("Press 1 to install managed metadata groups and term sets");
             Console.WriteLine("Press 2 to upload and activate sandboxed solution");
             Console.WriteLine("Press 3 to setup site columns and content types");
