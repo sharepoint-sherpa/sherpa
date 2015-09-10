@@ -4,6 +4,7 @@ namespace Sherpa.Library.SiteHierarchy.Model
 {
     public class ShCustomAction
     {
+        public string Id { get; set; }
         public string Description { get; set; }
         public string Group { get; set; }
         public string ImageUrl { get; set; }
