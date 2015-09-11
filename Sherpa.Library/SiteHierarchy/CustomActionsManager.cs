@@ -11,6 +11,23 @@ namespace Sherpa.Library.SiteHierarchy
     {
         private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
+        private string CreateUserActioName(ShCustomAction customAction)
+        {
+            if (!string.IsNullOrEmpty(customAction.Id))
+            {
+                return customAction.Id;
+            }
+            else if (!String.IsNullOrEmpty(customAction.ScriptSrc))
+            {
+                return customAction.ScriptSrc.Split('/')[customAction.ScriptSrc.Split('/').Length - 1].Replace(".", "");
+            }
+            else if (!String.IsNullOrEmpty(customAction.Sequence.ToString()))
+            {
+                return customAction.Sequence.ToString();
+            }
+            return "";
+        }
+
         public void SetUpCustomActions(ClientContext context, string CustomActionsPrefix, List<ShCustomAction> customActions)
         {
             if (customActions.Count > 0)
@@ -56,10 +73,11 @@ namespace Sherpa.Library.SiteHierarchy
                     userCustomAction.Sequence = customAction.Sequence;
                     userCustomAction.ScriptSrc = customAction.ScriptSrc;
                     userCustomAction.ScriptBlock = customAction.ScriptBlock;
-                    userCustomAction.Name = CustomActionsPrefix + "_" + customAction.ScriptSrc.Split('/')[customAction.ScriptSrc.Split('/').Length - 1].Replace(".", "");
+                    userCustomAction.Name = String.Format("{0}_{1}", CustomActionsPrefix, CreateUserActioName(customAction));
                     userCustomAction.Description = customAction.Description;
                     userCustomAction.RegistrationType = customAction.RegistrationType;
                     userCustomAction.Title = customAction.Title;
+                    userCustomAction.Url = customAction.Url;
                     userCustomAction.ImageUrl = customAction.ImageUrl;
                     userCustomAction.Group = customAction.Group;
 
