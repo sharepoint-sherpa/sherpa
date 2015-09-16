@@ -140,6 +140,7 @@
     <Compile Include="SiteHierarchy\PermissionManager.cs" />
     <Compile Include="SiteHierarchy\PropertyManager.cs" />
     <Compile Include="Deploy\SearchImportManager.cs" />
+    <Compile Include="SiteHierarchy\SearchNavigationManager.cs" />
     <Compile Include="SiteHierarchy\SiteSetupManager.cs" />
     <Compile Include="SiteHierarchy\QuicklaunchManager.cs" />
     <Compile Include="Taxonomy\Model\ShTaxonomyItem.cs" />

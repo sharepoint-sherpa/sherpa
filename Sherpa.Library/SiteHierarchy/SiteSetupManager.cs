@@ -62,7 +62,7 @@ namespace Sherpa.Library.SiteHierarchy
             PropertyManager.SetProperties(context, webToConfigure, configWeb.Properties);
             ContentUploadManager.UploadFilesInFolder(context, webToConfigure, configWeb.ContentFolders);
             ComposedLookManager.SetComposedLook(context, configWeb, webToConfigure, configWeb.ComposedLook);
-     
+            SearchNavigationManager.CreateSearchNavigationNodes(context, webToConfigure, configWeb.SearchNavigation);
             SetWelcomePageUrlIfConfigured(context, webToConfigure, configWeb);
             SetAlternateCssUrlForWeb(context, configWeb, webToConfigure);
 

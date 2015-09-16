@@ -19,6 +19,7 @@ namespace Sherpa.Library.SiteHierarchy.Model
         public ShComposedLook ComposedLook { get; set; }
         public Dictionary<string, string> Quicklaunch { get; set; }
         public Dictionary<string, string> Properties { get; set; }
+        public Dictionary<string, string> SearchNavigation { get; set; }
 
         public ShWeb()
         {
@@ -28,6 +29,7 @@ namespace Sherpa.Library.SiteHierarchy.Model
             Lists = new List<ShList>();
             Quicklaunch = new Dictionary<string, string>();
             Properties = new Dictionary<string, string>();
+            SearchNavigation = new Dictionary<string, string>();
             ContentFolders = new List<ShContentFolder>();
         }
     }
