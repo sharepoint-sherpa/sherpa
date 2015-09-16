@@ -24,7 +24,7 @@ namespace Sherpa.Library.SiteHierarchy
             }
 
 
-            foreach (KeyValuePair<string, string> newNode in searchNavigationNodes)
+            foreach (KeyValuePair<string, string> newNode in searchNavigationNodes.Reverse<KeyValuePair<string, string>>())
             {
                 nodeCollection.Add(new NavigationNodeCreationInformation
                 {
