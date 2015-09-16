@@ -205,7 +205,8 @@ namespace Sherpa.Library.SiteHierarchy
                 context.LoadQuery( listContentTypes.Include(ct => ct.Name) );
                 context.ExecuteQuery();
 
-                //Removing content types that are not in the configuration
+                if (!listConfig.RemoveExisitingContentTypes) return;
+
                 var contentTypesToRemove = new List<ContentType>();
                 foreach (ContentType listContentType in listContentTypes)
                 {
