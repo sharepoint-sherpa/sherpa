@@ -12,26 +12,39 @@ namespace Sherpa.Library.CustomTasks
 {
     public class CustomTasksManager : ICustomTasksManager
     {
+        private string ConfigurationRoot { get; set; }
         private Dictionary<string,TypeInfo> Tasks { set; get; }
         private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         public CustomTasksManager(string configurationRoot)
         {
+            ConfigurationRoot = configurationRoot;
+        }
+
+        private void LoadTasks()
+        {
             Tasks = new Dictionary<string, TypeInfo>();
             // Find all tasks located in assemblies unde the CustomTasks folder
-            foreach (var file in Directory.EnumerateFiles(Path.Combine(configurationRoot,"customtasks"), "*.dll", SearchOption.AllDirectories))
+            foreach (var file in Directory.EnumerateFiles(Path.Combine(ConfigurationRoot, "customtasks"), "*.dll", SearchOption.AllDirectories))
             {
                 var assembly = Assembly.LoadFrom(file);
-                var types = assembly.DefinedTypes.Where(type => type.ImplementedInterfaces.Any( i=> i==typeof(ITask) ));
-                foreach (var typeInfo in types)
+
+                try
                 {
-                    Tasks.Add(typeInfo.FullName,typeInfo);
-                }
+                    var types =
+                        assembly.DefinedTypes.Where(type => type.ImplementedInterfaces.Any(i => i == typeof (ITask)));
+                    foreach (var typeInfo in types)
+                    {
+                        Tasks.Add(typeInfo.FullName, typeInfo);
+                    }
+                } catch {}
             }
         }
         
         public void ExecuteTasks(ShWeb rootWeb, ClientContext context)
         {
+            LoadTasks();
+
             foreach (var taskConfig in rootWeb.CustomTaskTypes)
             {
                 TypeInfo taskTypeInfo = null;
