@@ -61,13 +61,15 @@ namespace Sherpa.Library
         // Define the event handlers.
         private void FileChange(object source, FileSystemEventArgs e)
         {
-            if (e.FullPath.EndsWith(".js") || e.FullPath.EndsWith(".css") || e.FullPath.EndsWith(".txt") ||
-                e.FullPath.EndsWith(".html") || e.FullPath.EndsWith(".webpart") || e.FullPath.EndsWith(".png"))
+            //Special handling when some files are not touched themselves, but have an ~something.tmp appended
+            var changedFile = e.Name.Split('~')[0];
+            if (changedFile.EndsWith(".js") || changedFile.EndsWith(".css") || changedFile.EndsWith(".txt") ||
+                changedFile.EndsWith(".html") || changedFile.EndsWith(".webpart") || changedFile.EndsWith(".png"))
             {
-                if (!ChangedFilesInIteration.Contains(e.FullPath))
+                if (!ChangedFilesInIteration.Contains(changedFile))
                 {
-                    Log.InfoFormat("File {0} changed and a new upload is starting", e.Name);
-                    ChangedFilesInIteration.Add(e.FullPath);
+                    Log.InfoFormat("File {0} changed and a new upload is starting", changedFile);
+                    ChangedFilesInIteration.Add(changedFile);
                     ResetEvent.Set();
                 }
             }
