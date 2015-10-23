@@ -4,6 +4,7 @@ using Sherpa.Library.SiteHierarchy.Model;
 using System.Reflection;
 using log4net;
 using Microsoft.SharePoint.Client;
+using System;
 
 namespace Sherpa.Library.SiteHierarchy
 {
@@ -21,11 +22,14 @@ namespace Sherpa.Library.SiteHierarchy
         private CustomActionsManager CustomActionsManager { get; set; }
         private PermissionManager PermissionManager { get; set; }
         private ComposedLookManager ComposedLookManager { get; set; }
-
+        private FileListenerAndUploader FileListenerAndUploader { get; set; }
+        private bool IncrementalUpload { get; set; }
+        private string ContentConfigurationPath { get; set; }
         public SiteSetupManager(ClientContext clientContext, ShSiteCollection configurationSiteCollection, string rootConfigurationPath, bool incrementalUpload)
         {
             ConfigurationSiteCollection = configurationSiteCollection;
             ClientContext = clientContext;
+            IncrementalUpload = incrementalUpload;
 
             FeatureManager = new FeatureManager();
             QuicklaunchManager = new QuicklaunchManager();
@@ -34,9 +38,10 @@ namespace Sherpa.Library.SiteHierarchy
             CustomActionsManager = new CustomActionsManager();
             PermissionManager = new PermissionManager();
             ComposedLookManager = new ComposedLookManager();
+            FileListenerAndUploader = new FileListenerAndUploader();
 
-            var contentConfigurationPath = Path.Combine(rootConfigurationPath, "content");
-            ContentUploadManager = new ContentUploadManager(contentConfigurationPath, incrementalUpload);
+            ContentConfigurationPath = Path.Combine(rootConfigurationPath, "content");
+            ContentUploadManager = new ContentUploadManager(ContentConfigurationPath);
         }
         public void SetupSites()
         {
@@ -60,7 +65,7 @@ namespace Sherpa.Library.SiteHierarchy
             ListManager.CreateLists(context, webToConfigure, configWeb.Lists);
             QuicklaunchManager.CreateQuicklaunchNodes(context, webToConfigure, configWeb.Quicklaunch);
             PropertyManager.SetProperties(context, webToConfigure, configWeb.Properties);
-            ContentUploadManager.UploadFilesInFolder(context, webToConfigure, configWeb.ContentFolders);
+            ContentUploadManager.UploadFilesInFolder(context, webToConfigure, configWeb.ContentFolders, IncrementalUpload);
             ComposedLookManager.SetComposedLook(context, configWeb, webToConfigure, configWeb.ComposedLook);
             SearchNavigationManager.CreateSearchNavigationNodes(context, webToConfigure, configWeb.SearchNavigation);
             SetWelcomePageUrlIfConfigured(context, webToConfigure, configWeb);
@@ -176,6 +181,28 @@ namespace Sherpa.Library.SiteHierarchy
             }
             web.DeleteObject();
             clientContext.ExecuteQuery();
+        }
+
+        public void StartFileWatching()
+        {
+            UploadFilesInWeb(ClientContext, null, ConfigurationSiteCollection.RootWeb);
+            FileListenerAndUploader.CreateFileWatcher(ContentConfigurationPath, this);
+        }
+        public void UploadChangedFiles()
+        {
+            UploadFilesInWeb(ClientContext, null, ConfigurationSiteCollection.RootWeb);
+        }
+
+        private void UploadFilesInWeb(ClientContext context, Web parentWeb, ShWeb configWeb)
+        {
+            Log.Info("Looking for updated files in web " + configWeb.Url);
+            var webToConfigure = EnsureWeb(context, parentWeb, configWeb);
+            ContentUploadManager.UploadFilesInFolder(context, webToConfigure, configWeb.ContentFolders, IncrementalUpload);
+
+            foreach (ShWeb subWeb in configWeb.Webs)
+            {
+                UploadFilesInWeb(context, webToConfigure, subWeb);
+            }
         }
     }
 }

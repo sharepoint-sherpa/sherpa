@@ -235,6 +235,18 @@ namespace Sherpa.Installer
                         }
                         break;
                     }
+                    case InstallationOperation.FileWatchUploader:
+                        {
+                            if (useConfigurationForInstall)
+                            {
+                                siteSetupManagerFromConfig.StartFileWatching();
+                            }
+                            else
+                            {
+                                UploadAllChangedFiles(context);
+                            }
+                            break;
+                        }
                     case InstallationOperation.ExportTaxonomy:
                     {
                         ExportTaxonomyGroup();
@@ -258,6 +270,20 @@ namespace Sherpa.Installer
                 }
             }
             Log.Debug("Completed installation operation");
+        }
+
+        private void UploadAllChangedFiles(ClientContext context)
+        {
+            Log.Debug("Starting UploadAllChangedFiles");
+            foreach (var file in Directory.GetFiles(ConfigurationDirectoryPath, "*sitehierarchy.json", SearchOption.AllDirectories))
+            {
+                var sitePersister = new FilePersistanceProvider<ShSiteCollection>(file);
+                
+                var siteManager = new SiteSetupManager(context, sitePersister.Load(), _rootPath, _incrementalUpload);
+
+                siteManager.StartFileWatching();
+            }
+
         }
 
         private void InstallAllTaxonomy(ClientContext context)
@@ -498,6 +524,10 @@ namespace Sherpa.Installer
                 case 1337:
                 {
                     return InstallationOperation.ForceRecrawl;
+                }
+                case 666:
+                {
+                    return InstallationOperation.FileWatchUploader;
                 }
                 case 0:
                 {

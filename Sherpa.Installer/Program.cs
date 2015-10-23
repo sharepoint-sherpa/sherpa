@@ -109,12 +109,15 @@ namespace Sherpa.Installer
             Console.WriteLine("Press 7 to execute custom tasks");
             Console.WriteLine("Press 8 to DELETE all sites (except root site)");
             Console.WriteLine("Press 9 to DELETE all custom site columns and content types");
+            Console.WriteLine("Press 666 to start developer mode: Continuous file upload");
             Console.WriteLine("Press 0 to exit application");
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.Write("Select a number to perform an operation: ");
             Console.BackgroundColor = ConsoleColor.White;
             Console.ForegroundColor = ConsoleColor.Black;
             var input = Console.ReadLine();
+            Console.BackgroundColor = ConsoleColor.Black;
+            Console.ForegroundColor = ConsoleColor.White;
             Console.ResetColor();
             HandleCommandKeyPress(input);
         }

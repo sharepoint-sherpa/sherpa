@@ -110,6 +110,7 @@
     <Compile Include="CustomTasks\CustomTasksManager.cs" />
     <Compile Include="CustomTasks\ICustomTasksManager.cs" />
     <Compile Include="Deploy\DeployManager.cs" />
+    <Compile Include="Deploy\FileListenerAndUploader.cs" />
     <Compile Include="Deploy\IDeployManager.cs" />
     <Compile Include="SharePointContext.cs" />
     <Compile Include="SiteHierarchy\ComposedLookManager.cs" />

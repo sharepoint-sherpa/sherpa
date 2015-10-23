@@ -21,27 +21,21 @@ namespace Sherpa.Library.SiteHierarchy
     {
         private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private static Dictionary<string, DateTime> LastUpload = new Dictionary<string, DateTime>();
-        private static bool IncrementalUpload;
 
         private readonly string _contentDirectoryPath;
         public ContentUploadManager(string rootConfigurationPath)
         {
             _contentDirectoryPath = rootConfigurationPath;
         }
-        public ContentUploadManager(string rootConfigurationPath, bool incrementalUpload)
-        {
-            _contentDirectoryPath = rootConfigurationPath;
-            IncrementalUpload = incrementalUpload;
-        }
-        public void UploadFilesInFolder(ClientContext context, Web web, List<ShContentFolder> contentFolders)
+        public void UploadFilesInFolder(ClientContext context, Web web, List<ShContentFolder> contentFolders, bool incrementalUpload)
         {
             foreach (ShContentFolder folder in contentFolders)
             {
-                UploadFilesInFolder(context, web, folder);
+                UploadFilesInFolder(context, web, folder, incrementalUpload);
             }
         }
 
-        public void UploadFilesInFolder(ClientContext context, Web web, ShContentFolder contentFolder)
+        public void UploadFilesInFolder(ClientContext context, Web web, ShContentFolder contentFolder, bool incrementalUpload)
         {
             Log.Info("Uploading files from contentfolder " + contentFolder.FolderName);
 
@@ -115,7 +109,7 @@ namespace Sherpa.Library.SiteHierarchy
             var files = Directory.GetFiles(configRootFolder, "*", SearchOption.AllDirectories)
                 .Where(file => !excludedFileExtensions.Contains(Path.GetExtension(file).ToLower())).ToList();
 
-            if (IncrementalUpload)
+            if (incrementalUpload)
             {
                 files = files.Where(f =>!LastUpload.ContainsKey(contentFolder.FolderName) || new FileInfo(f).LastWriteTimeUtc > LastUpload[contentFolder.FolderName]).ToList();
             }
@@ -123,33 +117,7 @@ namespace Sherpa.Library.SiteHierarchy
             int filesUploaded = 0;
             foreach (string filePath in files)
             {
-                var pathToFileFromRootFolder = filePath.Replace(configRootFolder.TrimEnd(new []{'\\'}) + "\\", "");
-                var fileName = Path.GetFileName(pathToFileFromRootFolder);
-
-                if (!string.IsNullOrEmpty(contentFolder.PropertiesFile) && contentFolder.PropertiesFile == fileName)
-                {
-                    Log.DebugFormat("Skipping file upload of {0} since it's used as a configuration file", fileName);
-                    continue;
-                }
-                Log.DebugFormat("Uploading file {0} to {1}", fileName, contentFolder.ListUrl);
-                var fileUrl = GetFileUrl(uploadTargetFolder, pathToFileFromRootFolder, filePropertiesCollection);
-                web.CheckOutFile(fileUrl);
-
-                var newFile = new FileCreationInformation
-                {
-                    Content = System.IO.File.ReadAllBytes(filePath),
-                    Url = fileUrl,
-                    Overwrite = true
-                };
-                File uploadFile = rootFolder.Files.Add(newFile);
-
-                context.Load(uploadFile);
-                context.Load(uploadFile.ListItemAllFields.ParentList, l => l.ForceCheckout, l => l.EnableMinorVersions, l => l.EnableModeration);
-                context.ExecuteQuery();
-
-                ApplyFileProperties(context, filePropertiesCollection, uploadFile);
-                uploadFile.PublishFileToLevel(FileLevel.Published);
-                context.ExecuteQuery();
+                UploadAndPublishSingleFile(context, web, configRootFolder, contentFolder, uploadTargetFolder, rootFolder, filePropertiesCollection, filePath);
 
                 filesUploaded++;
             }
@@ -172,6 +140,42 @@ namespace Sherpa.Library.SiteHierarchy
                 LastUpload.Add(contentFolder.FolderName, DateTime.UtcNow);
             }
 
+        }
+
+        private void UploadAndPublishSingleFile(ClientContext context, Web web, string configRootFolder, ShContentFolder contentFolder, string uploadTargetFolder, Folder rootFolder, List<ShFileProperties> filePropertiesCollection, string filePath)
+        {
+            var pathToFileFromRootFolder = filePath.Replace(configRootFolder.TrimEnd(new[] { '\\' }) + "\\", "");
+            var fileName = Path.GetFileName(pathToFileFromRootFolder);
+
+            if (!string.IsNullOrEmpty(contentFolder.PropertiesFile) && contentFolder.PropertiesFile == fileName)
+            {
+                Log.DebugFormat("Skipping file upload of {0} since it's used as a configuration file", fileName);
+                return;
+            }
+            Log.DebugFormat("Uploading file {0} to {1}", fileName, contentFolder.ListUrl);
+            var fileUrl = GetFileUrl(uploadTargetFolder, pathToFileFromRootFolder, filePropertiesCollection);
+            web.CheckOutFile(fileUrl);
+
+            var newFile = new FileCreationInformation
+            {
+                Content = System.IO.File.ReadAllBytes(filePath),
+                Url = fileUrl,
+                Overwrite = true
+            };
+            File uploadFile = rootFolder.Files.Add(newFile);
+
+            context.Load(uploadFile);
+            context.Load(uploadFile.ListItemAllFields.ParentList, l => l.ForceCheckout, l => l.EnableMinorVersions, l => l.EnableModeration);
+            context.ExecuteQuery();
+
+            var reloadedFile = web.GetFileByServerRelativeUrl(fileUrl);
+            context.Load(reloadedFile);
+            context.ExecuteQuery();
+
+            ApplyFileProperties(context, filePropertiesCollection, reloadedFile);
+
+            uploadFile.PublishFileToLevel(FileLevel.Published);
+            context.ExecuteQuery();
         }
 
         private string GetFileUrl(string uploadTargetFolder, string pathToFileFromRootFolder,

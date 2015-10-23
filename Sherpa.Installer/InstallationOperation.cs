@@ -15,6 +15,7 @@
         ForceRecrawl,
         Invalid,
         ExitApplication,
-        ExecuteCustomTasks
+        ExecuteCustomTasks,
+        FileWatchUploader
     }
 }
