@@ -51,12 +51,13 @@ namespace Sherpa.Library.SiteHierarchy
                 context.Load(web, w => w.ServerRelativeUrl);
                 context.ExecuteQuery();
 
-                var rootFolderServerRelativeUrl = Url.Combine(web.ServerRelativeUrl, contentFolder.ListUrl);
-                rootFolder = web.GetFolderByServerRelativeUrl(rootFolderServerRelativeUrl);
+                var listUrl = Url.Combine(web.ServerRelativeUrl, contentFolder.ListUrl);
+                rootFolder = web.GetFolderByServerRelativeUrl(listUrl);
                 context.Load(rootFolder);
                 context.ExecuteQuery();
 
-                uploadTargetFolder = Url.Combine(rootFolderServerRelativeUrl, contentFolder.FolderUrl);                
+
+                uploadTargetFolder = Url.Combine(listUrl, contentFolder.FolderUrl);                
             } else if (!string.IsNullOrEmpty(contentFolder.ListName)) 
             {
                 var assetLibrary = web.Lists.GetByTitle(contentFolder.ListName);
@@ -73,21 +74,9 @@ namespace Sherpa.Library.SiteHierarchy
 
             var configRootFolder = Path.Combine(_contentDirectoryPath, contentFolder.FolderName);
 
-            if (!web.DoesFolderExists(uploadTargetFolder))
-            {
-                web.Folders.Add(uploadTargetFolder);
-            }
-            context.ExecuteQuery();
+            EnsureTargetFolder(context, web, rootFolder.ServerRelativeUrl, contentFolder, uploadTargetFolder);
 
-            foreach (string folder in Directory.GetDirectories(configRootFolder, "*", SearchOption.AllDirectories))
-            {
-                var folderName = Url.Combine(uploadTargetFolder, folder.Replace(configRootFolder, "").Replace("\\", "/"));
-                if (!web.DoesFolderExists(folderName))
-                {
-                    web.Folders.Add(folderName);
-                }
-            }
-            context.ExecuteQuery();
+            EnsureAllContentFolders(context, web, configRootFolder, uploadTargetFolder);
 
             List<ShFileProperties> filePropertiesCollection = null;
             if (!string.IsNullOrEmpty(contentFolder.PropertiesFile))
@@ -140,6 +129,39 @@ namespace Sherpa.Library.SiteHierarchy
                 LastUpload.Add(contentFolder.FolderName, DateTime.UtcNow);
             }
 
+        }
+
+        private static void EnsureAllContentFolders(ClientContext context, Web web, string configRootFolder,
+            string uploadTargetFolder)
+        {
+            foreach (string folder in Directory.GetDirectories(configRootFolder, "*", SearchOption.AllDirectories))
+            {
+                var folderName = Url.Combine(uploadTargetFolder, folder.Replace(configRootFolder, "").Replace("\\", "/"));
+                if (!web.DoesFolderExists(folderName))
+                {
+                    web.Folders.Add(folderName);
+                }
+            }
+            context.ExecuteQuery();
+        }
+
+        private void EnsureTargetFolder(ClientContext context, Web web, string listUrl, string contentFolderUrl,
+            string uploadTargetFolder)
+        {
+            if (!web.DoesFolderExists(uploadTargetFolder))
+            {
+                var folderPaths = contentFolderUrl.Split('/');
+                var folderUrl = listUrl;
+                foreach (var folder in folderPaths)
+                {
+                    folderUrl = Url.Combine(folderUrl, folder);
+                    if (!web.DoesFolderExists(folderUrl))
+                    {
+                        web.Folders.Add(folderUrl);
+                        context.ExecuteQuery();
+                    }
+                }
+            }
         }
 
         private void UploadAndPublishSingleFile(ClientContext context, Web web, string configRootFolder, ShContentFolder contentFolder, string uploadTargetFolder, Folder rootFolder, List<ShFileProperties> filePropertiesCollection, string filePath)
