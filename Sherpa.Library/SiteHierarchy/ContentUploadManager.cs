@@ -74,7 +74,7 @@ namespace Sherpa.Library.SiteHierarchy
 
             var configRootFolder = Path.Combine(_contentDirectoryPath, contentFolder.FolderName);
 
-            EnsureTargetFolder(context, web, rootFolder.ServerRelativeUrl, contentFolder, uploadTargetFolder);
+            EnsureTargetFolder(context, web, rootFolder.ServerRelativeUrl, contentFolder.FolderUrl, uploadTargetFolder);
 
             EnsureAllContentFolders(context, web, configRootFolder, uploadTargetFolder);
 
