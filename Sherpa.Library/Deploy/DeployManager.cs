@@ -68,7 +68,7 @@ namespace Sherpa.Library.Deploy
                     var fi = new FileInfo(fileName);
                     context.Load(siteAssetsLibrary.RootFolder);
                     context.ExecuteQuery();
-                    var fileUrl = $"{siteAssetsLibrary.RootFolder.ServerRelativeUrl}/{fi.Name}";
+                    var fileUrl = string.Format("{0}/{1}", siteAssetsLibrary.RootFolder.ServerRelativeUrl, fi.Name);
 
                     Microsoft.SharePoint.Client.File.SaveBinaryDirect(context, fileUrl, fs, true);
                 }
