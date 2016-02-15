@@ -8,6 +8,7 @@ namespace Sherpa.Library.SiteHierarchy.Model
         public string Path { get; set; }
         public string Url { get; set; }
         public bool ReplaceWebParts { get; set; }
+        public bool ReplaceTokensInTextFile { get; set; }
 
         /* Published, Draft, CheckOut (not supported) */
         public FileLevel Level { get; set; }

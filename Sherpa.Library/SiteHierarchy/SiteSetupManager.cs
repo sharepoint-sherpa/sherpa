@@ -81,7 +81,7 @@ namespace Sherpa.Library.SiteHierarchy
             if (!string.IsNullOrEmpty(configWeb.AlternateCssUrl))
             {
                 Log.Debug("Setting AlternateCssUrl for web " + configWeb.Name);
-                webToConfigure.AlternateCssUrl = ContentUploadManager.GetPropertyValueWithTokensReplaced(configWeb.AlternateCssUrl, context);
+                webToConfigure.AlternateCssUrl = ContentUploadManager.ReplaceTokensInText(configWeb.AlternateCssUrl, context);
                 webToConfigure.Update();
                 context.ExecuteQuery();
             }

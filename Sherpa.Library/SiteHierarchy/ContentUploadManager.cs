@@ -14,6 +14,7 @@ using Newtonsoft.Json.Linq;
 using Sherpa.Library.SiteHierarchy.Model;
 using Flurl;
 using File = Microsoft.SharePoint.Client.File;
+using System.Text;
 
 namespace Sherpa.Library.SiteHierarchy
 {
@@ -169,6 +170,8 @@ namespace Sherpa.Library.SiteHierarchy
             var pathToFileFromRootFolder = filePath.Replace(configRootFolder.TrimEnd(new[] { '\\' }) + "\\", "");
             var fileName = Path.GetFileName(pathToFileFromRootFolder);
 
+            pathToFileFromRootFolder = pathToFileFromRootFolder.Replace("\\", "/");
+
             if (!string.IsNullOrEmpty(contentFolder.PropertiesFile) && contentFolder.PropertiesFile == fileName)
             {
                 Log.DebugFormat("Skipping file upload of {0} since it's used as a configuration file", fileName);
@@ -178,16 +181,10 @@ namespace Sherpa.Library.SiteHierarchy
             var fileUrl = GetFileUrl(uploadTargetFolder, pathToFileFromRootFolder, filePropertiesCollection);
             web.CheckOutFile(fileUrl);
 
-            var newFile = new FileCreationInformation
-            {
-                Content = System.IO.File.ReadAllBytes(filePath),
-                Url = fileUrl,
-                Overwrite = true
-            };
+            var newFile = GetFileCreationInformation(context, fileUrl, filePath, pathToFileFromRootFolder, filePropertiesCollection);
             File uploadFile = rootFolder.Files.Add(newFile);
 
             context.Load(uploadFile);
-            context.Load(uploadFile.ListItemAllFields.ParentList, l => l.ForceCheckout, l => l.EnableMinorVersions, l => l.EnableModeration);
             context.ExecuteQuery();
 
             var reloadedFile = web.GetFileByServerRelativeUrl(fileUrl);
@@ -196,14 +193,43 @@ namespace Sherpa.Library.SiteHierarchy
 
             ApplyFileProperties(context, filePropertiesCollection, reloadedFile);
 
-            uploadFile.PublishFileToLevel(FileLevel.Published);
-            context.ExecuteQuery();
+            try {
+                uploadFile.PublishFileToLevel(FileLevel.Published);
+            } catch
+            {
+                Log.Warn("Couldn't publish file " + fileUrl);
+            }
         }
 
+        private FileCreationInformation GetFileCreationInformation(ClientContext context, string fileUrl, string filePath, string pathToFileFromRootFolder, IEnumerable<ShFileProperties> filePropertiesCollection)
+        {
+            var fileCreationInfo = new FileCreationInformation
+            {
+                Url = fileUrl,
+                Overwrite = true,
+                Content = System.IO.File.ReadAllBytes(filePath),
+            };
+            
+            if (filePropertiesCollection != null)
+            {
+                var fileProperties = filePropertiesCollection.SingleOrDefault(f => f.Path == pathToFileFromRootFolder);
+                if (fileProperties != null)
+                {
+                    if (fileProperties.ReplaceTokensInTextFile)
+                    {
+                        var fileContents = System.IO.File.ReadAllText(filePath);
+                        fileContents = ReplaceTokensInText(fileContents, context);
+
+                        fileCreationInfo.Content = Encoding.UTF8.GetBytes(fileContents);
+                    }
+                }
+            }
+
+            return fileCreationInfo;
+        }
         private string GetFileUrl(string uploadTargetFolder, string pathToFileFromRootFolder,
             IEnumerable<ShFileProperties> filePropertiesCollection)
         {
-            pathToFileFromRootFolder = pathToFileFromRootFolder.Replace("\\", "/");
             var fileUrl = Url.Combine(uploadTargetFolder, pathToFileFromRootFolder);
 
             if (filePropertiesCollection != null)
@@ -227,7 +253,7 @@ namespace Sherpa.Library.SiteHierarchy
                     var filePropertiesWithTokensReplaced = new Dictionary<string, string>();
                     foreach (KeyValuePair<string, string> keyValuePair in fileProperties.Properties)
                     {
-                        filePropertiesWithTokensReplaced.Add(keyValuePair.Key, GetPropertyValueWithTokensReplaced(keyValuePair.Value, context));
+                        filePropertiesWithTokensReplaced.Add(keyValuePair.Key, ReplaceTokensInText(keyValuePair.Value, context));
                     }
                     uploadFile.SetFileProperties(filePropertiesWithTokensReplaced);
 
@@ -238,7 +264,7 @@ namespace Sherpa.Library.SiteHierarchy
             }
         }
 
-        public static string GetPropertyValueWithTokensReplaced(string valueWithTokens, ClientContext context)
+        public static string ReplaceTokensInText(string valueWithTokens, ClientContext context)
         {
             //Check if we have the context info we need, in which case we don't want to ExecuteQuery
             if(context.Site == null || context.Web == null)
@@ -254,10 +280,12 @@ namespace Sherpa.Library.SiteHierarchy
             return valueWithTokens
                 .Replace("~SiteCollection", siteCollectionUrl)
                 .Replace("~sitecollection", siteCollectionUrl)
+                .Replace("{sitecollection}", siteCollectionUrl)
                 .Replace("&#126;SiteCollection", siteCollectionUrl)
                 .Replace("&#126;sitecollection", siteCollectionUrl)
                 .Replace("~Site", webUrl)
                 .Replace("~site", webUrl)
+                .Replace("{site}", webUrl)
                 .Replace("&#126;Site", webUrl)
                 .Replace("&#126;site", webUrl)
                 .Replace("$Resources:core,Culture;", new CultureInfo((int)context.Web.Language).Name)
@@ -294,7 +322,7 @@ namespace Sherpa.Library.SiteHierarchy
                     }
 
                     //Token replacement in the webpart XML
-                    webPartFileContent = GetPropertyValueWithTokensReplaced(webPartFileContent, context);
+                    webPartFileContent = ReplaceTokensInText(webPartFileContent, context);
 
                     //Overriding DataProviderJSON properties if specified. Need to use different approach (Update XML directly before import)
                     if (webPart.PropertiesOverrides.Count > 0 || webPart.DataProviderJSONOverrides.Count > 0)
@@ -317,12 +345,12 @@ namespace Sherpa.Library.SiteHierarchy
             foreach (KeyValuePair<string, string> propertyOverride in webPart.PropertiesOverrides)
             {
                 //Token replacement in the PropertiesOverrides JSON array
-                var propOverrideValue = GetPropertyValueWithTokensReplaced(propertyOverride.Value, context);
+                var propOverrideValue = ReplaceTokensInText(propertyOverride.Value, context);
                 SetPropertyValueInXmlDocument(doc, propertyOverride.Key, propOverrideValue);
             }
             foreach (KeyValuePair<string, string> keyValuePair in webPart.DataProviderJSONOverrides)
             {
-                var propOverrideValue = GetPropertyValueWithTokensReplaced(keyValuePair.Value, context);
+                var propOverrideValue = ReplaceTokensInText(keyValuePair.Value, context);
                 SetPropertyValueInXmlDocument(doc, "DataProviderJSON", propOverrideValue, keyValuePair.Key);
             }
 

@@ -59,10 +59,6 @@ namespace Sherpa.Library.CustomTasks
                     Log.ErrorFormat("Could not find loaded task with name {0}", taskConfig.FullName);
                 }
             }
-            foreach (var web in rootWeb.Webs)
-            {
-                ExecuteTasks(web, context);
-            }
         }
     }
 }
