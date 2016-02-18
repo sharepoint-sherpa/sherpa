@@ -42,6 +42,33 @@ namespace Sherpa.Library.SiteHierarchy
             SetupContentTypesOfList(context, setupList, listConfig);
             SetupPermissionSchemeOfList(context, setupList, listConfig);
             SetupViewsOfList(context, setupList, listConfig);
+            SetupEventReceiversOfList(context, setupList, listConfig);
+        }
+
+        private void SetupEventReceiversOfList(ClientContext context, List setupList, ShList listConfig)
+        {
+            if (listConfig.AddMetadataDefaultsReceiver) {
+                var metadataDefaultsEventReceiver = new EventReceiverDefinitionCreationInformation
+                {
+                    ReceiverName = "LocationBasedMetadataDefaultsReceiver ItemAdded",
+                    EventType = EventReceiverType.ItemAdded,
+                    Synchronization = EventReceiverSynchronization.Synchronous,
+                    ReceiverAssembly = "Microsoft.Office.DocumentManagement, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c",
+                    ReceiverClass = "Microsoft.Office.DocumentManagement.LocationBasedMetadataDefaultsReceiver",
+                    SequenceNumber = 1000
+                };
+
+                if (setupList.GetEventReceiverByName(metadataDefaultsEventReceiver.ReceiverName) == null)
+                {
+                    Log.DebugFormat("Adding Metadata Event Receiver to list {0}", listConfig.Title);
+                    setupList.EventReceivers.Add(metadataDefaultsEventReceiver);
+                } else
+                {
+                    Log.DebugFormat("Metadata Event Receiver already added to list {0}", listConfig.Title);
+                }
+                setupList.Update();
+                context.ExecuteQuery();
+            }
         }
 
         private void SetupFieldsOfList(ClientContext context, List setupList, ShList listConfig)

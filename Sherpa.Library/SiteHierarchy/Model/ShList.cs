@@ -17,6 +17,7 @@ namespace Sherpa.Library.SiteHierarchy.Model
         public bool RemoveExisitingContentTypes { get; set; }
         public List<string> Fields { get; set; }
         public ShPermissionScheme PermissionScheme { get; set; }
+        public bool AddMetadataDefaultsReceiver { get; set; }
 
         public ShList()
         {
