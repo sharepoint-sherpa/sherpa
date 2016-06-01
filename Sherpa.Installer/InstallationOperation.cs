@@ -16,6 +16,7 @@
         Invalid,
         ExitApplication,
         ExecuteCustomTasks,
-        FileWatchUploader
+        FileWatchUploader,
+        ExportData
     }
 }

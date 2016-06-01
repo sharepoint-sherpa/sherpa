@@ -13,7 +13,7 @@ namespace Sherpa.Library.SiteHierarchy.Model
         public int Language { get; set; }
         public List<ShWeb> Webs { get; set; }
         public List<ShFeature> WebFeatures { get; set; }
-        public List<ShTask> CustomTaskTypes { get; set; }
+        public List<ShCustomTask> CustomTaskTypes { get; set; }
         public List<ShList> Lists { get; set; }
         public List<ShContentFolder> ContentFolders { get; set; }
         public ShComposedLook ComposedLook { get; set; }
@@ -25,7 +25,7 @@ namespace Sherpa.Library.SiteHierarchy.Model
         {
             Webs = new List<ShWeb>();
             WebFeatures = new List<ShFeature>();
-            CustomTaskTypes = new List<ShTask>();
+            CustomTaskTypes = new List<ShCustomTask>();
             Lists = new List<ShList>();
             Quicklaunch = new Dictionary<string, string>();
             Properties = new Dictionary<string, string>();

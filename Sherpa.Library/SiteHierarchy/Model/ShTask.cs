@@ -1,6 +1,6 @@
 ﻿namespace Sherpa.Library.SiteHierarchy.Model
 {
-    public class ShTask
+    public class ShCustomTask
     {
         public string FullName { set; get; }
         public string DisplayName { set; get; }

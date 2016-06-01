@@ -23,6 +23,7 @@ namespace Sherpa.Library.SiteHierarchy
         private PermissionManager PermissionManager { get; set; }
         private ComposedLookManager ComposedLookManager { get; set; }
         private FileListenerAndUploader FileListenerAndUploader { get; set; }
+        private ExportTaskManager ExportTaskManager { get; set; }
         private bool IncrementalUpload { get; set; }
         private string ContentConfigurationPath { get; set; }
         public SiteSetupManager(ClientContext clientContext, ShSiteCollection configurationSiteCollection, string rootConfigurationPath, bool incrementalUpload)
@@ -39,6 +40,7 @@ namespace Sherpa.Library.SiteHierarchy
             PermissionManager = new PermissionManager();
             ComposedLookManager = new ComposedLookManager();
             FileListenerAndUploader = new FileListenerAndUploader();
+            ExportTaskManager = new ExportTaskManager();
 
             ContentConfigurationPath = Path.Combine(rootConfigurationPath, "content");
             ContentUploadManager = new ContentUploadManager(ContentConfigurationPath);
@@ -50,6 +52,11 @@ namespace Sherpa.Library.SiteHierarchy
             PermissionManager.SetUpCustomPermissionLevels(ClientContext, ConfigurationSiteCollection.PermissionLevels);
             FeatureManager.ActivateSiteCollectionFeatures(ClientContext, ConfigurationSiteCollection.SiteFeatures);
             EnsureAndConfigureWebAndActivateFeatures(ClientContext, null, ConfigurationSiteCollection.RootWeb);
+        }
+
+        public void ExportListData(string outputDirectory)
+        {
+            ExportTaskManager.ExportData(ClientContext, null, ConfigurationSiteCollection.RootWeb, outputDirectory);
         }
 
         /// <summary>

@@ -252,6 +252,13 @@ namespace Sherpa.Installer
                         ExportTaxonomyGroup();
                         break;
                     }
+                    case InstallationOperation.ExportData:
+                    {
+                        var outputDirectoryPath = Path.Combine(_rootPath, "export");
+                        Directory.CreateDirectory(outputDirectoryPath);
+                        siteSetupManagerFromConfig.ExportListData(outputDirectoryPath);
+                        break;
+                    }
                     case InstallationOperation.ForceRecrawl:
                     {
                         ForceReCrawl();
@@ -520,6 +527,10 @@ namespace Sherpa.Installer
                 case 9:
                 {
                     return InstallationOperation.DeleteFieldsAndContentTypes;
+                }
+                case 69:
+                {
+                    return InstallationOperation.ExportData;
                 }
                 case 1337:
                 {

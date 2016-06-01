@@ -18,6 +18,7 @@ namespace Sherpa.Library.SiteHierarchy.Model
         public List<string> Fields { get; set; }
         public ShPermissionScheme PermissionScheme { get; set; }
         public bool AddMetadataDefaultsReceiver { get; set; }
+        public bool ExportData { get; set; }
 
         public ShList()
         {

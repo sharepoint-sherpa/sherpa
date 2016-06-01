@@ -4,7 +4,6 @@ using System.Linq;
 using System.Reflection;
 using log4net;
 using Microsoft.SharePoint.Client;
-using Sherpa.Library.ContentTypes.Model;
 using Sherpa.Library.SiteHierarchy.Model;
 
 namespace Sherpa.Library.SiteHierarchy
@@ -44,6 +43,8 @@ namespace Sherpa.Library.SiteHierarchy
             SetupViewsOfList(context, setupList, listConfig);
             SetupEventReceiversOfList(context, setupList, listConfig);
         }
+
+
 
         private void SetupEventReceiversOfList(ClientContext context, List setupList, ShList listConfig)
         {
