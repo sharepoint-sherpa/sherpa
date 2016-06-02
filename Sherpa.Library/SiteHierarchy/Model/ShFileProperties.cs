@@ -9,6 +9,7 @@ namespace Sherpa.Library.SiteHierarchy.Model
         public string Url { get; set; }
         public bool ReplaceWebParts { get; set; }
         public bool ReplaceTokensInTextFile { get; set; }
+        public bool ReplaceContent { get; set; }
 
         /* Published, Draft, CheckOut (not supported) */
         public FileLevel Level { get; set; }
@@ -20,6 +21,7 @@ namespace Sherpa.Library.SiteHierarchy.Model
             Properties = new Dictionary<string, string>();
             WebParts = new List<ShWebPartReference>();
             Level = FileLevel.Published;
+            ReplaceContent = true;
         }
     }
 }

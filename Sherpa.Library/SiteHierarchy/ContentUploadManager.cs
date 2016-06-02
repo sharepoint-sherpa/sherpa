@@ -177,31 +177,43 @@ namespace Sherpa.Library.SiteHierarchy
                 Log.DebugFormat("Skipping file upload of {0} since it's used as a configuration file", fileName);
                 return;
             }
+
+            ShFileProperties fileProperties = null;
+            if (filePropertiesCollection != null)
+            {
+                fileProperties = filePropertiesCollection.SingleOrDefault(f => f.Path == pathToFileFromRootFolder);
+            }
+
             Log.DebugFormat("Uploading file {0} to {1}", fileName, contentFolder.ListUrl);
-            var fileUrl = GetFileUrl(uploadTargetFolder, pathToFileFromRootFolder, filePropertiesCollection);
+            var fileUrl = GetFileUrl(uploadTargetFolder, pathToFileFromRootFolder, fileProperties);
             web.CheckOutFile(fileUrl);
 
-            var newFile = GetFileCreationInformation(context, fileUrl, filePath, pathToFileFromRootFolder, filePropertiesCollection);
-            File uploadFile = rootFolder.Files.Add(newFile);
+            if (fileProperties == null || fileProperties.ReplaceContent)
+            {
+                var newFile = GetFileCreationInformation(context, fileUrl, filePath, pathToFileFromRootFolder, fileProperties);
 
-            context.Load(uploadFile);
-            context.ExecuteQuery();
+                File uploadFile = rootFolder.Files.Add(newFile);
 
+                context.Load(uploadFile);
+                context.ExecuteQuery();
+
+            }
             var reloadedFile = web.GetFileByServerRelativeUrl(fileUrl);
             context.Load(reloadedFile);
             context.ExecuteQuery();
 
-            ApplyFileProperties(context, filePropertiesCollection, reloadedFile);
+
+            ApplyFileProperties(context, fileProperties, reloadedFile);
 
             try {
-                uploadFile.PublishFileToLevel(FileLevel.Published);
+                reloadedFile.PublishFileToLevel(FileLevel.Published);
             } catch
             {
                 Log.Warn("Couldn't publish file " + fileUrl);
             }
         }
 
-        private FileCreationInformation GetFileCreationInformation(ClientContext context, string fileUrl, string filePath, string pathToFileFromRootFolder, IEnumerable<ShFileProperties> filePropertiesCollection)
+        private FileCreationInformation GetFileCreationInformation(ClientContext context, string fileUrl, string filePath, string pathToFileFromRootFolder, ShFileProperties fileProperties)
         {
             var fileCreationInfo = new FileCreationInformation
             {
@@ -210,57 +222,46 @@ namespace Sherpa.Library.SiteHierarchy
                 Content = System.IO.File.ReadAllBytes(filePath),
             };
             
-            if (filePropertiesCollection != null)
+            if (fileProperties != null)
             {
-                var fileProperties = filePropertiesCollection.SingleOrDefault(f => f.Path == pathToFileFromRootFolder);
-                if (fileProperties != null)
+                if (fileProperties.ReplaceTokensInTextFile)
                 {
-                    if (fileProperties.ReplaceTokensInTextFile)
-                    {
-                        var fileContents = System.IO.File.ReadAllText(filePath);
-                        fileContents = ReplaceTokensInText(fileContents, context);
+                    var fileContents = System.IO.File.ReadAllText(filePath);
+                    fileContents = ReplaceTokensInText(fileContents, context);
 
-                        fileCreationInfo.Content = Encoding.UTF8.GetBytes(fileContents);
-                    }
+                    fileCreationInfo.Content = Encoding.UTF8.GetBytes(fileContents);
                 }
             }
+            
 
             return fileCreationInfo;
         }
-        private string GetFileUrl(string uploadTargetFolder, string pathToFileFromRootFolder,
-            IEnumerable<ShFileProperties> filePropertiesCollection)
+        private string GetFileUrl(string uploadTargetFolder, string pathToFileFromRootFolder, ShFileProperties fileProperties)
         {
             var fileUrl = Url.Combine(uploadTargetFolder, pathToFileFromRootFolder);
-
-            if (filePropertiesCollection != null)
+            
+            if (fileProperties != null)
             {
-                var fileProperties = filePropertiesCollection.SingleOrDefault(f => f.Path == pathToFileFromRootFolder);
-                if (fileProperties != null)
-                {
-                    fileUrl = Url.Combine(uploadTargetFolder, fileProperties.Url);
-                }
+                fileUrl = Url.Combine(uploadTargetFolder, fileProperties.Url);
             }
+            
             return fileUrl;
         }
 
-        private void ApplyFileProperties(ClientContext context, IEnumerable<ShFileProperties> filePropertiesCollection, File uploadFile)
+        private void ApplyFileProperties(ClientContext context, ShFileProperties fileProperties, File uploadFile)
         {
-            if (filePropertiesCollection != null)
+            if (fileProperties != null)
             {
-                var fileProperties = filePropertiesCollection.SingleOrDefault(f => f.Url == uploadFile.Name);
-                if (fileProperties != null)
+                var filePropertiesWithTokensReplaced = new Dictionary<string, string>();
+                foreach (KeyValuePair<string, string> keyValuePair in fileProperties.Properties)
                 {
-                    var filePropertiesWithTokensReplaced = new Dictionary<string, string>();
-                    foreach (KeyValuePair<string, string> keyValuePair in fileProperties.Properties)
-                    {
-                        filePropertiesWithTokensReplaced.Add(keyValuePair.Key, ReplaceTokensInText(keyValuePair.Value, context));
-                    }
-                    uploadFile.SetFileProperties(filePropertiesWithTokensReplaced);
-
-                    if (uploadFile.Name.ToLower().EndsWith(".aspx")) 
-                        AddWebParts(context, uploadFile, fileProperties.WebParts, fileProperties.ReplaceWebParts);
-                    context.ExecuteQuery();
+                    filePropertiesWithTokensReplaced.Add(keyValuePair.Key, ReplaceTokensInText(keyValuePair.Value, context));
                 }
+                uploadFile.SetFileProperties(filePropertiesWithTokensReplaced);
+
+                if (uploadFile.Name.ToLower().EndsWith(".aspx")) 
+                    AddWebParts(context, uploadFile, fileProperties.WebParts, fileProperties.ReplaceWebParts);
+                context.ExecuteQuery();
             }
         }
 
