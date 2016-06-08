@@ -52,7 +52,42 @@ namespace Sherpa.Library.ContentTypes
                 else
                 {
                     //Updating existing field
-                    UpdateExistingField(field, existingField);
+                    if (field.Type.StartsWith("TaxonomyFieldType"))
+                    {
+                        UpdateTaxonomyField(field, existingField);
+                    }
+                    else {
+                        UpdateExistingField(field, existingField);
+                    }
+                }
+            }
+        }
+
+        private void UpdateTaxonomyField(ShField configField, Field existingField)
+        {
+            var fieldUpdated = false;
+            var existingTaxField = existingField as TaxonomyField;
+            if (existingTaxField != null)
+            {
+                if (!configField.TermSetId.Equals(existingTaxField.TermSetId))
+                {
+                    existingTaxField.TermSetId = configField.TermSetId;
+                    fieldUpdated = true;
+                }
+                if (configField.DisplayName != existingTaxField.Title)
+                {
+                    existingTaxField.Title = configField.DisplayName;
+                    fieldUpdated = true;
+                }
+                if (configField.Group != existingTaxField.Group)
+                {
+                    existingTaxField.Group = configField.Group;
+                    fieldUpdated = true;
+                }
+                if (fieldUpdated)
+                {
+                    existingTaxField.UpdateAndPushChanges(true);
+                    ClientContext.ExecuteQuery();
                 }
             }
         }
