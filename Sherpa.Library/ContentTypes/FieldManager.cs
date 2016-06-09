@@ -51,6 +51,7 @@ namespace Sherpa.Library.ContentTypes
                 }
                 else
                 {
+                    Log.DebugFormat("Field '{0}' exists, checking for changes to field", field.DisplayName);
                     //Updating existing field
                     if (field.Type.StartsWith("TaxonomyFieldType"))
                     {
@@ -65,30 +66,48 @@ namespace Sherpa.Library.ContentTypes
 
         private void UpdateTaxonomyField(ShField configField, Field existingField)
         {
-            var fieldUpdated = false;
-            var existingTaxField = existingField as TaxonomyField;
-            if (existingTaxField != null)
+            try
             {
-                if (!configField.TermSetId.Equals(existingTaxField.TermSetId))
+                var existingTaxField = ClientContext.CastTo<TaxonomyField>(existingField);
+                if (existingTaxField != null)
                 {
-                    existingTaxField.TermSetId = configField.TermSetId;
-                    fieldUpdated = true;
-                }
-                if (configField.DisplayName != existingTaxField.Title)
-                {
-                    existingTaxField.Title = configField.DisplayName;
-                    fieldUpdated = true;
-                }
-                if (configField.Group != existingTaxField.Group)
-                {
-                    existingTaxField.Group = configField.Group;
-                    fieldUpdated = true;
-                }
-                if (fieldUpdated)
-                {
-                    existingTaxField.UpdateAndPushChanges(true);
+                    ClientContext.Load(existingTaxField, i => i.TermSetId, i => i.Title, i => i.Group, i => i.Hidden);
                     ClientContext.ExecuteQuery();
+
+                    var fieldUpdated = false;
+                    if (!configField.TermSetId.Equals(existingTaxField.TermSetId))
+                    {
+                        existingTaxField.TermSetId = configField.TermSetId;
+                        fieldUpdated = true;
+                    }
+                    if (configField.Hidden != existingField.Hidden)
+                    {
+                        existingField.Hidden = configField.Hidden;
+                        fieldUpdated = true;
+                    }
+                    if (configField.DisplayName != existingTaxField.Title)
+                    {
+                        existingTaxField.Title = configField.DisplayName;
+                        fieldUpdated = true;
+                    }
+                    if (configField.Group != existingTaxField.Group)
+                    {
+                        existingTaxField.Group = configField.Group;
+                        fieldUpdated = true;
+                    }
+                    if (fieldUpdated)
+                    {
+                        Log.DebugFormat("Updating taxonomy field '{0}' with changes", configField.DisplayName);
+                        existingTaxField.UpdateAndPushChanges(true);
+                        ClientContext.ExecuteQueryRetry();
+                    }
+                } else
+                {
+                    Log.ErrorFormat("Could not cast field '{0}' to TaxonomyField", configField.DisplayName);
                 }
+            } catch
+            {
+                Log.ErrorFormat("Could not cast field '{0}' to TaxonomyField");
             }
         }
 
@@ -99,6 +118,9 @@ namespace Sherpa.Library.ContentTypes
         /// <param name="existingField"></param>
         private void UpdateExistingField(ShField configField, Field existingField)
         {
+            ClientContext.Load(existingField, i => i.DefaultValue, i => i.Title, i => i.Group, i => i.Hidden);
+            ClientContext.ExecuteQuery();
+
             var fieldUpdated = false;
             if (configField.Hidden != existingField.Hidden)
             {
@@ -122,8 +144,9 @@ namespace Sherpa.Library.ContentTypes
             }
             if (fieldUpdated)
             {
+                Log.DebugFormat("Updating field {0} with changes", configField.DisplayName);
                 existingField.UpdateAndPushChanges(true);
-                ClientContext.ExecuteQuery();
+                ClientContext.ExecuteQueryRetry();
             }
         }
 
