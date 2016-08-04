@@ -17,6 +17,7 @@
         ExitApplication,
         ExecuteCustomTasks,
         FileWatchUploader,
-        ExportData
+        ExportData,
+        ImportData
     }
 }

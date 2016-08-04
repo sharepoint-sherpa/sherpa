@@ -44,7 +44,7 @@ namespace Sherpa.Library.SiteHierarchy
                     
                     context.ExecuteQuery();
 
-                    var listDataRows = new List<ShTaskListItemData>();
+                    var listDataRows = new List<ShTaskListDataItem>();
 
                     foreach (var item in items)
                     {
@@ -56,7 +56,7 @@ namespace Sherpa.Library.SiteHierarchy
                             var parentId = parentIdValue != null ? parentIdValue.LookupId : 0;
                             var order = item["Order"];
 
-                            var taskItem = new ShTaskListItemData(int.Parse(item["ID"].ToString()), parentId);
+                            var taskItem = new ShTaskListDataItem(int.Parse(item["ID"].ToString()), parentId);
                             taskItem.Order = double.Parse(order.ToString());
                             taskItem.Fields.Add(new ShFieldValue("Title", item["Title"].ToString()));
                             if (phaseValue != null) taskItem.Fields.Add(new ShFieldValue("GtProjectPhase", string.Format("{0}|{1}", phaseValue.Label, phaseValue.TermGuid)));
@@ -65,7 +65,7 @@ namespace Sherpa.Library.SiteHierarchy
                         }
                         else
                         {
-                            var taskItem = new ShTaskListItemData(int.Parse(item["ID"].ToString()));
+                            var taskItem = new ShTaskListDataItem(int.Parse(item["ID"].ToString()));
                             taskItem.Fields.Add(new ShFieldValue("Title", item["Title"].ToString()));
 
                             var phaseValue = item["GtProjectPhase"] as TaxonomyFieldValue;
@@ -80,13 +80,13 @@ namespace Sherpa.Library.SiteHierarchy
                     {
                         listDataRows.Single(i => i.ID == item.ParentID).Rows.Add(item);
                     }
-                    var itemsToPersist = new List<IShListDataItem>();
+                    var itemsToPersist = new List<ShTaskListDataItem>();
                     foreach (var item in listDataRows)
                     {
                         if (item.ParentID == 0) itemsToPersist.Add(item);
                     }
 
-                    var listData = new ShListData();
+                    var listData = new ShTaskListData();
                     listData.Data.Rows = itemsToPersist;
                     listData.Name = list.Title;
                     listData.Type = list.BaseType.ToString();

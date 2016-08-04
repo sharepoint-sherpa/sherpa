@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace Sherpa.Library.SiteHierarchy.Model
 {
-    public class ShTaskListItemData : ShListDataItem
+    public class ShTaskListDataItem : ShListDataItem
     {
         [JsonIgnore]
         public int ParentID { get; set; }
@@ -11,18 +11,21 @@ namespace Sherpa.Library.SiteHierarchy.Model
         [JsonIgnore]
         public double Order { get; set; }
         [JsonProperty(Order = 1)]
-        public List<ShTaskListItemData> Rows;
-        public ShTaskListItemData(int id) : base(id)
+        public List<ShTaskListDataItem> Rows;
+        public ShTaskListDataItem() : base(0)
         {
-            Fields = new List<ShFieldValue>();
-            Rows = new List<ShTaskListItemData>();
+            Rows = new List<ShTaskListDataItem>();
             ParentID = 0;
         }
-        public ShTaskListItemData(int id, int parentId) : base(id)
+        public ShTaskListDataItem(int id) : base(id)
+        {
+            Rows = new List<ShTaskListDataItem>();
+            ParentID = 0;
+        }
+        public ShTaskListDataItem(int id, int parentId) : base(id)
         {
             ParentID = parentId;
-            Fields = new List<ShFieldValue>();
-            Rows = new List<ShTaskListItemData>();
+            Rows = new List<ShTaskListDataItem>();
         }
         public bool ShouldSerializeRows()
         {

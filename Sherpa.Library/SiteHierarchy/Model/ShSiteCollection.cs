@@ -15,6 +15,7 @@ namespace Sherpa.Library.SiteHierarchy.Model
         public string[] ContentTypeConfigurations { get; set; }
         public string[] TaxonomyConfigurations { get; set; }
         public string[] SearchConfigurations { get; set; }
+        public string[] ImportDataConfigurations { get; set; }
 
         public ShSiteCollection()
         {

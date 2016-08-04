@@ -40,6 +40,10 @@ namespace Sherpa.Installer
         {
             get { return Path.Combine(_rootPath, "search"); }
         }
+        private string ImportDataDirectoryPath
+        {
+            get { return Path.Combine(_rootPath, "importdata"); }
+        }
 
         public InstallationManager(Uri urlToSite, ICredentials credentials, bool isSharePointOnline, string rootPath, bool incrementalUpload)
         {
@@ -259,6 +263,15 @@ namespace Sherpa.Installer
                         siteSetupManagerFromConfig.ExportListData(outputDirectoryPath);
                         break;
                     }
+                    case InstallationOperation.ImportData:
+                        {
+                            foreach (var fileName in siteSetupManagerFromConfig.ConfigurationSiteCollection.ImportDataConfigurations)
+                            {
+                                var filePath = FindFileInDirectory(ImportDataDirectoryPath, fileName);
+                                ImportDataFromFile(context, filePath);
+                            }
+                            break;
+                        }
                     case InstallationOperation.ForceRecrawl:
                     {
                         ForceReCrawl();
@@ -279,6 +292,23 @@ namespace Sherpa.Installer
             Log.Debug("Completed installation operation");
         }
 
+        private void ImportDataFromFile(ClientContext context, string filePath)
+        {
+            Log.Debug("Starting ImportDataFromFile");
+            var listDataProvider = new FilePersistanceProvider<ShListData>(filePath);
+            var listData = listDataProvider.Load();
+
+            var importDataManager = new ImportDataManager(context);
+            if (listData.Type == "TaskList")
+            {
+                var taskListData = new FilePersistanceProvider<ShTaskListData>(filePath);
+                importDataManager.ImportTaskListData(taskListData.Load());
+            }
+            else {
+                importDataManager.ImportListData(listData);
+            }
+        }
+
         private void UploadAllChangedFiles(ClientContext context)
         {
             Log.Debug("Starting UploadAllChangedFiles");
@@ -290,7 +320,6 @@ namespace Sherpa.Installer
 
                 siteManager.StartFileWatching();
             }
-
         }
 
         private void InstallAllTaxonomy(ClientContext context)
@@ -522,9 +551,13 @@ namespace Sherpa.Installer
                 }
                 case 8:
                 {
+                    return InstallationOperation.ImportData;
+                }
+                case 20:
+                {
                     return InstallationOperation.DeleteSites;
                 }
-                case 9:
+                case 21:
                 {
                     return InstallationOperation.DeleteFieldsAndContentTypes;
                 }

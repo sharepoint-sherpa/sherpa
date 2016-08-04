@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace Sherpa.Library.SiteHierarchy.Model
 {
-    public class ShListData
+    public class ShListData : IShListData
     {
         public string Name { get; set; }
         public string Type { get; set; }
@@ -18,12 +14,12 @@ namespace Sherpa.Library.SiteHierarchy.Model
         }
     }
 
-    public class ShListDataRoot
+    public class ShListDataRoot : IShListDataRoot
     {
-        public List<IShListDataItem> Rows { get; set; }
+        public List<ShListDataItem> Rows { get; set; }
         public ShListDataRoot()
         {
-            Rows = new List<IShListDataItem>();
+            Rows = new List<ShListDataItem>();
         }
     }
 }

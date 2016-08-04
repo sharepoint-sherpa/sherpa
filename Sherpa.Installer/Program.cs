@@ -107,8 +107,9 @@ namespace Sherpa.Installer
             Console.WriteLine("Press 5 to import search configurations");
             Console.WriteLine("Press 6 to export taxonomy group");
             Console.WriteLine("Press 7 to execute custom tasks");
-            Console.WriteLine("Press 8 to DELETE all sites (except root site)");
-            Console.WriteLine("Press 9 to DELETE all custom site columns and content types");
+            Console.WriteLine("Press 8 to import list data");
+            Console.WriteLine("Press 20 to DELETE all sites (except root site)");
+            Console.WriteLine("Press 21 to DELETE all custom site columns and content types");
             Console.WriteLine("Press 666 to start developer mode: Continuous file upload");
             Console.WriteLine("Press 0 to exit application");
             Console.ForegroundColor = ConsoleColor.Yellow;
