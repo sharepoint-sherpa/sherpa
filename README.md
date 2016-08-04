@@ -7,7 +7,7 @@ Today, Sherpa is still being the tool used to install Prosjektportalen, but we p
 
 If you are using Sherpa for any of your projects, we encourage you to switch to Office PnP. If you have questions about this update, Office PnP or the future of Sherpa, feel free to shoot me, Tarjei Ormestøyl, an e-mail at [<a href="mailto:tarjeieo@puzzlepart.com">tarjeieo@puzzlepart.com</a>].
 
-It was a fun ride with a lot of learning experiences, but it's great to see Sherpa be replaced by a better solution. As programmers, there is not many thing better than deleting or retiring code and software.
+It was a fun ride with a lot of learning experiences, but it's great to see Sherpa be replaced by a better solution. As programmers, there are not many things better than deleting or retiring old code and software.
 
 # What is Sherpa
 * Sherpa is a library and a command-line tool create for easy deployment of customizations and sandboxed solutions On-premises and to SharePoint Online (Office 365)
