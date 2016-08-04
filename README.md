@@ -1,13 +1,13 @@
 ﻿Sherpa
 =================
 # Update 04.08.2016: The non-existing future of Sherpa
-For more or less all practical purposes, Sherpa has been replaced by the Microsoft-driven community initiative OfficePnP and the [Office PnP Provisioning Schema](https://github.com/OfficeDev/PnP-Provisioning-Schema), which can be installed using [Office PnP PowerShell](https://github.com/OfficeDev/PnP-PowerShell). There are many benefits of following this initiative insstead of Sherpa, for one it has a large number of contributors which a one shop/one man initiative is unable to compete with (and it doesn't make sense to try). Being Microsoft backed, it also has the benefit of quickly adjusting to new technology from Microsoft for Office 365 and SharePoint. Puzzlepart has been using Office PnP to create customizations for Office 365 and SharePoint since mid 2015, and it's become a solid platform which we also support.
+For more or less all practical purposes, Sherpa has been replaced by the Microsoft-driven community initiative OfficePnP and the [Office PnP Provisioning Schema](https://github.com/OfficeDev/PnP-Provisioning-Schema), which can be installed using [Office PnP PowerShell](https://github.com/OfficeDev/PnP-PowerShell). There are many benefits of following this initiative, for one it has a large number of contributors which a one shop/one man initiative is unable to compete with (and it doesn't make sense to try). Being Microsoft backed, it also has the benefit of quickly adjusting to new technology from Microsoft for Office 365 and SharePoint. Puzzlepart has been using Office PnP to create customizations for Office 365 and SharePoint since mid 2015, and it's become a solid platform which we wholeheartedly support.
 
-Currently Sherpa is still being used to install Prosjektportalen, but we plan to port the installation of Prosjektportalen to OfficePnP Provisioning Schema when time and resources allow.
+Today, Sherpa is still being the tool used to install Prosjektportalen, but we plan to port the installation of Prosjektportalen to OfficePnP Provisioning Schema when time and resources allow.
 
-If you are using Sherpa for any of your projects, we encourage you to switch to Office PnP. If you have questions about this update, Office PnP or the future of Sherpa, feel free to shoot Tarjei Ormestøyl [<a href="mailto:tarjeieo@puzzlepart.com">tarjeieo@puzzlepart.com</a>] an e-mail.
+If you are using Sherpa for any of your projects, we encourage you to switch to Office PnP. If you have questions about this update, Office PnP or the future of Sherpa, feel free to shoot me, Tarjei Ormestøyl, an e-mail at [<a href="mailto:tarjeieo@puzzlepart.com">tarjeieo@puzzlepart.com</a>].
 
-It was a fun ride with a lot of learning experiences, but this too must come to an end.
+It was a fun ride with a lot of learning experiences, but it's great to see Sherpa be replaced by a better solution. As programmers, there is not many thing better than deleting or retiring code and software.
 
 # What is Sherpa
 * Sherpa is a library and a command-line tool create for easy deployment of customizations and sandboxed solutions On-premises and to SharePoint Online (Office 365)
