@@ -68,8 +68,8 @@ namespace Sherpa.Library.SiteHierarchy
         {
             var webToConfigure = EnsureWeb(context, parentWeb, configWeb);
 
-            FeatureManager.ActivateWebFeatures(context, webToConfigure, configWeb.WebFeatures);
             ListManager.CreateLists(context, webToConfigure, configWeb.Lists);
+            FeatureManager.ActivateWebFeatures(context, webToConfigure, configWeb.WebFeatures);
             QuicklaunchManager.CreateQuicklaunchNodes(context, webToConfigure, configWeb.Quicklaunch);
             PropertyManager.SetProperties(context, webToConfigure, configWeb.Properties);
             ContentUploadManager.UploadFilesInFolder(context, webToConfigure, configWeb.ContentFolders, IncrementalUpload);
