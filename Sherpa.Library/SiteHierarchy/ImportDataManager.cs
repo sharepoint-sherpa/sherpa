@@ -4,16 +4,25 @@ using Microsoft.SharePoint.Client;
 using log4net;
 using System.Reflection;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace Sherpa.Library.SiteHierarchy
 {
     public class ImportDataManager
     {
+        private static bool AvoidThrottling;
+        private static int ThrottlingTreshold;
         private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private ClientContext Context { get; set; }
-        public ImportDataManager(ClientContext context)
+        public ImportDataManager(ClientContext context, int throttlingTreshhold = 0)
         {
             Context = context;
+
+            if (throttlingTreshhold > 0)
+            {
+                AvoidThrottling = true;
+                ThrottlingTreshold = throttlingTreshhold;
+            }
         }
         public void ImportListData(ShListData listData)
         {
@@ -32,6 +41,11 @@ namespace Sherpa.Library.SiteHierarchy
 
         public void ImportRow(List list, List<ShListDataItem> dataRows)
         {
+            if (AvoidThrottling)
+            {
+                Thread.Sleep(ThrottlingTreshold);
+            }
+
             foreach (var item in dataRows)
             {
                 if (item.Fields.Count > 0)
@@ -65,6 +79,11 @@ namespace Sherpa.Library.SiteHierarchy
         }
         public void ImportTaskRow(List list, List<ShTaskListDataItem> dataRows, ListItem parentItem = null)
         {
+            if (AvoidThrottling)
+            {
+                Thread.Sleep(ThrottlingTreshold);
+            }
+
             foreach (var item in dataRows)
             {
                 if (item.Fields.Count > 0)
@@ -83,7 +102,7 @@ namespace Sherpa.Library.SiteHierarchy
                     newItem.Update();
                     Context.Load(newItem);
                     Context.ExecuteQuery();
-
+                    
                     if (item.Rows.Count > 0)
                     {
                         ImportTaskRow(list, item.Rows, newItem);

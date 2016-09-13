@@ -75,17 +75,20 @@ namespace Sherpa.Installer
         [Option("path", HelpText = "Path to directory where the config and solutions folders are present. Not specifying will use application directory")]
         public string RootPath { get; set; }
 
-        [Option("op", HelpText = "For unmanaged execution, specify the operation you want to execute by referencing the operation's ID. 1 is taxonomy, 2 is sandbox solution upload and so forth.")]
+        [Option("op", HelpText = "For unattended execution, specify the operation you want to execute by referencing the operation's ID. 1 is taxonomy, 2 is sandbox solution upload and so forth.")]
         public string Operations { get; set; }
 
-        [Option("conf", HelpText = "For unmanaged execution, specify the file name of the main site hierarchy configuration file. The file must reside in the config folder.")]
+        [Option("conf", HelpText = "Specify the file name of the main site hierarchy configuration file. The file must reside in the config folder.")]
         public string SiteHierarchy { get; set; }
 
         [Option('v', "verbose", HelpText = "Write everything to console")]
         public bool Verbose { get; set; }
         
-        [Option("inc", HelpText = "Specify if you want to use the incremental upload feature (i.e. only upload changed files)")]
+        [Option("inc", HelpText = "Use if you want to use the incremental upload feature (i.e. only upload changed files)")]
         public bool IncrementalUpload { get; set; }
+
+        [Option("throttling", HelpText = "Use if you want to avoid being throttled (in case of behind TMG, proxy or similar)")]
+        public bool AvoidThrottling { get; set; }
 
         [HelpOption]
         public string GetUsage()

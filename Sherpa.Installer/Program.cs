@@ -14,7 +14,7 @@ namespace Sherpa.Installer
         public static InstallationManager InstallationManager { get; set; }
         private static Options ProgramOptions { get; set; }
         private static Uri UrlToSite { get; set; }
-        private static bool Unmanaged { get; set; }
+        private static bool UnattendedInstall { get; set; }
 
         static int Main(string[] args)
         {
@@ -26,13 +26,13 @@ namespace Sherpa.Installer
             {
                 ProgramOptions = OptionsParser.ParseArguments(args);
                 UrlToSite = new Uri(ProgramOptions.UrlToSite);
-                Unmanaged = !string.IsNullOrEmpty(ProgramOptions.Operations);
-                Log.Debug(string.Format("Sherpa started with the following options - URL: {0}, userName: {1}, configPath: {2}, spo: {3}, unmanaged: {4}", 
+                UnattendedInstall = !string.IsNullOrEmpty(ProgramOptions.Operations);
+                Log.Debug(string.Format("Sherpa started with the following options - URL: {0}, userName: {1}, configPath: {2}, spo: {3}, unattended: {4}", 
                     ProgramOptions.UrlToSite,
                     ProgramOptions.UserName,
                     ProgramOptions.RootPath,
                     ProgramOptions.SharePointOnline,
-                    Unmanaged
+                    UnattendedInstall
                 ));
             }
             catch (Exception)
@@ -40,7 +40,7 @@ namespace Sherpa.Installer
                 Log.Fatal("Invalid parameters, application cannot continue");
                 Environment.Exit(1);
             }
-            if (!Unmanaged)
+            if (!UnattendedInstall)
             {
                 PrintLogo();
             }
@@ -65,7 +65,7 @@ namespace Sherpa.Installer
             {
                 Log.Fatal("An exception occured: " + exception.Message);
                 Log.Debug(exception.StackTrace);
-                if (Unmanaged) return 1;
+                if (UnattendedInstall) return 1;
                 RunApplication();
             }
             return 0;
@@ -73,9 +73,9 @@ namespace Sherpa.Installer
 
         private static void RunApplication()
         {
-            InstallationManager = new InstallationManager(UrlToSite, Credentials, ProgramOptions.SharePointOnline, ProgramOptions.RootPath, ProgramOptions.IncrementalUpload);
+            InstallationManager = new InstallationManager(UrlToSite, Credentials, ProgramOptions.SharePointOnline, ProgramOptions.RootPath, ProgramOptions.IncrementalUpload, ProgramOptions.AvoidThrottling);
 
-            if (!Unmanaged) ShowStartScreenAndExecuteCommand();
+            if (!UnattendedInstall) ShowStartScreenAndExecuteCommand();
             else
             {
                 var operation = InstallationManager.GetInstallationOperationFromInput(ProgramOptions.Operations);

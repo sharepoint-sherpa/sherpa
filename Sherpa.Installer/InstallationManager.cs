@@ -27,6 +27,8 @@ namespace Sherpa.Installer
         private readonly bool _isSharePointOnline;
         private readonly bool _incrementalUpload;
         private readonly string _rootPath;
+        private readonly bool _avoidThrottling;
+        private readonly int throttlingTreshold = 2000;
 
         private string ConfigurationDirectoryPath
         {
@@ -45,7 +47,7 @@ namespace Sherpa.Installer
             get { return Path.Combine(_rootPath, "importdata"); }
         }
 
-        public InstallationManager(Uri urlToSite, ICredentials credentials, bool isSharePointOnline, string rootPath, bool incrementalUpload)
+        public InstallationManager(Uri urlToSite, ICredentials credentials, bool isSharePointOnline, string rootPath, bool incrementalUpload, bool avoidThrottling = false)
         {
             _urlToSite = urlToSite;
             _credentials = credentials;
@@ -298,7 +300,7 @@ namespace Sherpa.Installer
             var listDataProvider = new FilePersistanceProvider<ShListData>(filePath);
             var listData = listDataProvider.Load();
 
-            var importDataManager = new ImportDataManager(context);
+            var importDataManager = new ImportDataManager(context, _avoidThrottling ? throttlingTreshold : 0);
             if (listData.Type == "TaskList")
             {
                 var taskListData = new FilePersistanceProvider<ShTaskListData>(filePath);
