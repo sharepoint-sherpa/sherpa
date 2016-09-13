@@ -38,14 +38,14 @@ namespace Sherpa.Library.ContentTypes
                     item => item.Id.ToString().Equals(contentType.ID.ToString(CultureInfo.InvariantCulture)));
                 if (existingContentType != null)
                 {
-                    if (existingContentType.Group != contentType.Group)
+                    if (existingContentType.Group != contentType.Group && !string.IsNullOrEmpty(contentType.Group))
                     {
                         Log.Debug("Updating group of content type " + contentType.DisplayName);
                         existingContentType.Group = contentType.Group;
                         existingContentType.Update(true);
                         ClientContext.ExecuteQuery();
                     }
-                    if (existingContentType.Name != contentType.DisplayName)
+                    if (existingContentType.Name != contentType.DisplayName && !string.IsNullOrEmpty(contentType.DisplayName))
                     {
                         Log.Debug("Updating display name of content type " + contentType.DisplayName);
                         existingContentType.Name = contentType.DisplayName;
