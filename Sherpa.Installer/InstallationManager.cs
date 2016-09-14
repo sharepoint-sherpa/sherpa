@@ -54,8 +54,9 @@ namespace Sherpa.Installer
             _isSharePointOnline = isSharePointOnline;
             _rootPath = rootPath ?? Environment.CurrentDirectory;
             _incrementalUpload = incrementalUpload;
-            Log.Debug("Installation manager created");
-            Log.DebugFormat("Site Url: {0}, Configpath: {1}, SPO: {2}", _urlToSite.AbsoluteUri, _rootPath, _isSharePointOnline);
+            _avoidThrottling = avoidThrottling;
+            
+            Log.DebugFormat("Installation manager initialized with the following configuration. Site Url: {0}, Configpath: {1}, SPO: {2}, Incremental: {3}, AvoidThrottling: {4}", _urlToSite.AbsoluteUri, _rootPath, _isSharePointOnline, _incrementalUpload, _avoidThrottling);
         }
 
         private static string FindFileInDirectory(string rootDirectory, string searchPattern)

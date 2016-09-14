@@ -27,13 +27,14 @@ namespace Sherpa.Installer
                 ProgramOptions = OptionsParser.ParseArguments(args);
                 UrlToSite = new Uri(ProgramOptions.UrlToSite);
                 UnattendedInstall = !string.IsNullOrEmpty(ProgramOptions.Operations);
-                Log.Debug(string.Format("Sherpa started with the following options - URL: {0}, userName: {1}, configPath: {2}, spo: {3}, unattended: {4}", 
+                Log.DebugFormat("Sherpa started with the following options - URL: {0}, userName: {1}, configPath: {2}, spo: {3}, unattended: {4}, avoidthrottling: {5}", 
                     ProgramOptions.UrlToSite,
                     ProgramOptions.UserName,
                     ProgramOptions.RootPath,
                     ProgramOptions.SharePointOnline,
-                    UnattendedInstall
-                ));
+                    UnattendedInstall,
+                    ProgramOptions.AvoidThrottling
+                );
             }
             catch (Exception)
             {
@@ -114,12 +115,8 @@ namespace Sherpa.Installer
             Console.WriteLine("Press 0 to exit application");
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.Write("Select a number to perform an operation: ");
-            Console.BackgroundColor = ConsoleColor.White;
-            Console.ForegroundColor = ConsoleColor.Black;
-            var input = Console.ReadLine();
-            Console.BackgroundColor = ConsoleColor.Black;
-            Console.ForegroundColor = ConsoleColor.White;
             Console.ResetColor();
+            var input = Console.ReadLine();
             HandleCommandKeyPress(input);
         }
 
